@@ -2,6 +2,7 @@
 
 import { X, Volume2 } from 'lucide-react';
 import type { Player } from '../../data/players';
+import { stationUniversalQuestions } from '../../data/players';
 import PlayerAvatar from './PlayerAvatar';
 import { stationConfig } from '../../components/StationIcon';
 
@@ -23,8 +24,6 @@ const groupColors = {
 
 export default function PlayerModal({ player, station, onClose, onStationChange, largeText = false }: PlayerModalProps) {
   const activeStation = station || 'field';
-
-  const activeQuestions = player.questions.find((q) => q.station === activeStation);
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
@@ -104,7 +103,6 @@ export default function PlayerModal({ player, station, onClose, onStationChange,
               {stationOrder.map((stationKey) => {
                 const config = stationConfig[stationKey];
                 const isActive = activeStation === stationKey;
-                const displayName = stationKey === 'packRip' ? 'PACK RIP' : stationKey.toUpperCase();
 
                 return (
                   <button
@@ -117,7 +115,7 @@ export default function PlayerModal({ player, station, onClose, onStationChange,
                     }`}
                   >
                     <span>{config.icon}</span>
-                    {displayName}
+                    {config.label}
                   </button>
                 );
               })}
@@ -126,25 +124,28 @@ export default function PlayerModal({ player, station, onClose, onStationChange,
 
           {/* Questions */}
           <div className={`p-6 ${largeText ? 'py-8' : ''}`}>
-            <h3 className={`font-semibold text-gray-500 tracking-wide mb-4 ${largeText ? 'text-sm' : 'text-xs'}`}>
-              INTERVIEW QUESTIONS
-            </h3>
-            {activeQuestions && (
-              <ul className={`space-y-${largeText ? '6' : '4'}`}>
-                {activeQuestions.questions.map((question, index) => {
-                  return (
-                    <li key={index} className="flex items-start gap-4">
-                      <span
-                        className={`${largeText ? 'w-10 h-10 text-lg' : 'w-8 h-8 text-sm'} bg-amber-500 rounded-lg flex items-center justify-center font-bold text-black flex-shrink-0`}
-                      >
-                        {index + 1}
-                      </span>
-                      <span className={`text-gray-100 leading-relaxed ${largeText ? 'text-xl' : 'text-lg'}`}>{question}</span>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
+            <div className="mb-4">
+              <h3 className={`font-bold ${stationConfig[activeStation as keyof typeof stationConfig].textColor} ${largeText ? 'text-base' : 'text-sm'}`}>
+                {stationUniversalQuestions[activeStation as keyof typeof stationUniversalQuestions].title}
+              </h3>
+              <p className="text-xs text-gray-500">
+                {stationUniversalQuestions[activeStation as keyof typeof stationUniversalQuestions].subtitle}
+              </p>
+            </div>
+            <ul className={largeText ? 'space-y-6' : 'space-y-4'}>
+              {stationUniversalQuestions[activeStation as keyof typeof stationUniversalQuestions].questions.map((question, index) => {
+                return (
+                  <li key={index} className="flex items-start gap-4">
+                    <span
+                      className={`${largeText ? 'w-10 h-10 text-lg' : 'w-8 h-8 text-sm'} bg-amber-500 rounded-lg flex items-center justify-center font-bold text-black flex-shrink-0`}
+                    >
+                      {index + 1}
+                    </span>
+                    <span className={`text-gray-100 leading-relaxed ${largeText ? 'text-xl' : 'text-lg'}`}>{question}</span>
+                  </li>
+                );
+              })}
+            </ul>
           </div>
 
           {/* Footer tip */}
