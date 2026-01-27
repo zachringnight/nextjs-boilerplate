@@ -150,7 +150,7 @@ export const players: Player[] = [
       {
         station: 'packRip',
         questions: [
-          'First time you held a card with your face on it . What was that moment like?',
+          'When you finally hold a card with your face on it, what do you think that moment will feel like?',
           'If Panini captured one defensive masterclass moment, what should it be?',
           'Call your shot: what are you hoping to pull?',
           'Card of the pack + give it a nickname',
@@ -353,7 +353,7 @@ export const players: Player[] = [
       {
         station: 'packRip',
         questions: [
-          'First time seeing yourself on a trading card. Walk us through that feeling.',
+          'When you see yourself on a Panini trading card for the first time, what do you think that will feel like?',
           'Dream card design: bold and loud, clean and classic, or something wild?',
           'Call your shot: what are you hoping to pull?',
           'Card of the pack + give it a nickname',
@@ -691,7 +691,7 @@ export const players: Player[] = [
       {
         station: 'packRip',
         questions: [
-          'First time you saw your name on a checklist or card . What was that like?',
+          'When you see your name on a Panini checklist for the first time, what will that moment mean to you?',
           'If you could pick your card photo, what moment would it capture?',
           'Call your shot: what are you hoping to pull?',
           'Card of the pack + give it a nickname',
@@ -816,26 +816,26 @@ export const stationUniversalQuestions = {
     title: 'PANINI PRODUCT + PARTNERSHIP',
     subtitle: 'Cards + Category Growth + Sticker Album',
     questions: [
-      'What does it mean to be officially in Panini products as an NWSL athlete?',
-      'When you saw your Panini card for the first time, what was your reaction?',
+      'What does it mean to be part of the first official Panini x NWSL partnership?',
+      'When fans finally get to hold your Panini card, what do you hope they feel?',
       'What do you want fans to notice first when they see your card?',
       'If you could choose the photo on your card, what moment would you pick?',
-      'What detail on your card feels most personal to you?',
-      'What moment from your game translates best to a card and why?',
-      'What makes it special that Panini is telling NWSL stories through product?',
+      'What detail would you want on your card that feels personal to you?',
+      'What moment from your game would translate best to a card and why?',
+      'What makes it special that Panini is now telling NWSL stories through product?',
       'What does this partnership do for the league and for players in a real way?',
       'Why is this a big moment for women\'s soccer collecting?',
-      'What would you want a serious collector to understand about the NWSL from your card alone?',
+      'What would you want a serious collector to understand about the NWSL from your card?',
       'What\'s one thing about this league that deserves more spotlight in product storytelling?',
-      'If a new fan finds the NWSL through Panini, what do you hope they discover?',
+      'If a new fan discovers the NWSL through Panini, what do you hope they find?',
       'Did you grow up doing World Cup sticker albums?',
       'What did you love most about sticker albums: chasing, trading, or completing pages?',
       'What\'s your best sticker album memory?',
       'If you could be a World Cup style sticker, what would your pose be?',
       'What would it mean to be part of Panini\'s World Cup activations representing the NWSL?',
       'What\'s the connection between the World Cup global moment and the NWSL season?',
-      'What does it mean knowing your card could be someone\'s first intro to you?',
-      'End-cap: hold up your card and give one line on why fans should be excited this year.',
+      'What does it mean knowing your card will be someone\'s first intro to you?',
+      'Give us one line on why fans should be excited about this Panini partnership.',
     ],
   },
   vnr: {
