@@ -1,6 +1,7 @@
 {
-  "name": "nextjs",
-  "version": "0.1.0",
+  "name": "nwsl-media-day-crew-app",
+  "version": "1.0.0",
+  "description": "Production crew app for NWSL x Panini Media Day 2026",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
