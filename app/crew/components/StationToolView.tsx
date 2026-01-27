@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { players, rotationSchedule } from '../../data/players';
+import { players, rotationSchedule, stationUniversalQuestions } from '../../data/players';
 import { stationConfig } from '../../components/StationIcon';
 import PlayerAvatar from './PlayerAvatar';
 import { ChevronDown, ChevronUp, Volume2, Clock, Zap } from 'lucide-react';
@@ -256,26 +256,30 @@ function PlayerSlotCard({
 
           {/* Station Questions */}
           <div className="p-4">
-            <h4 className={`text-xs font-semibold ${config.textColor} tracking-wide mb-3 flex items-center gap-2`}>
-              <span className={`w-5 h-5 ${config.bgColor} rounded flex items-center justify-center text-white text-xs`}>
-                {config.icon}
-              </span>
-              {station === 'packRip' ? 'PACK RIP' : station.toUpperCase()} QUESTIONS
-            </h4>
-            {stationQuestions && (
-              <ul className="space-y-4">
-                {stationQuestions.questions.map((question, index) => (
-                  <li key={index} className="flex items-start gap-3">
-                    <span
-                      className="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center text-sm font-bold text-black flex-shrink-0"
-                    >
-                      {index + 1}
-                    </span>
-                    <span className="text-gray-100 leading-relaxed text-lg">{question}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
+            {/* Station Title & Subtitle */}
+            <div className="mb-4">
+              <h4 className={`text-sm font-bold ${config.textColor} flex items-center gap-2`}>
+                <span className={`w-6 h-6 ${config.bgColor} rounded flex items-center justify-center text-white text-xs`}>
+                  {config.icon}
+                </span>
+                {stationUniversalQuestions[station].title}
+              </h4>
+              <p className="text-xs text-gray-500 ml-8">{stationUniversalQuestions[station].subtitle}</p>
+            </div>
+
+            {/* Universal Questions */}
+            <ul className="space-y-4">
+              {stationUniversalQuestions[station].questions.map((question, index) => (
+                <li key={index} className="flex items-start gap-3">
+                  <span
+                    className="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center text-sm font-bold text-black flex-shrink-0"
+                  >
+                    {index + 1}
+                  </span>
+                  <span className="text-gray-100 leading-relaxed text-lg">{question}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       )}
