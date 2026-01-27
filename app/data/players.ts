@@ -810,18 +810,7 @@ export const stationUniversalQuestions = {
   field: {
     title: 'FIELD - Hero Rollout',
     subtitle: 'On-camera prompts (not Q&A)',
-    questions: [
-      'Give a clean "Panini x NWSL" line with your name and team.',
-      'Deliver a one-line hype message to collectors.',
-      'Deliver a one-line hype message to young players watching.',
-      'Give us a "World Cup sticker album energy" line.',
-      'Give us a "trading cards turn moments into memories" line.',
-      'Give us a "women\'s soccer is growing, collecting is growing with it" line.',
-      'Hit your signature celebration once, then hold for 2 seconds.',
-      'Give us a strong card-photo pose: confident, eyes to camera, small smile.',
-      'Give us an action beat: quick turn, point, clap, then reset.',
-      'Close with: "Collectors, thank you. Let\'s grow this together."',
-    ],
+    questions: [],
   },
   social: {
     title: 'PANINI PRODUCT + PARTNERSHIP',
