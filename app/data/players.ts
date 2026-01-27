@@ -775,10 +775,10 @@ export const rotationSchedule = {
     time: '9:00 AM - 10:20 AM',
     players: ['Ally Watt', 'Kaleigh Kurtz', 'Manaka Matsukubo'],
     schedule: [
-      { time: '9:00', field: 'Ally', social: 'Kaleigh', vnr: 'Manaka', packRip: '—' },
-      { time: '9:20', field: 'Kaleigh', social: 'Manaka', vnr: '—', packRip: 'Ally' },
-      { time: '9:40', field: 'Manaka', social: '—', vnr: 'Ally', packRip: 'Kaleigh' },
-      { time: '10:00', field: '—', social: 'Ally', vnr: 'Kaleigh', packRip: 'Manaka' },
+      { time: '9:00', field: 'Ally Watt', social: 'Kaleigh Kurtz', vnr: 'Manaka Matsukubo', packRip: 'BREAK' },
+      { time: '9:20', field: 'Kaleigh Kurtz', social: 'Manaka Matsukubo', vnr: 'BREAK', packRip: 'Ally Watt' },
+      { time: '9:40', field: 'Manaka Matsukubo', social: 'BREAK', vnr: 'Ally Watt', packRip: 'Kaleigh Kurtz' },
+      { time: '10:00', field: 'BREAK', social: 'Ally Watt', vnr: 'Kaleigh Kurtz', packRip: 'Manaka Matsukubo' },
     ],
   },
   group2: {
@@ -786,10 +786,10 @@ export const rotationSchedule = {
     time: '10:30 AM - 11:50 AM',
     players: ['Kenza Dali', 'Mia Fishel', 'Mina Tanaka', 'Casey Murphy'],
     schedule: [
-      { time: '10:30', field: 'Kenza', social: 'Mia', vnr: 'Mina', packRip: 'Casey' },
-      { time: '10:50', field: 'Mia', social: 'Mina', vnr: 'Casey', packRip: 'Kenza' },
-      { time: '11:10', field: 'Mina', social: 'Casey', vnr: 'Kenza', packRip: 'Mia' },
-      { time: '11:30', field: 'Casey', social: 'Kenza', vnr: 'Mia', packRip: 'Mina' },
+      { time: '10:30', field: 'Kenza Dali', social: 'Mia Fishel', vnr: 'Mina Tanaka', packRip: 'Casey Murphy' },
+      { time: '10:50', field: 'Mia Fishel', social: 'Mina Tanaka', vnr: 'Casey Murphy', packRip: 'Kenza Dali' },
+      { time: '11:10', field: 'Mina Tanaka', social: 'Casey Murphy', vnr: 'Kenza Dali', packRip: 'Mia Fishel' },
+      { time: '11:30', field: 'Casey Murphy', social: 'Kenza Dali', vnr: 'Mia Fishel', packRip: 'Mina Tanaka' },
     ],
   },
   group3: {
@@ -797,10 +797,10 @@ export const rotationSchedule = {
     time: '1:00 PM - 2:20 PM',
     players: ['Ivonne Chacon', 'Temwa Chawinga', 'Jordyn Bloomer', 'Riley Tiernan'],
     schedule: [
-      { time: '1:00', field: 'Ivonne', social: 'Temwa', vnr: 'Jordyn', packRip: 'Riley' },
-      { time: '1:20', field: 'Temwa', social: 'Jordyn', vnr: 'Riley', packRip: 'Ivonne' },
-      { time: '1:40', field: 'Jordyn', social: 'Riley', vnr: 'Ivonne', packRip: 'Temwa' },
-      { time: '2:00', field: 'Riley', social: 'Ivonne', vnr: 'Temwa', packRip: 'Jordyn' },
+      { time: '1:00', field: 'Ivonne Chacon', social: 'Temwa Chawinga', vnr: 'Jordyn Bloomer', packRip: 'Riley Tiernan' },
+      { time: '1:20', field: 'Temwa Chawinga', social: 'Jordyn Bloomer', vnr: 'Riley Tiernan', packRip: 'Ivonne Chacon' },
+      { time: '1:40', field: 'Jordyn Bloomer', social: 'Riley Tiernan', vnr: 'Ivonne Chacon', packRip: 'Temwa Chawinga' },
+      { time: '2:00', field: 'Riley Tiernan', social: 'Ivonne Chacon', vnr: 'Temwa Chawinga', packRip: 'Jordyn Bloomer' },
     ],
   },
 };
