@@ -1,36 +1,116 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NWSL Media Day 2026 - Crew App
 
-## Getting Started
+Production crew app for the NWSL x Panini Media Day shoot. Built for station leaders, floor managers, and production staff to manage player rotations, access interview questions, and track the shoot in real-time.
 
-First, run the development server:
+## Quick Start
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000/crew](http://localhost:3000/crew) to access the crew app.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Features
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Live Now Dashboard
+- Real-time view of all 4 stations showing who's currently at each
+- Countdown timer for current time slot (flashes red when < 5 minutes)
+- Quick stats showing progress through the day
+- Smart status messages for pre-shoot, lunch break, and wrap
 
-## Learn More
+### Schedule View
+- Full rotation schedule for all 3 groups
+- NOW/NEXT indicators highlight current and upcoming slots
+- Click any player name to view their full profile
+- Jump to Now button scrolls to current time slot
 
-To learn more about Next.js, take a look at the following resources:
+### Station Tool
+- For station leaders to see all players coming to their station
+- Auto-expands current player on load
+- Full player background, talking points, and station-specific questions
+- Expand All / Collapse All for quick reference
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Players
+- Searchable roster of all 11 players
+- Filter by group
+- Full profiles with bio, talking points, and questions by station
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Global Search (⌘K)
+- Works from any view
+- Find players by name, team, or position
+- Shows group and time slot in results
 
-## Deploy on Vercel
+### Large Text Mode
+- Toggle with the Aa button in header
+- Larger questions for reading on set or on-camera
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Adding Player Photos
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Drop headshot images in `/public/players/` with matching filenames:
+- `ally-watt.jpg`
+- `kaleigh-kurtz.jpg`
+- `manaka-matsukubo.jpg`
+- `kenza-dali.jpg`
+- `mia-fishel.jpg`
+- `mina-tanaka.jpg`
+- `casey-murphy.jpg`
+- `ivonne-chacon.jpg`
+- `temwa-chawinga.jpg`
+- `jordyn-bloomer.jpg`
+- `riley-tiernan.jpg`
+
+## Schedule
+
+| Group | Time | Players |
+|-------|------|---------|
+| Group 1 | 9:00 - 10:20 AM | Ally Watt, Kaleigh Kurtz, Manaka Matsukubo |
+| Group 2 | 10:30 - 11:50 AM | Kenza Dali, Mia Fishel, Mina Tanaka, Casey Murphy |
+| Group 3 | 1:00 - 2:20 PM | Ivonne Chacon, Temwa Chawinga, Jordyn Bloomer, Riley Tiernan |
+
+**Stations:** Field, Social, VNR, Pack Rip (20 min each)
+
+## Tech Stack
+
+- Next.js 15 (App Router)
+- React 19
+- TypeScript
+- Tailwind CSS v4
+- Lucide React icons
+
+## Deployment
+
+```bash
+npm run build
+npm start
+```
+
+Or deploy to Vercel:
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
+
+## Project Structure
+
+```
+app/
+├── crew/                    # Crew app
+│   ├── page.tsx            # Main crew page with navigation
+│   └── components/
+│       ├── NowDashboard.tsx    # Live station overview
+│       ├── ScheduleView.tsx    # Rotation schedule
+│       ├── StationToolView.tsx # Station leader tool
+│       ├── PlayerCard.tsx      # Player card in grid
+│       ├── PlayerModal.tsx     # Full player profile modal
+│       └── PlayerAvatar.tsx    # Player avatar with fallback
+├── data/
+│   └── players.ts          # Player data and schedule
+└── components/
+    └── StationIcon.tsx     # Station icons and config
+```
+
+## Event Details
+
+- **Date:** January 28, 2026
+- **Location:** MG Studio, Los Angeles
+- **Client:** Panini America
+- **League:** NWSL
