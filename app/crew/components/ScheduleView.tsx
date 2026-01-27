@@ -4,6 +4,17 @@ import { useState, useEffect } from 'react';
 import { stationConfig } from '../../components/StationIcon';
 import { Clock, Zap } from 'lucide-react';
 
+// Get current time in PST
+function getPSTTime(date: Date): { hours: number; minutes: number; seconds: number } {
+  const pstString = date.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });
+  const pstDate = new Date(pstString);
+  return {
+    hours: pstDate.getHours(),
+    minutes: pstDate.getMinutes(),
+    seconds: pstDate.getSeconds(),
+  };
+}
+
 interface ScheduleGroup {
   name: string;
   time: string;
@@ -46,27 +57,28 @@ const groupStyles = {
 
 const timeSlots = {
   group1: [
-    { slot: 1, time: '9:00 - 9:20', startHour: 9, startMin: 0, endHour: 9, endMin: 20 },
-    { slot: 2, time: '9:20 - 9:40', startHour: 9, startMin: 20, endHour: 9, endMin: 40 },
-    { slot: 3, time: '9:40 - 10:00', startHour: 9, startMin: 40, endHour: 10, endMin: 0 },
-    { slot: 4, time: '10:00 - 10:20', startHour: 10, startMin: 0, endHour: 10, endMin: 20 },
+    { slot: 1, time: '9:00 to 9:20', startHour: 9, startMin: 0, endHour: 9, endMin: 20 },
+    { slot: 2, time: '9:20 to 9:40', startHour: 9, startMin: 20, endHour: 9, endMin: 40 },
+    { slot: 3, time: '9:40 to 10:00', startHour: 9, startMin: 40, endHour: 10, endMin: 0 },
+    { slot: 4, time: '10:00 to 10:20', startHour: 10, startMin: 0, endHour: 10, endMin: 20 },
   ],
   group2: [
-    { slot: 1, time: '10:30 - 10:50', startHour: 10, startMin: 30, endHour: 10, endMin: 50 },
-    { slot: 2, time: '10:50 - 11:10', startHour: 10, startMin: 50, endHour: 11, endMin: 10 },
-    { slot: 3, time: '11:10 - 11:30', startHour: 11, startMin: 10, endHour: 11, endMin: 30 },
-    { slot: 4, time: '11:30 - 11:50', startHour: 11, startMin: 30, endHour: 11, endMin: 50 },
+    { slot: 1, time: '10:30 to 10:50', startHour: 10, startMin: 30, endHour: 10, endMin: 50 },
+    { slot: 2, time: '10:50 to 11:10', startHour: 10, startMin: 50, endHour: 11, endMin: 10 },
+    { slot: 3, time: '11:10 to 11:30', startHour: 11, startMin: 10, endHour: 11, endMin: 30 },
+    { slot: 4, time: '11:30 to 11:50', startHour: 11, startMin: 30, endHour: 11, endMin: 50 },
   ],
   group3: [
-    { slot: 1, time: '1:00 - 1:20', startHour: 13, startMin: 0, endHour: 13, endMin: 20 },
-    { slot: 2, time: '1:20 - 1:40', startHour: 13, startMin: 20, endHour: 13, endMin: 40 },
-    { slot: 3, time: '1:40 - 2:00', startHour: 13, startMin: 40, endHour: 14, endMin: 0 },
-    { slot: 4, time: '2:00 - 2:20', startHour: 14, startMin: 0, endHour: 14, endMin: 20 },
+    { slot: 1, time: '1:00 to 1:20', startHour: 13, startMin: 0, endHour: 13, endMin: 20 },
+    { slot: 2, time: '1:20 to 1:40', startHour: 13, startMin: 20, endHour: 13, endMin: 40 },
+    { slot: 3, time: '1:40 to 2:00', startHour: 13, startMin: 40, endHour: 14, endMin: 0 },
+    { slot: 4, time: '2:00 to 2:20', startHour: 14, startMin: 0, endHour: 14, endMin: 20 },
   ],
 };
 
 function isCurrentSlot(slot: { startHour: number; startMin: number; endHour: number; endMin: number }, currentTime: Date): boolean {
-  const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
+  const pst = getPSTTime(currentTime);
+  const currentMinutes = pst.hours * 60 + pst.minutes;
   const slotStart = slot.startHour * 60 + slot.startMin;
   const slotEnd = slot.endHour * 60 + slot.endMin;
   return currentMinutes >= slotStart && currentMinutes < slotEnd;
@@ -94,7 +106,7 @@ function GroupSchedule({
   const styles = groupStyles[groupNumber];
 
   const renderCell = (name: string) => {
-    if (name === '—' || name === 'BREAK') {
+    if (name === '-' || name === 'BREAK') {
       return (
         <span className="text-gray-600 text-sm italic">BREAK</span>
       );
@@ -234,6 +246,7 @@ export default function ScheduleView({ schedule, onPlayerClick }: ScheduleViewPr
     hour: 'numeric',
     minute: '2-digit',
     hour12: true,
+    timeZone: 'America/Los_Angeles',
   });
 
   // Determine which group/slot is current
