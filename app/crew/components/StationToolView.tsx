@@ -269,30 +269,59 @@ function PlayerSlotCard({
 
           {/* Station Questions */}
           <div className="p-4">
-            {/* Station Title & Subtitle */}
-            <div className="mb-4">
-              <h4 className={`text-sm font-bold ${config.textColor} flex items-center gap-2`}>
-                <span className={`w-6 h-6 ${config.bgColor} rounded flex items-center justify-center text-white text-xs`}>
-                  {config.icon}
-                </span>
-                {stationUniversalQuestions[station].title}
-              </h4>
-              <p className="text-xs text-gray-500 ml-8">{stationUniversalQuestions[station].subtitle}</p>
-            </div>
+            {/* Player-Specific Questions */}
+            {stationQuestions && stationQuestions.questions.length > 0 && (
+              <div className="mb-6">
+                <div className="mb-4">
+                  <h4 className={`text-sm font-bold ${config.textColor} flex items-center gap-2`}>
+                    <span className={`w-6 h-6 ${config.bgColor} rounded flex items-center justify-center text-white text-xs`}>
+                      {config.icon}
+                    </span>
+                    QUESTIONS FOR {player.firstName.toUpperCase()}
+                  </h4>
+                  <p className="text-xs text-gray-500 ml-8">Player specific prompts</p>
+                </div>
+                <ul className="space-y-4">
+                  {stationQuestions.questions.map((question, index) => (
+                    <li key={index} className="flex items-start gap-3">
+                      <span
+                        className={`w-8 h-8 ${config.bgColor} rounded-lg flex items-center justify-center text-sm font-bold text-white flex-shrink-0`}
+                      >
+                        {index + 1}
+                      </span>
+                      <span className="text-gray-100 leading-relaxed text-lg">{question}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             {/* Universal Questions */}
-            <ul className="space-y-4">
-              {stationUniversalQuestions[station].questions.map((question, index) => (
-                <li key={index} className="flex items-start gap-3">
-                  <span
-                    className="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center text-sm font-bold text-black flex-shrink-0"
-                  >
-                    {index + 1}
-                  </span>
-                  <span className="text-gray-100 leading-relaxed text-lg">{question}</span>
-                </li>
-              ))}
-            </ul>
+            {stationUniversalQuestions[station].questions.length > 0 && (
+              <div>
+                <div className="mb-4">
+                  <h4 className="text-sm font-bold text-gray-400 flex items-center gap-2">
+                    <span className="w-6 h-6 bg-gray-600 rounded flex items-center justify-center text-white text-xs">
+                      📋
+                    </span>
+                    UNIVERSAL QUESTIONS
+                  </h4>
+                  <p className="text-xs text-gray-500 ml-8">{stationUniversalQuestions[station].subtitle}</p>
+                </div>
+                <ul className="space-y-4">
+                  {stationUniversalQuestions[station].questions.map((question, index) => (
+                    <li key={index} className="flex items-start gap-3">
+                      <span
+                        className="w-8 h-8 bg-gray-600 rounded-lg flex items-center justify-center text-sm font-bold text-white flex-shrink-0"
+                      >
+                        {index + 1}
+                      </span>
+                      <span className="text-gray-300 leading-relaxed text-lg">{question}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         </div>
       )}
