@@ -1,103 +1,266 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+import Navigation from './components/Navigation';
+import TitleSlide from './components/slides/TitleSlide';
+import OverviewSlide from './components/slides/OverviewSlide';
+import StationSlide from './components/slides/StationSlide';
+import ClosingSlide from './components/slides/ClosingSlide';
+import RotationSlide from './components/slides/RotationSlide';
+import PlayerDividerSlide from './components/slides/PlayerDividerSlide';
+import PlayerQuestionsSlide from './components/slides/PlayerQuestionsSlide';
+import GenericBanksSlide from './components/slides/GenericBanksSlide';
+import { players } from './data/players';
+
+const stationData = [
+  {
+    stationNumber: 1,
+    station: 'field' as const,
+    title: 'FIELD',
+    subtitle: 'Hero Video + Rollout Content',
+    description: 'Lead asset for partnership announcement. This is where we capture the marquee footage that anchors the entire campaign — cinematic, high-energy, unmistakably NWSL.',
+    uses: [
+      'Hero video for partnership launch',
+      'Social cutdowns (15s, 30s, 60s)',
+      'Launch week campaign assets',
+      'Seasonal content bank for in-game moments',
+    ],
+    capture: [
+      'Hero walk-in with dramatic lighting',
+      'Dynamic action beats (ball work, movement)',
+      'Signature celebration recreations',
+      'Detail shots: boots, ball, crest, hands',
+      'Modular end-caps for flexible editing',
+    ],
+    tips: [
+      'Let athletes bring their energy — don\'t over-direct',
+      'Capture both wide and tight simultaneously',
+      'Get at least 3 clean takes per setup',
+    ],
+  },
+  {
+    stationNumber: 2,
+    station: 'packRip' as const,
+    title: 'PACK RIPS',
+    subtitle: 'Cards + Category Growth',
+    description: 'Real reactions, real collecting energy. This station bridges hobby culture with athlete authenticity — the content that makes collectors feel connected.',
+    uses: [
+      'Product launch day content',
+      'Hobby growth storytelling',
+      'Release-day drops + evergreen edits',
+      'Sticker album nostalgia bridge',
+      'Retail activation support',
+    ],
+    capture: [
+      'Rip reactions (wide + tight angles)',
+      'Pull-by-pull commentary',
+      'Favorite card hold-up with reaction',
+      'Quick collector message to fans',
+      'Teammate card reactions',
+    ],
+    tips: [
+      'Let them talk through every card — no silent flips',
+      'Capture genuine surprise, not staged reactions',
+      'End with "message to collectors" soundbite',
+    ],
+  },
+  {
+    stationNumber: 3,
+    station: 'social' as const,
+    title: 'SOCIAL',
+    subtitle: 'Partnership + Seasonal Toolkit',
+    description: 'Fast, scalable content for the full season. Vertical-first, quotable, and designed to flood timelines when the moment calls for it.',
+    uses: [
+      'Partnership storytelling posts',
+      'Collecting culture positioning',
+      'Tentpole moment coverage',
+      'In-season quick-hit content',
+      'Reactive soundbite library',
+    ],
+    capture: [
+      'Vertical-first clips (9:16)',
+      'One horizontal backup option',
+      'Tight, quotable 10-15s answers',
+      'Reactive soundbite bank for any moment',
+      'Personal stories + childhood memories',
+    ],
+    soundbites: [
+      "We're just getting started.",
+      "This league is different.",
+      "Big year. Big energy.",
+    ],
+  },
+  {
+    stationNumber: 4,
+    station: 'vnr' as const,
+    title: 'VNR',
+    subtitle: 'Broadcast Soundbites + B-Roll',
+    description: 'Press-ready assets for any media package. Clean, professional, ready to drop into any broadcast feature or news segment.',
+    uses: [
+      'Broadcast feature packages',
+      'Media kit distribution',
+      'League narrative content',
+      'Partner delivery assets',
+      'Documentary-style storytelling',
+    ],
+    capture: [
+      'Clean soundbites on black/neutral backdrop',
+      'B-roll: movement, ball work, detail shots',
+      'Walk-ins with confident energy',
+      'Thoughtful answers to legacy questions',
+    ],
+    tips: [
+      'Keep backgrounds clean and distraction-free',
+      'Capture both formal and casual tones',
+      'Get backup takes for key soundbites',
+    ],
+  },
+  {
+    stationNumber: 5,
+    station: 'signing' as const,
+    title: 'SIGNING',
+    subtitle: 'Behind-the-Scenes + Authenticity',
+    description: 'Collector trust content. This is proof it\'s real — the footage that makes premium products feel premium and connects fans to the actual moment.',
+    uses: [
+      'Behind-the-scenes hobby content',
+      'Authenticity storytelling',
+      'Premium product marketing',
+      'Autograph certification support',
+      'Collector community engagement',
+    ],
+    capture: [
+      'Signing footage: wide setup + tight detail',
+      'Pen-to-card close-ups',
+      'End-cap holding finished signed card',
+      'Casual athlete chat while signing',
+      'Stack of completed cards beauty shot',
+    ],
+    tips: [
+      'Capture the full signing motion, not just the result',
+      'Get natural athlete commentary during signing',
+      'Wide shot should show the professional setup',
+    ],
+  },
+];
+
+// Build slide labels for navigation
+const slideLabels = [
+  'Title',
+  'Overview',
+  'Station 1: Field',
+  'Station 2: Pack Rips',
+  'Station 3: Social',
+  'Station 4: VNR',
+  'Station 5: Signing',
+  'Closing',
+  'Rotation Schedule',
+  ...players.flatMap((player) => [
+    `${player.name}`,
+    `${player.name} — Questions`,
+  ]),
+  'Generic Banks',
+];
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const totalSlides = slideLabels.length;
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+  const handleNavigate = useCallback((slide: number) => {
+    setCurrentSlide(slide);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't navigate if user is typing in an input
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+        e.preventDefault();
+        setCurrentSlide((prev) => Math.min(totalSlides - 1, prev + 1));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        setCurrentSlide((prev) => Math.max(0, prev - 1));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        setCurrentSlide(0);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        setCurrentSlide(totalSlides - 1);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [totalSlides]);
+
+  const renderSlide = () => {
+    // Slide 0: Title
+    if (currentSlide === 0) {
+      return <TitleSlide />;
+    }
+    // Slide 1: Overview
+    if (currentSlide === 1) {
+      return <OverviewSlide />;
+    }
+    // Slides 2-6: Stations
+    if (currentSlide >= 2 && currentSlide <= 6) {
+      const stationIndex = currentSlide - 2;
+      return <StationSlide {...stationData[stationIndex]} />;
+    }
+    // Slide 7: Closing
+    if (currentSlide === 7) {
+      return <ClosingSlide />;
+    }
+    // Slide 8: Rotation Schedule
+    if (currentSlide === 8) {
+      return <RotationSlide />;
+    }
+    // Slides 9-30: Player Dividers and Questions (11 players x 2 slides each)
+    if (currentSlide >= 9 && currentSlide <= 30) {
+      const playerIndex = Math.floor((currentSlide - 9) / 2);
+      const isQuestionSlide = (currentSlide - 9) % 2 === 1;
+      const player = players[playerIndex];
+
+      if (isQuestionSlide) {
+        return <PlayerQuestionsSlide player={player} />;
+      } else {
+        return (
+          <PlayerDividerSlide
+            playerNumber={player.playerNumber}
+            totalPlayers={11}
+            group={player.group}
+            groupTime={player.groupTime}
+            name={player.name}
+            subtitle={player.subtitle}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+        );
+      }
+    }
+    // Slide 31: Generic Banks
+    if (currentSlide === 31) {
+      return <GenericBanksSlide />;
+    }
+
+    return <TitleSlide />;
+  };
+
+  return (
+    <main className="pb-20">
+      <div className="slide">{renderSlide()}</div>
+      <Navigation
+        currentSlide={currentSlide}
+        totalSlides={totalSlides}
+        onNavigate={handleNavigate}
+        slideLabels={slideLabels}
+      />
+    </main>
   );
 }
