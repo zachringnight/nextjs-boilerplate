@@ -8,6 +8,17 @@ import { ChevronDown, ChevronUp, Volume2, Clock, Zap } from 'lucide-react';
 
 type StationType = 'field' | 'social' | 'vnr' | 'packRip';
 
+// Get current time in PST
+function getPSTTime(date: Date): { hours: number; minutes: number; seconds: number } {
+  const pstString = date.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });
+  const pstDate = new Date(pstString);
+  return {
+    hours: pstDate.getHours(),
+    minutes: pstDate.getMinutes(),
+    seconds: pstDate.getSeconds(),
+  };
+}
+
 interface StationToolViewProps {
   initialStation?: StationType;
   largeText?: boolean;
@@ -26,14 +37,16 @@ interface TimeSlotInfo {
 }
 
 function isCurrentSlot(slot: TimeSlotInfo, currentTime: Date): boolean {
-  const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
+  const pst = getPSTTime(currentTime);
+  const currentMinutes = pst.hours * 60 + pst.minutes;
   const slotStart = slot.startHour * 60 + slot.startMin;
   const slotEnd = slot.endHour * 60 + slot.endMin;
   return currentMinutes >= slotStart && currentMinutes < slotEnd;
 }
 
 function isUpcomingSlot(slot: TimeSlotInfo, currentTime: Date): boolean {
-  const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
+  const pst = getPSTTime(currentTime);
+  const currentMinutes = pst.hours * 60 + pst.minutes;
   const slotStart = slot.startHour * 60 + slot.startMin;
   return slotStart > currentMinutes && slotStart <= currentMinutes + 30;
 }
@@ -307,6 +320,7 @@ export default function StationToolView({ initialStation = 'field', largeText = 
     hour: 'numeric',
     minute: '2-digit',
     hour12: true,
+    timeZone: 'America/Los_Angeles',
   });
 
   const toggleSlot = (slotKey: string) => {

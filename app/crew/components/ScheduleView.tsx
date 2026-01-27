@@ -4,6 +4,17 @@ import { useState, useEffect } from 'react';
 import { stationConfig } from '../../components/StationIcon';
 import { Clock, Zap } from 'lucide-react';
 
+// Get current time in PST
+function getPSTTime(date: Date): { hours: number; minutes: number; seconds: number } {
+  const pstString = date.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });
+  const pstDate = new Date(pstString);
+  return {
+    hours: pstDate.getHours(),
+    minutes: pstDate.getMinutes(),
+    seconds: pstDate.getSeconds(),
+  };
+}
+
 interface ScheduleGroup {
   name: string;
   time: string;
@@ -66,7 +77,8 @@ const timeSlots = {
 };
 
 function isCurrentSlot(slot: { startHour: number; startMin: number; endHour: number; endMin: number }, currentTime: Date): boolean {
-  const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
+  const pst = getPSTTime(currentTime);
+  const currentMinutes = pst.hours * 60 + pst.minutes;
   const slotStart = slot.startHour * 60 + slot.startMin;
   const slotEnd = slot.endHour * 60 + slot.endMin;
   return currentMinutes >= slotStart && currentMinutes < slotEnd;
@@ -234,6 +246,7 @@ export default function ScheduleView({ schedule, onPlayerClick }: ScheduleViewPr
     hour: 'numeric',
     minute: '2-digit',
     hour12: true,
+    timeZone: 'America/Los_Angeles',
   });
 
   // Determine which group/slot is current

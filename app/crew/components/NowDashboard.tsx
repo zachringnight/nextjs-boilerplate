@@ -8,6 +8,17 @@ import { Clock, Zap, ChevronRight, Volume2 } from 'lucide-react';
 
 type StationType = 'field' | 'social' | 'vnr' | 'packRip';
 
+// Get current time in PST
+function getPSTTime(date: Date): { hours: number; minutes: number; seconds: number } {
+  const pstString = date.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });
+  const pstDate = new Date(pstString);
+  return {
+    hours: pstDate.getHours(),
+    minutes: pstDate.getMinutes(),
+    seconds: pstDate.getSeconds(),
+  };
+}
+
 interface TimeSlotData {
   startHour: number;
   startMin: number;
@@ -34,7 +45,8 @@ const allTimeSlots: Array<TimeSlotData & { group: number }> = [
 ];
 
 function getCurrentSlotInfo(currentTime: Date): { slot: TimeSlotData & { group: number }; index: number } | null {
-  const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
+  const pst = getPSTTime(currentTime);
+  const currentMinutes = pst.hours * 60 + pst.minutes;
 
   for (let i = 0; i < allTimeSlots.length; i++) {
     const slot = allTimeSlots[i];
@@ -48,7 +60,8 @@ function getCurrentSlotInfo(currentTime: Date): { slot: TimeSlotData & { group: 
 }
 
 function getTimeRemaining(slot: TimeSlotData, currentTime: Date): { minutes: number; seconds: number } {
-  const now = currentTime.getHours() * 60 * 60 + currentTime.getMinutes() * 60 + currentTime.getSeconds();
+  const pst = getPSTTime(currentTime);
+  const now = pst.hours * 60 * 60 + pst.minutes * 60 + pst.seconds;
   const end = slot.endHour * 60 * 60 + slot.endMin * 60;
   const remaining = Math.max(0, end - now);
   return {
@@ -165,12 +178,14 @@ export default function NowDashboard({ onPlayerClick }: NowDashboardProps) {
     minute: '2-digit',
     second: '2-digit',
     hour12: true,
+    timeZone: 'America/Los_Angeles',
   });
 
   // Not during active hours
   if (!currentSlotInfo) {
-    const currentHour = currentTime.getHours();
-    const currentMin = currentTime.getMinutes();
+    const pst = getPSTTime(currentTime);
+    const currentHour = pst.hours;
+    const currentMin = pst.minutes;
 
     // Before first group
     if (currentHour < 9 || (currentHour === 9 && currentMin < 0)) {
