@@ -36,7 +36,7 @@ export default function GenericBanksSlide() {
         </p>
         <h1 className="text-4xl md:text-5xl font-bold mb-2 tracking-tight">GENERIC BANKS</h1>
         <p className="text-gray-500 max-w-xl">
-          Use anywhere — always approval-safe, hype-only, collecting culture questions.
+          Use anywhere - always approval-safe, hype-only, collecting culture questions.
           Perfect for quick pivots or supplementary content.
         </p>
       </div>

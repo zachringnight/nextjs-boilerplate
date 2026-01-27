@@ -100,16 +100,16 @@ function ScheduleTable({ group, groupNumber }: ScheduleTableProps) {
                   </span>
                 </td>
                 <td className="py-3 px-2 text-gray-300 font-medium">
-                  {row.field === '—' ? <span className="text-gray-600">—</span> : row.field}
+                  {row.field === '-' ? <span className="text-gray-600">-</span> : row.field}
                 </td>
                 <td className="py-3 px-2 text-gray-300 font-medium">
-                  {row.social === '—' ? <span className="text-gray-600">—</span> : row.social}
+                  {row.social === '-' ? <span className="text-gray-600">-</span> : row.social}
                 </td>
                 <td className="py-3 px-2 text-gray-300 font-medium">
-                  {row.vnr === '—' ? <span className="text-gray-600">—</span> : row.vnr}
+                  {row.vnr === '-' ? <span className="text-gray-600">-</span> : row.vnr}
                 </td>
                 <td className="py-3 pl-2 text-gray-300 font-medium">
-                  {row.packRip === '—' ? <span className="text-gray-600">—</span> : row.packRip}
+                  {row.packRip === '-' ? <span className="text-gray-600">-</span> : row.packRip}
                 </td>
               </tr>
             ))}

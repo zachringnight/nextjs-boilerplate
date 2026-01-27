@@ -106,7 +106,7 @@ function GroupSchedule({
   const styles = groupStyles[groupNumber];
 
   const renderCell = (name: string) => {
-    if (name === '—' || name === 'BREAK') {
+    if (name === '-' || name === 'BREAK') {
       return (
         <span className="text-gray-600 text-sm italic">BREAK</span>
       );
