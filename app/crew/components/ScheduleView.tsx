@@ -1,6 +1,8 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { stationConfig } from '../../components/StationIcon';
+import { Clock, Zap } from 'lucide-react';
 
 interface ScheduleGroup {
   name: string;
@@ -44,35 +46,50 @@ const groupStyles = {
 
 const timeSlots = {
   group1: [
-    { slot: 1, time: '9:00 - 9:20' },
-    { slot: 2, time: '9:20 - 9:40' },
-    { slot: 3, time: '9:40 - 10:00' },
-    { slot: 4, time: '10:00 - 10:20' },
+    { slot: 1, time: '9:00 - 9:20', startHour: 9, startMin: 0, endHour: 9, endMin: 20 },
+    { slot: 2, time: '9:20 - 9:40', startHour: 9, startMin: 20, endHour: 9, endMin: 40 },
+    { slot: 3, time: '9:40 - 10:00', startHour: 9, startMin: 40, endHour: 10, endMin: 0 },
+    { slot: 4, time: '10:00 - 10:20', startHour: 10, startMin: 0, endHour: 10, endMin: 20 },
   ],
   group2: [
-    { slot: 1, time: '10:30 - 10:50' },
-    { slot: 2, time: '10:50 - 11:10' },
-    { slot: 3, time: '11:10 - 11:30' },
-    { slot: 4, time: '11:30 - 11:50' },
+    { slot: 1, time: '10:30 - 10:50', startHour: 10, startMin: 30, endHour: 10, endMin: 50 },
+    { slot: 2, time: '10:50 - 11:10', startHour: 10, startMin: 50, endHour: 11, endMin: 10 },
+    { slot: 3, time: '11:10 - 11:30', startHour: 11, startMin: 10, endHour: 11, endMin: 30 },
+    { slot: 4, time: '11:30 - 11:50', startHour: 11, startMin: 30, endHour: 11, endMin: 50 },
   ],
   group3: [
-    { slot: 1, time: '1:00 - 1:20' },
-    { slot: 2, time: '1:20 - 1:40' },
-    { slot: 3, time: '1:40 - 2:00' },
-    { slot: 4, time: '2:00 - 2:20' },
+    { slot: 1, time: '1:00 - 1:20', startHour: 13, startMin: 0, endHour: 13, endMin: 20 },
+    { slot: 2, time: '1:20 - 1:40', startHour: 13, startMin: 20, endHour: 13, endMin: 40 },
+    { slot: 3, time: '1:40 - 2:00', startHour: 13, startMin: 40, endHour: 14, endMin: 0 },
+    { slot: 4, time: '2:00 - 2:20', startHour: 14, startMin: 0, endHour: 14, endMin: 20 },
   ],
 };
+
+function isCurrentSlot(slot: { startHour: number; startMin: number; endHour: number; endMin: number }, currentTime: Date): boolean {
+  const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
+  const slotStart = slot.startHour * 60 + slot.startMin;
+  const slotEnd = slot.endHour * 60 + slot.endMin;
+  return currentMinutes >= slotStart && currentMinutes < slotEnd;
+}
+
+function isUpcomingSlot(slot: { startHour: number; startMin: number }, currentTime: Date): boolean {
+  const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
+  const slotStart = slot.startHour * 60 + slot.startMin;
+  return slotStart > currentMinutes && slotStart <= currentMinutes + 30; // Within next 30 min
+}
 
 function GroupSchedule({
   group,
   groupNumber,
   slots,
   onPlayerClick,
+  currentTime,
 }: {
   group: ScheduleGroup;
   groupNumber: 1 | 2 | 3;
-  slots: { slot: number; time: string }[];
+  slots: { slot: number; time: string; startHour: number; startMin: number; endHour: number; endMin: number }[];
   onPlayerClick: (name: string) => void;
+  currentTime: Date;
 }) {
   const styles = groupStyles[groupNumber];
 
@@ -152,18 +169,49 @@ function GroupSchedule({
             </tr>
           </thead>
           <tbody>
-            {group.schedule.map((row, index) => (
-              <tr key={index} className="border-b border-[#2a2a2a] last:border-0 hover:bg-[#1a1a1a]">
-                <td className="py-3 px-4">
-                  <div className="text-gray-500 text-xs mb-0.5">Slot {slots[index].slot}</div>
-                  <div className="text-gray-300 font-mono text-xs">{slots[index].time}</div>
-                </td>
-                <td className="text-center py-3 px-3">{renderCell(row.field)}</td>
-                <td className="text-center py-3 px-3">{renderCell(row.social)}</td>
-                <td className="text-center py-3 px-3">{renderCell(row.vnr)}</td>
-                <td className="text-center py-3 px-3">{renderCell(row.packRip)}</td>
-              </tr>
-            ))}
+            {group.schedule.map((row, index) => {
+              const slot = slots[index];
+              const isCurrent = isCurrentSlot(slot, currentTime);
+              const isUpcoming = !isCurrent && isUpcomingSlot(slot, currentTime);
+
+              return (
+                <tr
+                  key={index}
+                  className={`border-b border-[#2a2a2a] last:border-0 transition-colors ${
+                    isCurrent
+                      ? 'bg-amber-500/10 border-l-2 border-l-amber-500'
+                      : isUpcoming
+                      ? 'bg-blue-500/5'
+                      : 'hover:bg-[#1a1a1a]'
+                  }`}
+                >
+                  <td className="py-3 px-4">
+                    <div className="flex items-center gap-2">
+                      {isCurrent && (
+                        <span className="flex items-center gap-1 text-amber-400 text-xs font-bold animate-pulse">
+                          <Zap className="w-3 h-3" />
+                          NOW
+                        </span>
+                      )}
+                      {isUpcoming && !isCurrent && (
+                        <span className="flex items-center gap-1 text-blue-400 text-xs">
+                          <Clock className="w-3 h-3" />
+                          NEXT
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-gray-500 text-xs mb-0.5">Slot {slot.slot}</div>
+                    <div className={`font-mono text-xs ${isCurrent ? 'text-amber-400 font-bold' : 'text-gray-300'}`}>
+                      {slot.time}
+                    </div>
+                  </td>
+                  <td className="text-center py-3 px-3">{renderCell(row.field)}</td>
+                  <td className="text-center py-3 px-3">{renderCell(row.social)}</td>
+                  <td className="text-center py-3 px-3">{renderCell(row.vnr)}</td>
+                  <td className="text-center py-3 px-3">{renderCell(row.packRip)}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -172,12 +220,35 @@ function GroupSchedule({
 }
 
 export default function ScheduleView({ schedule, onPlayerClick }: ScheduleViewProps) {
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Update time every minute
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const formattedTime = currentTime.toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  });
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Rotation Schedule</h2>
           <p className="text-sm text-gray-500">20 min per station • Tap player name for profile</p>
+        </div>
+        <div className="text-right">
+          <div className="flex items-center gap-2 text-amber-400">
+            <Clock className="w-4 h-4" />
+            <span className="font-mono font-bold">{formattedTime}</span>
+          </div>
+          <p className="text-xs text-gray-500">Current time</p>
         </div>
       </div>
 
@@ -186,18 +257,21 @@ export default function ScheduleView({ schedule, onPlayerClick }: ScheduleViewPr
         groupNumber={1}
         slots={timeSlots.group1}
         onPlayerClick={onPlayerClick}
+        currentTime={currentTime}
       />
       <GroupSchedule
         group={schedule.group2}
         groupNumber={2}
         slots={timeSlots.group2}
         onPlayerClick={onPlayerClick}
+        currentTime={currentTime}
       />
       <GroupSchedule
         group={schedule.group3}
         groupNumber={3}
         slots={timeSlots.group3}
         onPlayerClick={onPlayerClick}
+        currentTime={currentTime}
       />
 
       <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-4 text-sm text-gray-500">

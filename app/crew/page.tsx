@@ -5,13 +5,14 @@ import { players, rotationSchedule } from '../data/players';
 import PlayerCard from './components/PlayerCard';
 import PlayerModal from './components/PlayerModal';
 import ScheduleView from './components/ScheduleView';
+import StationToolView from './components/StationToolView';
 import type { Player } from '../data/players';
-import { Search, Users, Filter, Calendar, User } from 'lucide-react';
+import { Search, Users, Filter, Calendar, User, Radio, Zap } from 'lucide-react';
 
-type ViewMode = 'players' | 'schedule';
+type ViewMode = 'schedule' | 'station' | 'players';
 
 export default function CrewPage() {
-  const [viewMode, setViewMode] = useState<ViewMode>('players');
+  const [viewMode, setViewMode] = useState<ViewMode>('schedule');
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeGroup, setActiveGroup] = useState<number | null>(null);
@@ -60,26 +61,37 @@ export default function CrewPage() {
           {/* View Toggle */}
           <div className="flex gap-2 mb-4">
             <button
-              onClick={() => setViewMode('players')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                viewMode === 'players'
-                  ? 'bg-white text-black'
-                  : 'bg-[#141414] text-gray-300 hover:bg-[#1a1a1a]'
-              }`}
-            >
-              <User className="w-4 h-4" />
-              Players
-            </button>
-            <button
               onClick={() => setViewMode('schedule')}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 viewMode === 'schedule'
-                  ? 'bg-white text-black'
+                  ? 'bg-amber-500 text-black'
                   : 'bg-[#141414] text-gray-300 hover:bg-[#1a1a1a]'
               }`}
             >
               <Calendar className="w-4 h-4" />
               Schedule
+            </button>
+            <button
+              onClick={() => setViewMode('station')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                viewMode === 'station'
+                  ? 'bg-amber-500 text-black'
+                  : 'bg-[#141414] text-gray-300 hover:bg-[#1a1a1a]'
+              }`}
+            >
+              <Radio className="w-4 h-4" />
+              Station Tool
+            </button>
+            <button
+              onClick={() => setViewMode('players')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                viewMode === 'players'
+                  ? 'bg-amber-500 text-black'
+                  : 'bg-[#141414] text-gray-300 hover:bg-[#1a1a1a]'
+              }`}
+            >
+              <User className="w-4 h-4" />
+              Players
             </button>
           </div>
 
@@ -132,7 +144,16 @@ export default function CrewPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 py-6">
-        {viewMode === 'players' ? (
+        {viewMode === 'schedule' && (
+          <ScheduleView
+            schedule={rotationSchedule}
+            onPlayerClick={handlePlayerClick}
+          />
+        )}
+        {viewMode === 'station' && (
+          <StationToolView />
+        )}
+        {viewMode === 'players' && (
           <>
             {filteredPlayers.length === 0 ? (
               <div className="text-center py-12">
@@ -150,11 +171,6 @@ export default function CrewPage() {
               </div>
             )}
           </>
-        ) : (
-          <ScheduleView
-            schedule={rotationSchedule}
-            onPlayerClick={handlePlayerClick}
-          />
         )}
       </main>
 
