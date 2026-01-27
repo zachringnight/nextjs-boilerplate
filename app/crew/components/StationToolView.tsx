@@ -56,10 +56,10 @@ function getStationSchedule(station: StationType): TimeSlotInfo[] {
 
   // Group 1
   const group1Times = [
-    { timeDisplay: '9:00 - 9:20', startHour: 9, startMin: 0, endHour: 9, endMin: 20 },
-    { timeDisplay: '9:20 - 9:40', startHour: 9, startMin: 20, endHour: 9, endMin: 40 },
-    { timeDisplay: '9:40 - 10:00', startHour: 9, startMin: 40, endHour: 10, endMin: 0 },
-    { timeDisplay: '10:00 - 10:20', startHour: 10, startMin: 0, endHour: 10, endMin: 20 },
+    { timeDisplay: '9:00 to 9:20', startHour: 9, startMin: 0, endHour: 9, endMin: 20 },
+    { timeDisplay: '9:20 to 9:40', startHour: 9, startMin: 20, endHour: 9, endMin: 40 },
+    { timeDisplay: '9:40 to 10:00', startHour: 9, startMin: 40, endHour: 10, endMin: 0 },
+    { timeDisplay: '10:00 to 10:20', startHour: 10, startMin: 0, endHour: 10, endMin: 20 },
   ];
   rotationSchedule.group1.schedule.forEach((slot, index) => {
     schedule.push({
@@ -73,10 +73,10 @@ function getStationSchedule(station: StationType): TimeSlotInfo[] {
 
   // Group 2
   const group2Times = [
-    { timeDisplay: '10:30 - 10:50', startHour: 10, startMin: 30, endHour: 10, endMin: 50 },
-    { timeDisplay: '10:50 - 11:10', startHour: 10, startMin: 50, endHour: 11, endMin: 10 },
-    { timeDisplay: '11:10 - 11:30', startHour: 11, startMin: 10, endHour: 11, endMin: 30 },
-    { timeDisplay: '11:30 - 11:50', startHour: 11, startMin: 30, endHour: 11, endMin: 50 },
+    { timeDisplay: '10:30 to 10:50', startHour: 10, startMin: 30, endHour: 10, endMin: 50 },
+    { timeDisplay: '10:50 to 11:10', startHour: 10, startMin: 50, endHour: 11, endMin: 10 },
+    { timeDisplay: '11:10 to 11:30', startHour: 11, startMin: 10, endHour: 11, endMin: 30 },
+    { timeDisplay: '11:30 to 11:50', startHour: 11, startMin: 30, endHour: 11, endMin: 50 },
   ];
   rotationSchedule.group2.schedule.forEach((slot, index) => {
     schedule.push({
@@ -90,10 +90,10 @@ function getStationSchedule(station: StationType): TimeSlotInfo[] {
 
   // Group 3
   const group3Times = [
-    { timeDisplay: '1:00 - 1:20', startHour: 13, startMin: 0, endHour: 13, endMin: 20 },
-    { timeDisplay: '1:20 - 1:40', startHour: 13, startMin: 20, endHour: 13, endMin: 40 },
-    { timeDisplay: '1:40 - 2:00', startHour: 13, startMin: 40, endHour: 14, endMin: 0 },
-    { timeDisplay: '2:00 - 2:20', startHour: 14, startMin: 0, endHour: 14, endMin: 20 },
+    { timeDisplay: '1:00 to 1:20', startHour: 13, startMin: 0, endHour: 13, endMin: 20 },
+    { timeDisplay: '1:20 to 1:40', startHour: 13, startMin: 20, endHour: 13, endMin: 40 },
+    { timeDisplay: '1:40 to 2:00', startHour: 13, startMin: 40, endHour: 14, endMin: 0 },
+    { timeDisplay: '2:00 to 2:20', startHour: 14, startMin: 0, endHour: 14, endMin: 20 },
   ];
   rotationSchedule.group3.schedule.forEach((slot, index) => {
     schedule.push({

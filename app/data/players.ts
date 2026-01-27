@@ -36,7 +36,7 @@ export const players: Player[] = [
     flag: '🇺🇸',
     photo: '/players/ally-watt.jpg',
     group: 1,
-    groupTime: '9:00 - 10:20 AM',
+    groupTime: '9:00 to 10:20 AM',
     playerNumber: 1,
     bio: [
       'Speed demon and fan favorite known for explosive runs',
@@ -45,17 +45,17 @@ export const players: Player[] = [
       'Known for her work ethic and leadership on and off the pitch',
     ],
     talkingPoints: [
-      'Colorado connection - playing at home means everything',
-      'Speed is her weapon - one of the fastest in the league',
-      'Community-focused - heavily involved in local youth soccer',
+      'Colorado connection. Playing at home means everything',
+      'Speed is her weapon. One of the fastest in the league',
+      'Community focused and heavily involved in local youth soccer',
     ],
     questions: [
       {
         station: 'field',
         questions: [
-          'Pro soccer is coming home to Colorado - what does that moment mean to you?',
+          'Pro soccer is coming home to Colorado . What does that moment mean to you?',
           'Everyone talks about your speed. When does it feel most dangerous?',
-          "If we're freezing one Ally Watt moment for your Panini card - what's the shot?",
+          "If we're freezing one Ally Watt moment for your Panini card . What's the shot?",
           'Name your dream Panini insert',
           'What do you want fans to feel pulling your card?',
         ],
@@ -66,14 +66,14 @@ export const players: Player[] = [
           'Finish it: "Playing at home in Colorado means…"',
           'Three words. Your game. Go.',
           'Best fan moment so far this year?',
-          "Stickers or trading cards - which one's your vibe?",
+          "Stickers or trading cards. Which one's your vibe?",
           'Card tagline in one sentence',
         ],
       },
       {
         station: 'vnr',
         questions: [
-          "There's a kid in Denver watching you right now dreaming of this - what do you tell her?",
+          "There's a kid in Denver watching you right now dreaming of this . What do you tell her?",
           "Women's soccer is having a moment. What does it feel like to be part of it?",
           "What does being part of Panini's collecting culture mean?",
           'One line for collectors',
@@ -83,7 +83,7 @@ export const players: Player[] = [
         station: 'packRip',
         questions: [
           "Little Ally rips a pack and pulls… herself. What's going through her head?",
-          'One career moment on your card forever - what is it?',
+          'One career moment on your card forever . What is it?',
           'Call your shot: what are you hoping to pull?',
           'Card of the pack + give it a nickname',
           'Message to collectors chasing your card',
@@ -104,7 +104,7 @@ export const players: Player[] = [
     flag: '🇺🇸',
     photo: '/players/kaleigh-kurtz.jpg',
     group: 1,
-    groupTime: '9:00 - 10:20 AM',
+    groupTime: '9:00 to 10:20 AM',
     playerNumber: 2,
     bio: [
       'Rock-solid center back known for consistency and leadership',
@@ -113,8 +113,8 @@ export const players: Player[] = [
       'Quiet leader who lets her play speak for itself',
     ],
     talkingPoints: [
-      'Consistency is her superpower - shows up every single game',
-      'Defenders rarely get the spotlight - she deserves it',
+      'Consistency is her superpower. Shows up every single game',
+      'Defenders rarely get the spotlight. She deserves it',
       'Aerial presence makes her a threat on set pieces',
     ],
     questions: [
@@ -123,7 +123,7 @@ export const players: Player[] = [
         questions: [
           'Consistency is your superpower. What does "showing up every single day" actually look like?',
           "Center backs do the work nobody sees. What's the part of your job fans would be surprised by?",
-          'Panini is making the ultimate defender card - what HAS to be on it?',
+          'Panini is making the ultimate defender card . What HAS to be on it?',
           'Name your dream Panini insert',
           'What do you want fans to feel pulling your card?',
         ],
@@ -134,7 +134,7 @@ export const players: Player[] = [
           'Minute 90, tied game. One word for your mindset.',
           'What do you love most about being in this league right now?',
           'Card photo: mid-tackle, post-clean sheet, or portrait? Pick one.',
-          "Stickers or trading cards - which one's your vibe?",
+          "Stickers or trading cards. Which one's your vibe?",
           'Card tagline in one sentence',
         ],
       },
@@ -150,7 +150,7 @@ export const players: Player[] = [
       {
         station: 'packRip',
         questions: [
-          'First time you held a card with your face on it - what was that moment like?',
+          'First time you held a card with your face on it . What was that moment like?',
           'If Panini captured one defensive masterclass moment, what should it be?',
           'Call your shot: what are you hoping to pull?',
           'Card of the pack + give it a nickname',
@@ -172,7 +172,7 @@ export const players: Player[] = [
     flag: '🇯🇵',
     photo: '/players/manaka-matsukubo.jpg',
     group: 1,
-    groupTime: '9:00 - 10:20 AM',
+    groupTime: '9:00 to 10:20 AM',
     playerNumber: 3,
     bio: [
       'Japanese international bringing flair and creativity to NWSL',
@@ -181,7 +181,7 @@ export const players: Player[] = [
       'Rising star connecting Japanese and American soccer cultures',
     ],
     talkingPoints: [
-      'Joy is her trademark - plays with visible happiness',
+      'Joy is her trademark. Plays with visible happiness',
       'Represents growing Japan-NWSL pipeline',
       'Technical ability stands out even in a league full of talent',
     ],
@@ -189,7 +189,7 @@ export const players: Player[] = [
       {
         station: 'field',
         questions: [
-          'You play with so much joy - where does that come from?',
+          'You play with so much joy. Where does that come from?',
           'Your chemistry with teammates is electric. What makes it click?',
           "Dream Panini card shot: what's the scene?",
           'Name your dream Panini insert',
@@ -199,17 +199,17 @@ export const players: Player[] = [
       {
         station: 'social',
         questions: [
-          'Your style in three words - go!',
+          'Your style in three words. Go!',
           "Favorite thing about NWSL culture you didn't expect?",
           'Best American food discovery so far?',
-          "Stickers or trading cards - which one's your vibe?",
+          "Stickers or trading cards. Which one's your vibe?",
           'Card tagline in one sentence',
         ],
       },
       {
         station: 'vnr',
         questions: [
-          "There's a girl in Tokyo watching NWSL for the first time because of you - what's your message?",
+          "There's a girl in Tokyo watching NWSL for the first time because of you . What's your message?",
           'What makes representing Japan on this stage special?',
           "What does being part of Panini's collecting culture mean?",
           'One line for collectors',
@@ -219,7 +219,7 @@ export const players: Player[] = [
         station: 'packRip',
         questions: [
           'Did you grow up with sticker albums or trading cards in Japan?',
-          'One moment that screams "Manaka" for a card - what is it?',
+          'One moment that screams "Manaka" for a card . What is it?',
           'Call your shot: what are you hoping to pull?',
           'Card of the pack + give it a nickname',
           'Message to collectors chasing your card',
@@ -240,7 +240,7 @@ export const players: Player[] = [
     flag: '🇫🇷',
     photo: '/players/kenza-dali.jpg',
     group: 2,
-    groupTime: '10:30 - 11:50 AM',
+    groupTime: '10:30 to 11:50 AM',
     playerNumber: 4,
     bio: [
       'French international with elite technical skills',
@@ -249,9 +249,9 @@ export const players: Player[] = [
       'Fashion-forward with an eye for style on and off the pitch',
     ],
     talkingPoints: [
-      'European pedigree - played in France, England, now NWSL',
+      'European pedigree. Played in France, England, now NWSL',
       'Set-piece specialist with a dangerous delivery',
-      'Style icon - watch for sneaker game and fashion choices',
+      'Style icon. Watch for sneaker game and fashion choices',
     ],
     questions: [
       {
@@ -259,7 +259,7 @@ export const players: Player[] = [
         questions: [
           'Your football has a signature style. How would you describe it?',
           'What drew you to the NWSL and what keeps you here?',
-          "If we're capturing the perfect Kenza Dali card photo - what's the vibe?",
+          "If we're capturing the perfect Kenza Dali card photo . What's the vibe?",
           'Name your dream Panini insert',
           'What do you want fans to feel pulling your card?',
         ],
@@ -267,17 +267,17 @@ export const players: Player[] = [
       {
         station: 'social',
         questions: [
-          "Game day sneakers - what's the energy today?",
+          "Game day sneakers . What's the energy today?",
           'If your card had a tagline, what would it say?',
           'How do you reset after a tough match?',
-          "Stickers or trading cards - which one's your vibe?",
+          "Stickers or trading cards. Which one's your vibe?",
           'Card tagline in one sentence',
         ],
       },
       {
         station: 'vnr',
         questions: [
-          "To the young players watching from France and around the world - what's your message?",
+          "To the young players watching from France and around the world . What's your message?",
           "You've seen women's football grow across continents. What excites you most right now?",
           "What does being part of Panini's collecting culture mean?",
           'One line for collectors',
@@ -287,7 +287,7 @@ export const players: Player[] = [
         station: 'packRip',
         questions: [
           'You appreciate craftsmanship. What makes something actually worth collecting?',
-          'One career moment immortalized on a card - what is it?',
+          'One career moment immortalized on a card . What is it?',
           'Call your shot: what are you hoping to pull?',
           'Card of the pack + give it a nickname',
           'Message to collectors chasing your card',
@@ -307,18 +307,18 @@ export const players: Player[] = [
     flag: '🇺🇸',
     photo: '/players/mia-fishel.jpg',
     group: 2,
-    groupTime: '10:30 - 11:50 AM',
+    groupTime: '10:30 to 11:50 AM',
     playerNumber: 5,
     bio: [
       'Dynamic forward with a unique path through Liga MX Femenil',
-      'Known as "Big Fish" - built a brand around authentic self-expression',
+      'Known as "Big Fish". Built a brand around authentic self-expression',
       'Social media savvy with a devoted fanbase',
       'Goal scorer with flair and personality to match',
     ],
     talkingPoints: [
-      '"Big Fish Energy" is her brand - owns her confidence',
+      '"Big Fish Energy" is her brand. Owns her confidence',
       'Blazed her own trail through Mexico before NWSL',
-      'Highly engaged fanbase - knows her audience',
+      'Highly engaged fanbase. Knows her audience',
     ],
     questions: [
       {
@@ -326,7 +326,7 @@ export const players: Player[] = [
         questions: [
           'You built your path your own way. What does it mean to bring fans along on that journey?',
           "When you're at your best, what do your highlights say about you?",
-          'The iconic Mia Fishel card shot - describe it.',
+          'The iconic Mia Fishel card shot. Describe it.',
           'Name your dream Panini insert',
           'What do you want fans to feel pulling your card?',
         ],
@@ -334,10 +334,10 @@ export const players: Player[] = [
       {
         station: 'social',
         questions: [
-          '"Big Fish Energy" - define it in one sentence.',
+          '"Big Fish Energy". Define it in one sentence.',
           'Favorite way to connect with fans?',
-          "Signature celebration - what's the move?",
-          "Stickers or trading cards - which one's your vibe?",
+          "Signature celebration . What's the move?",
+          "Stickers or trading cards. Which one's your vibe?",
           'Card tagline in one sentence',
         ],
       },
@@ -353,7 +353,7 @@ export const players: Player[] = [
       {
         station: 'packRip',
         questions: [
-          'First time seeing yourself on a trading card - walk us through that feeling.',
+          'First time seeing yourself on a trading card. Walk us through that feeling.',
           'Dream card design: bold and loud, clean and classic, or something wild?',
           'Call your shot: what are you hoping to pull?',
           'Card of the pack + give it a nickname',
@@ -375,7 +375,7 @@ export const players: Player[] = [
     flag: '🇯🇵',
     photo: '/players/mina-tanaka.jpg',
     group: 2,
-    groupTime: '10:30 - 11:50 AM',
+    groupTime: '10:30 to 11:50 AM',
     playerNumber: 6,
     bio: [
       'Japanese international striker with clinical finishing',
@@ -384,7 +384,7 @@ export const players: Player[] = [
       'Quiet demeanor masks fierce competitive fire',
     ],
     talkingPoints: [
-      'Clinical finisher - makes the hard chances look easy',
+      'Clinical finisher. Makes the hard chances look easy',
       'Growing Japanese presence in NWSL',
       'Utah\'s newest star building a following in the Mountain West',
     ],
@@ -392,9 +392,9 @@ export const players: Player[] = [
       {
         station: 'field',
         questions: [
-          'NWSL fans are just getting to know you - what do you want them to see?',
-          'The build-up, the finish, the celebration - which part is YOUR favorite?',
-          'Signature Mina Tanaka moment for a Panini card - what is it?',
+          'NWSL fans are just getting to know you . What do you want them to see?',
+          'The build-up, the finish, the celebration. Which part is YOUR favorite?',
+          'Signature Mina Tanaka moment for a Panini card . What is it?',
           'Name your dream Panini insert',
           'What do you want fans to feel pulling your card?',
         ],
@@ -405,7 +405,7 @@ export const players: Player[] = [
           'One word for your playing style.',
           'Favorite thing about Utah so far?',
           'Best part of matchday?',
-          "Stickers or trading cards - which one's your vibe?",
+          "Stickers or trading cards. Which one's your vibe?",
           'Card tagline in one sentence',
         ],
       },
@@ -413,7 +413,7 @@ export const players: Player[] = [
         station: 'vnr',
         questions: [
           'What does it mean to represent Japan here and connect fans across the world?',
-          "To the young collectors just starting - what's your message?",
+          "To the young collectors just starting . What's your message?",
           "What does being part of Panini's collecting culture mean?",
           'One line for collectors',
         ],
@@ -421,8 +421,8 @@ export const players: Player[] = [
       {
         station: 'packRip',
         questions: [
-          'Sticker albums, trading cards - were you into collecting growing up in Japan?',
-          'A fan in Tokyo pulls your Panini card - what does that mean to you?',
+          'Sticker albums, trading cards. Were you into collecting growing up in Japan?',
+          'A fan in Tokyo pulls your Panini card . What does that mean to you?',
           'Call your shot: what are you hoping to pull?',
           'Card of the pack + give it a nickname',
           'Message to collectors chasing your card',
@@ -442,7 +442,7 @@ export const players: Player[] = [
     flag: '🇺🇸',
     photo: '/players/casey-murphy.jpg',
     group: 2,
-    groupTime: '10:30 - 11:50 AM',
+    groupTime: '10:30 to 11:50 AM',
     playerNumber: 7,
     bio: [
       'USWNT goalkeeper and one of the best in the world',
@@ -451,17 +451,17 @@ export const players: Player[] = [
       'Vocal leader and defensive organizer',
     ],
     talkingPoints: [
-      'National team goalkeeper - represents the pinnacle',
+      'National team goalkeeper. Represents the pinnacle',
       'International experience in France shaped her game',
-      'Commanding presence - organizes the entire defense',
+      'Commanding presence. Organizes the entire defense',
     ],
     questions: [
       {
         station: 'field',
         questions: [
           'Goalkeepers set the tone for everything. What do you want your presence to say?',
-          'Representing your club AND the national team - what does that responsibility feel like?',
-          'The ultimate goalkeeper Panini card - what details have to be on it?',
+          'Representing your club AND the national team . What does that responsibility feel like?',
+          'The ultimate goalkeeper Panini card . What details have to be on it?',
           'Name your dream Panini insert',
           'What do you want fans to feel pulling your card?',
         ],
@@ -472,14 +472,14 @@ export const players: Player[] = [
           'Goalkeeper mindset in three words.',
           "What's your favorite part of signing autographs for fans?",
           'One word for the goalkeeper sisterhood.',
-          "Stickers or trading cards - which one's your vibe?",
+          "Stickers or trading cards. Which one's your vibe?",
           'Card tagline in one sentence',
         ],
       },
       {
         station: 'vnr',
         questions: [
-          "To every young keeper out there dreaming big - what do you want them to hear?",
+          "To every young keeper out there dreaming big . What do you want them to hear?",
           "What makes being a goalkeeper in women's soccer right now feel special?",
           "What does being part of Panini's collecting culture mean?",
           'One line for collectors',
@@ -489,7 +489,7 @@ export const players: Player[] = [
         station: 'packRip',
         questions: [
           'Were you a card collector growing up?',
-          'A young goalkeeper pulls your card - what do you hope they feel?',
+          'A young goalkeeper pulls your card . What do you hope they feel?',
           'Call your shot: what are you hoping to pull?',
           'Card of the pack + give it a nickname',
           'Message to collectors chasing your card',
@@ -510,7 +510,7 @@ export const players: Player[] = [
     flag: '🇨🇴',
     photo: '/players/ivonne-chacon.jpg',
     group: 3,
-    groupTime: '1:00 - 2:20 PM',
+    groupTime: '1:00 to 2:20 PM',
     playerNumber: 8,
     bio: [
       'Colombian international bringing South American flair to Chicago',
@@ -519,17 +519,17 @@ export const players: Player[] = [
       'Passionate about inspiring young girls back home in Colombia',
     ],
     talkingPoints: [
-      'Colombian pride - represents a nation passionate about football',
-      'Sticker culture is HUGE in Colombia - World Cup albums are legendary',
+      'Colombian pride. Represents a nation passionate about football',
+      'Sticker culture is HUGE in Colombia. World Cup albums are legendary',
       'Bridge between Colombian fans and NWSL',
     ],
     questions: [
       {
         station: 'field',
         questions: [
-          'Representing Colombia in the NWSL - what does that mean to you and to fans back home?',
+          'Representing Colombia in the NWSL . What does that mean to you and to fans back home?',
           'What do you want Chicago to know about the energy you bring?',
-          "Your story in one card image - what's the moment?",
+          "Your story in one card image . What's the moment?",
           'Name your dream Panini insert',
           'What do you want fans to feel pulling your card?',
         ],
@@ -540,7 +540,7 @@ export const players: Player[] = [
           'Three words: your playing style.',
           'Message to young girls watching in Colombia?',
           'Best part about playing in front of fans here?',
-          "Stickers or trading cards - which one's your vibe?",
+          "Stickers or trading cards. Which one's your vibe?",
           'Card tagline in one sentence',
         ],
       },
@@ -548,7 +548,7 @@ export const players: Player[] = [
         station: 'vnr',
         questions: [
           "Colombian women's football is on the rise. What does this moment mean?",
-          "Fans in Bogotá will be proud to collect your card - what do you want to say to them?",
+          "Fans in Bogotá will be proud to collect your card . What do you want to say to them?",
           "What does being part of Panini's collecting culture mean?",
           'One line for collectors',
         ],
@@ -557,7 +557,7 @@ export const players: Player[] = [
         station: 'packRip',
         questions: [
           'World Cup sticker albums are LEGENDARY in Colombia. Were you a sticker kid?',
-          "A young fan in Medellín pulls your Panini card - what does that moment mean?",
+          "A young fan in Medellín pulls your Panini card . What does that moment mean?",
           'Call your shot: what are you hoping to pull?',
           'Card of the pack + give it a nickname',
           'Message to collectors chasing your card',
@@ -578,18 +578,18 @@ export const players: Player[] = [
     flag: '🇲🇼',
     photo: '/players/temwa-chawinga.jpg',
     group: 3,
-    groupTime: '1:00 - 2:20 PM',
+    groupTime: '1:00 to 2:20 PM',
     playerNumber: 9,
     bio: [
       'Malawian international and sister of Tabitha Chawinga',
       'Represents an entire continent in NWSL',
-      'Name means "love" in Chichewa - plays with heart',
+      'Name means "love" in Chichewa. Plays with heart',
       'Trailblazer for African women in professional soccer',
     ],
     talkingPoints: [
-      'African representation matters - she carries a continent\'s hopes',
-      'Sister duo with Tabitha - family legacy in the sport',
-      'Her name "Temwa" means love - beautiful story angle',
+      'African representation matters. She carries a continent\'s hopes',
+      'Sister duo with Tabitha. Family legacy in the sport',
+      'Her name "Temwa" means love. Beautiful story angle',
     ],
     questions: [
       {
@@ -597,7 +597,7 @@ export const players: Player[] = [
         questions: [
           "You're representing an entire continent. What does that responsibility feel like?",
           'When kids watch you play, what do you want them to feel?',
-          'If Panini captures your legacy in one image - what does it show?',
+          'If Panini captures your legacy in one image . What does it show?',
           'Name your dream Panini insert',
           'What do you want fans to feel pulling your card?',
         ],
@@ -608,14 +608,14 @@ export const players: Player[] = [
           'Your name means "love." What does that mean to you on the pitch?',
           'Favorite thing about Kansas City?',
           'Best way to celebrate a goal?',
-          "Stickers or trading cards - which one's your vibe?",
+          "Stickers or trading cards. Which one's your vibe?",
           'Card tagline in one sentence',
         ],
       },
       {
         station: 'vnr',
         questions: [
-          "To every young player in Africa dreaming of this stage - what's your message?",
+          "To every young player in Africa dreaming of this stage . What's your message?",
           'What does it mean to see African players celebrated on a global stage like this?',
           "What does being part of Panini's collecting culture mean?",
           'One line for collectors',
@@ -645,17 +645,17 @@ export const players: Player[] = [
     flag: '🇺🇸',
     photo: '/players/jordyn-bloomer.jpg',
     group: 3,
-    groupTime: '1:00 - 2:20 PM',
+    groupTime: '1:00 to 2:20 PM',
     playerNumber: 10,
     bio: [
       'Rising goalkeeper making a name with clutch performances',
-      'Big-game mentality - thrives under pressure',
+      'Big-game mentality. Thrives under pressure',
       'Known for signature celebration and personality',
       'Fan favorite with growing following',
     ],
     talkingPoints: [
-      'Clutch performer - big moments find her',
-      'Personality stands out - genuine and engaging',
+      'Clutch performer. Big moments find her',
+      'Personality stands out. Genuine and engaging',
       'Signature celebration worth capturing',
     ],
     questions: [
@@ -664,7 +664,7 @@ export const players: Player[] = [
         questions: [
           'Big moments find you. What does it feel like to step up and deliver?',
           'What do you love MOST about being a goalkeeper?',
-          'Goalkeeper highlight card for Jordyn Bloomer - what moment does it celebrate?',
+          'Goalkeeper highlight card for Jordyn Bloomer . What moment does it celebrate?',
           'Name your dream Panini insert',
           'What do you want fans to feel pulling your card?',
         ],
@@ -672,10 +672,10 @@ export const players: Player[] = [
       {
         station: 'social',
         questions: [
-          "Tell us about your signature celebration - what's the story?",
+          "Tell us about your signature celebration . What's the story?",
           'Goalkeeper energy in one sentence.',
           "Coolest autograph moment you've had with a fan?",
-          "Stickers or trading cards - which one's your vibe?",
+          "Stickers or trading cards. Which one's your vibe?",
           'Card tagline in one sentence',
         ],
       },
@@ -691,7 +691,7 @@ export const players: Player[] = [
       {
         station: 'packRip',
         questions: [
-          'First time you saw your name on a checklist or card - what was that like?',
+          'First time you saw your name on a checklist or card . What was that like?',
           'If you could pick your card photo, what moment would it capture?',
           'Call your shot: what are you hoping to pull?',
           'Card of the pack + give it a nickname',
@@ -712,7 +712,7 @@ export const players: Player[] = [
     flag: '🇺🇸',
     photo: '/players/riley-tiernan.jpg',
     group: 3,
-    groupTime: '1:00 - 2:20 PM',
+    groupTime: '1:00 to 2:20 PM',
     playerNumber: 11,
     bio: [
       'Jersey native making waves in Los Angeles',
@@ -721,17 +721,17 @@ export const players: Player[] = [
       'Brings East Coast grit to West Coast soccer',
     ],
     talkingPoints: [
-      'Rookie sensation - "welcome to the league" energy',
-      'Angel City fanbase is massive - built-in audience',
-      'Jersey to LA journey - interesting contrast',
+      'Rookie sensation. "Welcome to the league" energy',
+      'Angel City fanbase is massive. Built in audience',
+      'Jersey to LA journey. Interesting contrast',
     ],
     questions: [
       {
         station: 'field',
         questions: [
           'Your rise has been electric. What do you want fans to know about the joy you play with?',
-          'Angel City supporters bring the energy - what does playing in front of them feel like?',
-          '"Welcome to the league" Panini card - what moment should it be?',
+          'Angel City supporters bring the energy . What does playing in front of them feel like?',
+          '"Welcome to the league" Panini card . What moment should it be?',
           'Name your dream Panini insert',
           'What do you want fans to feel pulling your card?',
         ],
@@ -739,17 +739,17 @@ export const players: Player[] = [
       {
         station: 'social',
         questions: [
-          'Jersey to LA - favorite new LA discovery?',
+          'Jersey to LA. Favorite new LA discovery?',
           'Best part about being in the NWSL?',
           'Your game in three words.',
-          "Stickers or trading cards - which one's your vibe?",
+          "Stickers or trading cards. Which one's your vibe?",
           'Card tagline in one sentence',
         ],
       },
       {
         station: 'vnr',
         questions: [
-          "To every young player dreaming of this league - what's your message?",
+          "To every young player dreaming of this league . What's your message?",
           'What does connecting with fans through autographs and collecting mean to you?',
           "What does being part of Panini's collecting culture mean?",
           'One line for collectors',
@@ -759,7 +759,7 @@ export const players: Player[] = [
         station: 'packRip',
         questions: [
           'Were you a card collector growing up?',
-          'A young fan pulls your rookie card - what do you hope that moment feels like for them?',
+          'A young fan pulls your rookie card . What do you hope that moment feels like for them?',
           'Call your shot: what are you hoping to pull?',
           'Card of the pack + give it a nickname',
           'Message to collectors chasing your card',
@@ -772,7 +772,7 @@ export const players: Player[] = [
 export const rotationSchedule = {
   group1: {
     name: 'GROUP 1',
-    time: '9:00 AM - 10:20 AM',
+    time: '9:00 AM to 10:20 AM',
     players: ['Ally Watt', 'Kaleigh Kurtz', 'Manaka Matsukubo'],
     schedule: [
       { time: '9:00', field: 'Ally Watt', social: 'Kaleigh Kurtz', vnr: 'Manaka Matsukubo', packRip: 'BREAK' },
@@ -783,7 +783,7 @@ export const rotationSchedule = {
   },
   group2: {
     name: 'GROUP 2',
-    time: '10:30 AM - 11:50 AM',
+    time: '10:30 AM to 11:50 AM',
     players: ['Kenza Dali', 'Mia Fishel', 'Mina Tanaka', 'Casey Murphy'],
     schedule: [
       { time: '10:30', field: 'Kenza Dali', social: 'Mia Fishel', vnr: 'Mina Tanaka', packRip: 'Casey Murphy' },
@@ -794,7 +794,7 @@ export const rotationSchedule = {
   },
   group3: {
     name: 'GROUP 3',
-    time: '1:00 PM - 2:20 PM',
+    time: '1:00 PM to 2:20 PM',
     players: ['Ivonne Chacon', 'Temwa Chawinga', 'Jordyn Bloomer', 'Riley Tiernan'],
     schedule: [
       { time: '1:00', field: 'Ivonne Chacon', social: 'Temwa Chawinga', vnr: 'Jordyn Bloomer', packRip: 'Riley Tiernan' },
@@ -808,7 +808,7 @@ export const rotationSchedule = {
 // Universal questions for each station (same for all players)
 export const stationUniversalQuestions = {
   field: {
-    title: 'FIELD - Hero Rollout',
+    title: 'FIELD: Hero Rollout',
     subtitle: 'On-camera prompts (not Q&A)',
     questions: [],
   },
@@ -839,7 +839,7 @@ export const stationUniversalQuestions = {
     ],
   },
   vnr: {
-    title: 'SOCIAL - Season Beats + Milestones',
+    title: 'SOCIAL: Season Beats + Milestones',
     subtitle: 'Fun Seasonal Content (No All-Star)',
     questions: [
       'What are you most excited about for the 2026 season?',
@@ -865,7 +865,7 @@ export const stationUniversalQuestions = {
     ],
   },
   packRip: {
-    title: 'VNR - Local News Soundbites',
+    title: 'VNR: Local News Soundbites',
     subtitle: 'Broadcast B-Roll (Positive Only, No Collecting)',
     questions: [
       'What should fans be most excited about in the NWSL this season?',
@@ -900,15 +900,15 @@ export const genericBanks = {
       'First sticker you really wanted?',
       '"Place it perfectly" or "close enough" person?',
       'Did you trade duplicates with friends or family?',
-      "If you could be a sticker - what's the photo?",
+      "If you could be a sticker . What's the photo?",
     ],
   },
   tradingCard: {
     title: 'TRADING CARD',
     questions: [
       'What makes a card a keeper: photo, rarity, auto, or story?',
-      'Card nickname or tagline - what would yours be?',
-      'Design your own insert - name and look?',
+      'Card nickname or tagline . What would yours be?',
+      'Design your own insert. Name and look?',
       'One detail that HAS to be on your card photo?',
       'Message to collectors chasing your card this season?',
     ],
@@ -917,10 +917,10 @@ export const genericBanks = {
     title: 'PACK RIP REACTIONS',
     questions: [
       'Call your shot: what are you hoping to pull?',
-      'Talk through every card out loud - no silent flips!',
+      'Talk through every card out loud. No silent flips!',
       'Pick "card of the pack" and give it a nickname.',
-      'If you pull a teammate - what do you say about them?',
-      "If you pull yourself - what's the reaction line?",
+      'If you pull a teammate . What do you say about them?',
+      "If you pull yourself . What's the reaction line?",
     ],
   },
 };
