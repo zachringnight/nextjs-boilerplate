@@ -10,6 +10,7 @@ type StationType = 'field' | 'social' | 'vnr' | 'packRip';
 
 interface StationToolViewProps {
   initialStation?: StationType;
+  largeText?: boolean;
 }
 
 interface TimeSlotInfo {
@@ -262,15 +263,15 @@ function PlayerSlotCard({
               {station === 'packRip' ? 'PACK RIP' : station.toUpperCase()} QUESTIONS
             </h4>
             {stationQuestions && (
-              <ul className="space-y-3">
+              <ul className="space-y-4">
                 {stationQuestions.questions.map((question, index) => (
                   <li key={index} className="flex items-start gap-3">
                     <span
-                      className={`w-6 h-6 ${config.bgColor} bg-opacity-20 rounded flex items-center justify-center text-xs font-bold ${config.textColor} flex-shrink-0`}
+                      className="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center text-sm font-bold text-black flex-shrink-0"
                     >
                       {index + 1}
                     </span>
-                    <span className="text-gray-200 leading-relaxed">{question}</span>
+                    <span className="text-gray-100 leading-relaxed text-lg">{question}</span>
                   </li>
                 ))}
               </ul>
@@ -282,7 +283,7 @@ function PlayerSlotCard({
   );
 }
 
-export default function StationToolView({ initialStation = 'field' }: StationToolViewProps) {
+export default function StationToolView({ initialStation = 'field', largeText = false }: StationToolViewProps) {
   const [activeStation, setActiveStation] = useState<StationType>(initialStation);
   const [expandedSlots, setExpandedSlots] = useState<Set<string>>(new Set());
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -316,8 +317,8 @@ export default function StationToolView({ initialStation = 'field' }: StationToo
 
   const expandAll = () => {
     const allKeys = stationSchedule
-      .filter(s => s.playerName !== 'BREAK')
-      .map((_, i) => `slot-${i}`);
+      .map((_, i) => `slot-${i}`)
+      .filter((_, i) => stationSchedule[i].playerName !== 'BREAK');
     setExpandedSlots(new Set(allKeys));
   };
 
@@ -326,6 +327,27 @@ export default function StationToolView({ initialStation = 'field' }: StationToo
   };
 
   const playerCount = stationSchedule.filter(s => s.playerName !== 'BREAK').length;
+
+  // Find current slot index
+  const currentSlotIndex = stationSchedule.findIndex(slot => isCurrentSlot(slot, currentTime));
+
+  // Auto-expand current player on mount/station change
+  useEffect(() => {
+    if (currentSlotIndex >= 0 && stationSchedule[currentSlotIndex].playerName !== 'BREAK') {
+      setExpandedSlots(new Set([`slot-${currentSlotIndex}`]));
+    }
+  }, [activeStation]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const jumpToNow = () => {
+    if (currentSlotIndex >= 0) {
+      setExpandedSlots(new Set([`slot-${currentSlotIndex}`]));
+      // Scroll to the element
+      const element = document.getElementById(`slot-${currentSlotIndex}`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -383,6 +405,15 @@ export default function StationToolView({ initialStation = 'field' }: StationToo
           <p className="text-sm text-gray-500">{playerCount} players today • 20 min each</p>
         </div>
         <div className="flex gap-2">
+          {currentSlotIndex >= 0 && (
+            <button
+              onClick={jumpToNow}
+              className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 transition-colors"
+            >
+              <Zap className="w-3 h-3" />
+              Jump to Now
+            </button>
+          )}
           <button
             onClick={expandAll}
             className="text-xs px-3 py-1.5 rounded-lg bg-[#0a0a0a] text-gray-400 hover:text-white transition-colors"
@@ -401,14 +432,15 @@ export default function StationToolView({ initialStation = 'field' }: StationToo
       {/* Player Timeline */}
       <div className="space-y-3">
         {stationSchedule.map((slot, index) => (
-          <PlayerSlotCard
-            key={`slot-${index}`}
-            slot={slot}
-            station={activeStation}
-            isExpanded={expandedSlots.has(`slot-${index}`)}
-            onToggle={() => toggleSlot(`slot-${index}`)}
-            currentTime={currentTime}
-          />
+          <div key={`slot-${index}`} id={`slot-${index}`}>
+            <PlayerSlotCard
+              slot={slot}
+              station={activeStation}
+              isExpanded={expandedSlots.has(`slot-${index}`)}
+              onToggle={() => toggleSlot(`slot-${index}`)}
+              currentTime={currentTime}
+            />
+          </div>
         ))}
       </div>
 
