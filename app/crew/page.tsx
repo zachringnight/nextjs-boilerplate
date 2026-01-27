@@ -7,7 +7,7 @@ import PlayerModal from './components/PlayerModal';
 import ScheduleView from './components/ScheduleView';
 import StationToolView from './components/StationToolView';
 import type { Player } from '../data/players';
-import { Search, Users, Filter, Calendar, User, Radio, Zap } from 'lucide-react';
+import { Search, Users, Filter, Calendar, User, Radio } from 'lucide-react';
 
 type ViewMode = 'schedule' | 'station' | 'players';
 

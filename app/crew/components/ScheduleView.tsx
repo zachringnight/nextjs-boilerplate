@@ -236,6 +236,28 @@ export default function ScheduleView({ schedule, onPlayerClick }: ScheduleViewPr
     hour12: true,
   });
 
+  // Determine which group/slot is current
+  const getCurrentGroup = (): number | null => {
+    const allSlots = [
+      ...timeSlots.group1.map(s => ({ ...s, group: 1 })),
+      ...timeSlots.group2.map(s => ({ ...s, group: 2 })),
+      ...timeSlots.group3.map(s => ({ ...s, group: 3 })),
+    ];
+    const current = allSlots.find(s => isCurrentSlot(s, currentTime));
+    return current ? current.group : null;
+  };
+
+  const currentGroup = getCurrentGroup();
+
+  const jumpToNow = () => {
+    if (currentGroup) {
+      const element = document.getElementById(`group-${currentGroup}`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -243,36 +265,53 @@ export default function ScheduleView({ schedule, onPlayerClick }: ScheduleViewPr
           <h2 className="text-2xl font-bold">Rotation Schedule</h2>
           <p className="text-sm text-gray-500">20 min per station • Tap player name for profile</p>
         </div>
-        <div className="text-right">
-          <div className="flex items-center gap-2 text-amber-400">
-            <Clock className="w-4 h-4" />
-            <span className="font-mono font-bold">{formattedTime}</span>
+        <div className="flex items-center gap-4">
+          {currentGroup && (
+            <button
+              onClick={jumpToNow}
+              className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 transition-colors"
+            >
+              <Zap className="w-3 h-3" />
+              Jump to Now
+            </button>
+          )}
+          <div className="text-right">
+            <div className="flex items-center gap-2 text-amber-400">
+              <Clock className="w-4 h-4" />
+              <span className="font-mono font-bold">{formattedTime}</span>
+            </div>
+            <p className="text-xs text-gray-500">Current time</p>
           </div>
-          <p className="text-xs text-gray-500">Current time</p>
         </div>
       </div>
 
-      <GroupSchedule
-        group={schedule.group1}
-        groupNumber={1}
-        slots={timeSlots.group1}
-        onPlayerClick={onPlayerClick}
-        currentTime={currentTime}
-      />
-      <GroupSchedule
-        group={schedule.group2}
-        groupNumber={2}
-        slots={timeSlots.group2}
-        onPlayerClick={onPlayerClick}
-        currentTime={currentTime}
-      />
-      <GroupSchedule
-        group={schedule.group3}
-        groupNumber={3}
-        slots={timeSlots.group3}
-        onPlayerClick={onPlayerClick}
-        currentTime={currentTime}
-      />
+      <div id="group-1">
+        <GroupSchedule
+          group={schedule.group1}
+          groupNumber={1}
+          slots={timeSlots.group1}
+          onPlayerClick={onPlayerClick}
+          currentTime={currentTime}
+        />
+      </div>
+      <div id="group-2">
+        <GroupSchedule
+          group={schedule.group2}
+          groupNumber={2}
+          slots={timeSlots.group2}
+          onPlayerClick={onPlayerClick}
+          currentTime={currentTime}
+        />
+      </div>
+      <div id="group-3">
+        <GroupSchedule
+          group={schedule.group3}
+          groupNumber={3}
+          slots={timeSlots.group3}
+          onPlayerClick={onPlayerClick}
+          currentTime={currentTime}
+        />
+      </div>
 
       <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-4 text-sm text-gray-500">
         <strong className="text-gray-400">Note:</strong> Signing station runs throughout the day.

@@ -316,8 +316,8 @@ export default function StationToolView({ initialStation = 'field' }: StationToo
 
   const expandAll = () => {
     const allKeys = stationSchedule
-      .filter(s => s.playerName !== 'BREAK')
-      .map((_, i) => `slot-${i}`);
+      .map((_, i) => `slot-${i}`)
+      .filter((_, i) => stationSchedule[i].playerName !== 'BREAK');
     setExpandedSlots(new Set(allKeys));
   };
 
@@ -326,6 +326,27 @@ export default function StationToolView({ initialStation = 'field' }: StationToo
   };
 
   const playerCount = stationSchedule.filter(s => s.playerName !== 'BREAK').length;
+
+  // Find current slot index
+  const currentSlotIndex = stationSchedule.findIndex(slot => isCurrentSlot(slot, currentTime));
+
+  // Auto-expand current player on mount/station change
+  useEffect(() => {
+    if (currentSlotIndex >= 0 && stationSchedule[currentSlotIndex].playerName !== 'BREAK') {
+      setExpandedSlots(new Set([`slot-${currentSlotIndex}`]));
+    }
+  }, [activeStation]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const jumpToNow = () => {
+    if (currentSlotIndex >= 0) {
+      setExpandedSlots(new Set([`slot-${currentSlotIndex}`]));
+      // Scroll to the element
+      const element = document.getElementById(`slot-${currentSlotIndex}`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -383,6 +404,15 @@ export default function StationToolView({ initialStation = 'field' }: StationToo
           <p className="text-sm text-gray-500">{playerCount} players today • 20 min each</p>
         </div>
         <div className="flex gap-2">
+          {currentSlotIndex >= 0 && (
+            <button
+              onClick={jumpToNow}
+              className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 transition-colors"
+            >
+              <Zap className="w-3 h-3" />
+              Jump to Now
+            </button>
+          )}
           <button
             onClick={expandAll}
             className="text-xs px-3 py-1.5 rounded-lg bg-[#0a0a0a] text-gray-400 hover:text-white transition-colors"
@@ -401,14 +431,15 @@ export default function StationToolView({ initialStation = 'field' }: StationToo
       {/* Player Timeline */}
       <div className="space-y-3">
         {stationSchedule.map((slot, index) => (
-          <PlayerSlotCard
-            key={`slot-${index}`}
-            slot={slot}
-            station={activeStation}
-            isExpanded={expandedSlots.has(`slot-${index}`)}
-            onToggle={() => toggleSlot(`slot-${index}`)}
-            currentTime={currentTime}
-          />
+          <div key={`slot-${index}`} id={`slot-${index}`}>
+            <PlayerSlotCard
+              slot={slot}
+              station={activeStation}
+              isExpanded={expandedSlots.has(`slot-${index}`)}
+              onToggle={() => toggleSlot(`slot-${index}`)}
+              currentTime={currentTime}
+            />
+          </div>
         ))}
       </div>
 
