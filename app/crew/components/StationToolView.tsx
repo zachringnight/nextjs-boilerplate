@@ -10,6 +10,7 @@ type StationType = 'field' | 'social' | 'vnr' | 'packRip';
 
 interface StationToolViewProps {
   initialStation?: StationType;
+  largeText?: boolean;
 }
 
 interface TimeSlotInfo {
@@ -262,15 +263,15 @@ function PlayerSlotCard({
               {station === 'packRip' ? 'PACK RIP' : station.toUpperCase()} QUESTIONS
             </h4>
             {stationQuestions && (
-              <ul className="space-y-3">
+              <ul className="space-y-4">
                 {stationQuestions.questions.map((question, index) => (
                   <li key={index} className="flex items-start gap-3">
                     <span
-                      className={`w-6 h-6 ${config.bgColor} bg-opacity-20 rounded flex items-center justify-center text-xs font-bold ${config.textColor} flex-shrink-0`}
+                      className="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center text-sm font-bold text-black flex-shrink-0"
                     >
                       {index + 1}
                     </span>
-                    <span className="text-gray-200 leading-relaxed">{question}</span>
+                    <span className="text-gray-100 leading-relaxed text-lg">{question}</span>
                   </li>
                 ))}
               </ul>
@@ -282,7 +283,7 @@ function PlayerSlotCard({
   );
 }
 
-export default function StationToolView({ initialStation = 'field' }: StationToolViewProps) {
+export default function StationToolView({ initialStation = 'field', largeText = false }: StationToolViewProps) {
   const [activeStation, setActiveStation] = useState<StationType>(initialStation);
   const [expandedSlots, setExpandedSlots] = useState<Set<string>>(new Set());
   const [currentTime, setCurrentTime] = useState(new Date());

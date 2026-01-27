@@ -10,6 +10,7 @@ interface PlayerModalProps {
   station: string | null;
   onClose: () => void;
   onStationChange: (station: string | null) => void;
+  largeText?: boolean;
 }
 
 const stationOrder: Array<'field' | 'social' | 'vnr' | 'packRip'> = ['field', 'social', 'vnr', 'packRip'];
@@ -20,7 +21,7 @@ const groupColors = {
   3: 'bg-violet-500/20 text-violet-400 border-violet-500/30',
 };
 
-export default function PlayerModal({ player, station, onClose, onStationChange }: PlayerModalProps) {
+export default function PlayerModal({ player, station, onClose, onStationChange, largeText = false }: PlayerModalProps) {
   const activeStation = station || 'field';
 
   const activeQuestions = player.questions.find((q) => q.station === activeStation);
@@ -124,22 +125,21 @@ export default function PlayerModal({ player, station, onClose, onStationChange 
           </div>
 
           {/* Questions */}
-          <div className="p-6">
-            <h3 className="text-xs font-semibold text-gray-500 tracking-wide mb-4">
+          <div className={`p-6 ${largeText ? 'py-8' : ''}`}>
+            <h3 className={`font-semibold text-gray-500 tracking-wide mb-4 ${largeText ? 'text-sm' : 'text-xs'}`}>
               INTERVIEW QUESTIONS
             </h3>
             {activeQuestions && (
-              <ul className="space-y-4">
+              <ul className={`space-y-${largeText ? '6' : '4'}`}>
                 {activeQuestions.questions.map((question, index) => {
-                  const config = stationConfig[activeStation as keyof typeof stationConfig];
                   return (
-                    <li key={index} className="flex items-start gap-3">
+                    <li key={index} className="flex items-start gap-4">
                       <span
-                        className={`w-6 h-6 ${config.bgColor} bg-opacity-20 rounded flex items-center justify-center text-xs font-bold ${config.textColor} flex-shrink-0 mt-0.5`}
+                        className={`${largeText ? 'w-10 h-10 text-lg' : 'w-8 h-8 text-sm'} bg-amber-500 rounded-lg flex items-center justify-center font-bold text-black flex-shrink-0`}
                       >
                         {index + 1}
                       </span>
-                      <span className="text-gray-200 leading-relaxed">{question}</span>
+                      <span className={`text-gray-100 leading-relaxed ${largeText ? 'text-xl' : 'text-lg'}`}>{question}</span>
                     </li>
                   );
                 })}
