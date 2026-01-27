@@ -6,10 +6,20 @@ export interface PlayerQuestion {
 export interface Player {
   id: string;
   name: string;
+  firstName: string;
+  lastName: string;
+  pronunciation?: string;
   subtitle: string;
+  position: string;
+  team: string;
+  nationality: string;
+  flag: string;
+  photo: string;
   group: number;
   groupTime: string;
   playerNumber: number;
+  bio: string[];
+  talkingPoints: string[];
   questions: PlayerQuestion[];
 }
 
@@ -17,10 +27,28 @@ export const players: Player[] = [
   {
     id: 'ally-watt',
     name: 'ALLY WATT',
+    firstName: 'Ally',
+    lastName: 'Watt',
     subtitle: 'COLORADO RAPIDS',
+    position: 'Forward',
+    team: 'Colorado Rapids',
+    nationality: 'United States',
+    flag: '🇺🇸',
+    photo: '/players/ally-watt.jpg',
     group: 1,
     groupTime: '9:00 - 10:20 AM',
     playerNumber: 1,
+    bio: [
+      'Speed demon and fan favorite known for explosive runs',
+      'Hometown hero bringing pro soccer back to Colorado',
+      'Former North Carolina Courage standout',
+      'Known for her work ethic and leadership on and off the pitch',
+    ],
+    talkingPoints: [
+      'Colorado connection — playing at home means everything',
+      'Speed is her weapon — one of the fastest in the league',
+      'Community-focused — heavily involved in local youth soccer',
+    ],
     questions: [
       {
         station: 'field',
@@ -66,10 +94,29 @@ export const players: Player[] = [
   {
     id: 'kaleigh-kurtz',
     name: 'KALEIGH KURTZ',
+    firstName: 'Kaleigh',
+    lastName: 'Kurtz',
+    pronunciation: 'KAY-lee KURTS',
     subtitle: 'DEFENDER',
+    position: 'Center Back',
+    team: 'North Carolina Courage',
+    nationality: 'United States',
+    flag: '🇺🇸',
+    photo: '/players/kaleigh-kurtz.jpg',
     group: 1,
     groupTime: '9:00 - 10:20 AM',
     playerNumber: 2,
+    bio: [
+      'Rock-solid center back known for consistency and leadership',
+      'Anchors the back line with composure under pressure',
+      'Virginia Tech alum with a reputation for aerial dominance',
+      'Quiet leader who lets her play speak for itself',
+    ],
+    talkingPoints: [
+      'Consistency is her superpower — shows up every single game',
+      'Defenders rarely get the spotlight — she deserves it',
+      'Aerial presence makes her a threat on set pieces',
+    ],
     questions: [
       {
         station: 'field',
@@ -115,10 +162,29 @@ export const players: Player[] = [
   {
     id: 'manaka-matsukubo',
     name: 'MANAKA MATSUKUBO',
+    firstName: 'Manaka',
+    lastName: 'Matsukubo',
+    pronunciation: 'mah-NAH-kah maht-soo-KOO-boh',
     subtitle: 'JAPAN / NWSL',
+    position: 'Midfielder',
+    team: 'Portland Thorns',
+    nationality: 'Japan',
+    flag: '🇯🇵',
+    photo: '/players/manaka-matsukubo.jpg',
     group: 1,
     groupTime: '9:00 - 10:20 AM',
     playerNumber: 3,
+    bio: [
+      'Japanese international bringing flair and creativity to NWSL',
+      'Known for joyful style of play and infectious energy',
+      'Technical midfielder with exceptional vision',
+      'Rising star connecting Japanese and American soccer cultures',
+    ],
+    talkingPoints: [
+      'Joy is her trademark — plays with visible happiness',
+      'Represents growing Japan-NWSL pipeline',
+      'Technical ability stands out even in a league full of talent',
+    ],
     questions: [
       {
         station: 'field',
@@ -164,10 +230,29 @@ export const players: Player[] = [
   {
     id: 'kenza-dali',
     name: 'KENZA DALI',
+    firstName: 'Kenza',
+    lastName: 'Dali',
+    pronunciation: 'KEN-zah DAH-lee',
     subtitle: 'FRANCE / NWSL',
+    position: 'Midfielder',
+    team: 'Houston Dash',
+    nationality: 'France',
+    flag: '🇫🇷',
+    photo: '/players/kenza-dali.jpg',
     group: 2,
     groupTime: '10:30 - 11:50 AM',
     playerNumber: 4,
+    bio: [
+      'French international with elite technical skills',
+      'Veteran presence who has played across Europe\'s top leagues',
+      'Known for vision, creativity, and set-piece delivery',
+      'Fashion-forward with an eye for style on and off the pitch',
+    ],
+    talkingPoints: [
+      'European pedigree — played in France, England, now NWSL',
+      'Set-piece specialist with a dangerous delivery',
+      'Style icon — watch for sneaker game and fashion choices',
+    ],
     questions: [
       {
         station: 'field',
@@ -213,10 +298,28 @@ export const players: Player[] = [
   {
     id: 'mia-fishel',
     name: 'MIA FISHEL',
+    firstName: 'Mia',
+    lastName: 'Fishel',
     subtitle: 'FORWARD',
+    position: 'Forward',
+    team: 'Houston Dash',
+    nationality: 'United States',
+    flag: '🇺🇸',
+    photo: '/players/mia-fishel.jpg',
     group: 2,
     groupTime: '10:30 - 11:50 AM',
     playerNumber: 5,
+    bio: [
+      'Dynamic forward with a unique path through Liga MX Femenil',
+      'Known as "Big Fish" — built a brand around authentic self-expression',
+      'Social media savvy with a devoted fanbase',
+      'Goal scorer with flair and personality to match',
+    ],
+    talkingPoints: [
+      '"Big Fish Energy" is her brand — owns her confidence',
+      'Blazed her own trail through Mexico before NWSL',
+      'Highly engaged fanbase — knows her audience',
+    ],
     questions: [
       {
         station: 'field',
@@ -262,10 +365,29 @@ export const players: Player[] = [
   {
     id: 'mina-tanaka',
     name: 'MINA TANAKA',
+    firstName: 'Mina',
+    lastName: 'Tanaka',
+    pronunciation: 'MEE-nah tah-NAH-kah',
     subtitle: 'JAPAN / UTAH',
+    position: 'Forward',
+    team: 'Utah Royals',
+    nationality: 'Japan',
+    flag: '🇯🇵',
+    photo: '/players/mina-tanaka.jpg',
     group: 2,
     groupTime: '10:30 - 11:50 AM',
     playerNumber: 6,
+    bio: [
+      'Japanese international striker with clinical finishing',
+      'Prolific scorer in Japan before joining NWSL',
+      'Combines technical skill with intelligent movement',
+      'Quiet demeanor masks fierce competitive fire',
+    ],
+    talkingPoints: [
+      'Clinical finisher — makes the hard chances look easy',
+      'Growing Japanese presence in NWSL',
+      'Utah\'s newest star building a following in the Mountain West',
+    ],
     questions: [
       {
         station: 'field',
@@ -311,10 +433,28 @@ export const players: Player[] = [
   {
     id: 'casey-murphy',
     name: 'CASEY MURPHY',
+    firstName: 'Casey',
+    lastName: 'Murphy',
     subtitle: 'GOALKEEPER / USWNT',
+    position: 'Goalkeeper',
+    team: 'North Carolina Courage',
+    nationality: 'United States',
+    flag: '🇺🇸',
+    photo: '/players/casey-murphy.jpg',
     group: 2,
     groupTime: '10:30 - 11:50 AM',
     playerNumber: 7,
+    bio: [
+      'USWNT goalkeeper and one of the best in the world',
+      'Shot-stopper with commanding presence in goal',
+      'Rutgers alum who developed in France before returning to NWSL',
+      'Vocal leader and defensive organizer',
+    ],
+    talkingPoints: [
+      'National team goalkeeper — represents the pinnacle',
+      'International experience in France shaped her game',
+      'Commanding presence — organizes the entire defense',
+    ],
     questions: [
       {
         station: 'field',
@@ -360,10 +500,29 @@ export const players: Player[] = [
   {
     id: 'ivonne-chacon',
     name: 'IVONNE CHACON',
+    firstName: 'Ivonne',
+    lastName: 'Chacon',
+    pronunciation: 'ee-VON-nay chah-CONE',
     subtitle: 'COLOMBIA / CHICAGO',
+    position: 'Midfielder',
+    team: 'Chicago Stars',
+    nationality: 'Colombia',
+    flag: '🇨🇴',
+    photo: '/players/ivonne-chacon.jpg',
     group: 3,
     groupTime: '1:00 - 2:20 PM',
     playerNumber: 8,
+    bio: [
+      'Colombian international bringing South American flair to Chicago',
+      'Dynamic midfielder with energy and creativity',
+      'Represents the growing Latin American presence in NWSL',
+      'Passionate about inspiring young girls back home in Colombia',
+    ],
+    talkingPoints: [
+      'Colombian pride — represents a nation passionate about football',
+      'Sticker culture is HUGE in Colombia — World Cup albums are legendary',
+      'Bridge between Colombian fans and NWSL',
+    ],
     questions: [
       {
         station: 'field',
@@ -409,10 +568,29 @@ export const players: Player[] = [
   {
     id: 'temwa-chawinga',
     name: 'TEMWA CHAWINGA',
+    firstName: 'Temwa',
+    lastName: 'Chawinga',
+    pronunciation: 'TEM-wah chah-WING-gah',
     subtitle: 'MALAWI / KANSAS CITY',
+    position: 'Forward',
+    team: 'Kansas City Current',
+    nationality: 'Malawi',
+    flag: '🇲🇼',
+    photo: '/players/temwa-chawinga.jpg',
     group: 3,
     groupTime: '1:00 - 2:20 PM',
     playerNumber: 9,
+    bio: [
+      'Malawian international and sister of Tabitha Chawinga',
+      'Represents an entire continent in NWSL',
+      'Name means "love" in Chichewa — plays with heart',
+      'Trailblazer for African women in professional soccer',
+    ],
+    talkingPoints: [
+      'African representation matters — she carries a continent\'s hopes',
+      'Sister duo with Tabitha — family legacy in the sport',
+      'Her name "Temwa" means love — beautiful story angle',
+    ],
     questions: [
       {
         station: 'field',
@@ -458,10 +636,28 @@ export const players: Player[] = [
   {
     id: 'jordyn-bloomer',
     name: 'JORDYN BLOOMER',
+    firstName: 'Jordyn',
+    lastName: 'Bloomer',
     subtitle: 'GOALKEEPER',
+    position: 'Goalkeeper',
+    team: 'Racing Louisville',
+    nationality: 'United States',
+    flag: '🇺🇸',
+    photo: '/players/jordyn-bloomer.jpg',
     group: 3,
     groupTime: '1:00 - 2:20 PM',
     playerNumber: 10,
+    bio: [
+      'Rising goalkeeper making a name with clutch performances',
+      'Big-game mentality — thrives under pressure',
+      'Known for signature celebration and personality',
+      'Fan favorite with growing following',
+    ],
+    talkingPoints: [
+      'Clutch performer — big moments find her',
+      'Personality stands out — genuine and engaging',
+      'Signature celebration worth capturing',
+    ],
     questions: [
       {
         station: 'field',
@@ -507,10 +703,28 @@ export const players: Player[] = [
   {
     id: 'riley-tiernan',
     name: 'RILEY TIERNAN',
+    firstName: 'Riley',
+    lastName: 'Tiernan',
     subtitle: 'ANGEL CITY',
+    position: 'Midfielder',
+    team: 'Angel City FC',
+    nationality: 'United States',
+    flag: '🇺🇸',
+    photo: '/players/riley-tiernan.jpg',
     group: 3,
     groupTime: '1:00 - 2:20 PM',
     playerNumber: 11,
+    bio: [
+      'Jersey native making waves in Los Angeles',
+      'Electric young talent with fearless attacking style',
+      'Angel City\'s rising star with a bright future',
+      'Brings East Coast grit to West Coast soccer',
+    ],
+    talkingPoints: [
+      'Rookie sensation — "welcome to the league" energy',
+      'Angel City fanbase is massive — built-in audience',
+      'Jersey to LA journey — interesting contrast',
+    ],
     questions: [
       {
         station: 'field',
@@ -561,10 +775,10 @@ export const rotationSchedule = {
     time: '9:00 AM - 10:20 AM',
     players: ['Ally Watt', 'Kaleigh Kurtz', 'Manaka Matsukubo'],
     schedule: [
-      { time: '9:00', field: 'Ally', social: 'Kaleigh', vnr: 'Manaka', packRip: '—' },
-      { time: '9:20', field: 'Kaleigh', social: 'Manaka', vnr: '—', packRip: 'Ally' },
-      { time: '9:40', field: 'Manaka', social: '—', vnr: 'Ally', packRip: 'Kaleigh' },
-      { time: '10:00', field: '—', social: 'Ally', vnr: 'Kaleigh', packRip: 'Manaka' },
+      { time: '9:00', field: 'Ally Watt', social: 'Kaleigh Kurtz', vnr: 'Manaka Matsukubo', packRip: 'BREAK' },
+      { time: '9:20', field: 'Kaleigh Kurtz', social: 'Manaka Matsukubo', vnr: 'BREAK', packRip: 'Ally Watt' },
+      { time: '9:40', field: 'Manaka Matsukubo', social: 'BREAK', vnr: 'Ally Watt', packRip: 'Kaleigh Kurtz' },
+      { time: '10:00', field: 'BREAK', social: 'Ally Watt', vnr: 'Kaleigh Kurtz', packRip: 'Manaka Matsukubo' },
     ],
   },
   group2: {
@@ -572,10 +786,10 @@ export const rotationSchedule = {
     time: '10:30 AM - 11:50 AM',
     players: ['Kenza Dali', 'Mia Fishel', 'Mina Tanaka', 'Casey Murphy'],
     schedule: [
-      { time: '10:30', field: 'Kenza', social: 'Mia', vnr: 'Mina', packRip: 'Casey' },
-      { time: '10:50', field: 'Mia', social: 'Mina', vnr: 'Casey', packRip: 'Kenza' },
-      { time: '11:10', field: 'Mina', social: 'Casey', vnr: 'Kenza', packRip: 'Mia' },
-      { time: '11:30', field: 'Casey', social: 'Kenza', vnr: 'Mia', packRip: 'Mina' },
+      { time: '10:30', field: 'Kenza Dali', social: 'Mia Fishel', vnr: 'Mina Tanaka', packRip: 'Casey Murphy' },
+      { time: '10:50', field: 'Mia Fishel', social: 'Mina Tanaka', vnr: 'Casey Murphy', packRip: 'Kenza Dali' },
+      { time: '11:10', field: 'Mina Tanaka', social: 'Casey Murphy', vnr: 'Kenza Dali', packRip: 'Mia Fishel' },
+      { time: '11:30', field: 'Casey Murphy', social: 'Kenza Dali', vnr: 'Mia Fishel', packRip: 'Mina Tanaka' },
     ],
   },
   group3: {
@@ -583,10 +797,10 @@ export const rotationSchedule = {
     time: '1:00 PM - 2:20 PM',
     players: ['Ivonne Chacon', 'Temwa Chawinga', 'Jordyn Bloomer', 'Riley Tiernan'],
     schedule: [
-      { time: '1:00', field: 'Ivonne', social: 'Temwa', vnr: 'Jordyn', packRip: 'Riley' },
-      { time: '1:20', field: 'Temwa', social: 'Jordyn', vnr: 'Riley', packRip: 'Ivonne' },
-      { time: '1:40', field: 'Jordyn', social: 'Riley', vnr: 'Ivonne', packRip: 'Temwa' },
-      { time: '2:00', field: 'Riley', social: 'Ivonne', vnr: 'Temwa', packRip: 'Jordyn' },
+      { time: '1:00', field: 'Ivonne Chacon', social: 'Temwa Chawinga', vnr: 'Jordyn Bloomer', packRip: 'Riley Tiernan' },
+      { time: '1:20', field: 'Temwa Chawinga', social: 'Jordyn Bloomer', vnr: 'Riley Tiernan', packRip: 'Ivonne Chacon' },
+      { time: '1:40', field: 'Jordyn Bloomer', social: 'Riley Tiernan', vnr: 'Ivonne Chacon', packRip: 'Temwa Chawinga' },
+      { time: '2:00', field: 'Riley Tiernan', social: 'Ivonne Chacon', vnr: 'Temwa Chawinga', packRip: 'Jordyn Bloomer' },
     ],
   },
 };
