@@ -4,7 +4,13 @@ import { useState, useEffect } from 'react';
 import { players } from '../../data/players';
 import type { Player } from '../../data/players';
 import PlayerAvatar from './PlayerAvatar';
-import { Clock, Zap, ChevronRight, Volume2, AlertTriangle, Languages } from 'lucide-react';
+import { Clock, Zap, ChevronRight, Volume2, AlertTriangle, Languages, Calendar } from 'lucide-react';
+
+// Event dates - January 28-29, 2026
+const EVENT_DATES = {
+  day1: { year: 2026, month: 0, day: 28 }, // month is 0-indexed (January = 0)
+  day2: { year: 2026, month: 0, day: 29 },
+};
 
 function parseTime(timeStr: string): { hours: number; minutes: number } {
   const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
@@ -20,7 +26,27 @@ function parseTime(timeStr: string): { hours: number; minutes: number } {
   return { hours, minutes };
 }
 
-function isCurrentPlayer(player: Player, currentTime: Date): boolean {
+function getEventDay(date: Date): 1 | 2 | null {
+  const pstString = date.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });
+  const pstDate = new Date(pstString);
+
+  const year = pstDate.getFullYear();
+  const month = pstDate.getMonth();
+  const day = pstDate.getDate();
+
+  if (year === EVENT_DATES.day1.year && month === EVENT_DATES.day1.month && day === EVENT_DATES.day1.day) {
+    return 1;
+  }
+  if (year === EVENT_DATES.day2.year && month === EVENT_DATES.day2.month && day === EVENT_DATES.day2.day) {
+    return 2;
+  }
+  return null;
+}
+
+function isCurrentPlayer(player: Player, currentTime: Date, eventDay: 1 | 2 | null): boolean {
+  // Only match players on the current event day
+  if (eventDay === null || player.day !== eventDay) return false;
+
   const { hours, minutes } = parseTime(player.scheduledTime);
   const slotStart = hours * 60 + minutes;
   const slotEnd = slotStart + 15;
@@ -47,12 +73,17 @@ function getTimeRemaining(player: Player, currentTime: Date): { minutes: number;
   };
 }
 
-function getNextPlayer(currentTime: Date): Player | null {
+function getNextPlayer(currentTime: Date, eventDay: 1 | 2 | null): Player | null {
+  // Only look for next player on the current event day
+  if (eventDay === null) return null;
+
   const pstString = currentTime.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });
   const pstDate = new Date(pstString);
   const currentMinutes = pstDate.getHours() * 60 + pstDate.getMinutes();
 
-  for (const player of players) {
+  const dayPlayers = players.filter(p => p.day === eventDay);
+
+  for (const player of dayPlayers) {
     const { hours, minutes } = parseTime(player.scheduledTime);
     const slotStart = hours * 60 + minutes;
     if (slotStart > currentMinutes) {
@@ -142,8 +173,11 @@ export default function NowDashboard({ onPlayerClick }: NowDashboardProps) {
     return () => clearInterval(interval);
   }, []);
 
-  const currentPlayer = players.find(p => isCurrentPlayer(p, currentTime));
-  const nextPlayer = getNextPlayer(currentTime);
+  // Get the current event day (1, 2, or null if not during event)
+  const eventDay = getEventDay(currentTime);
+
+  const currentPlayer = players.find(p => isCurrentPlayer(p, currentTime, eventDay));
+  const nextPlayer = getNextPlayer(currentTime, eventDay);
 
   const formattedTime = currentTime.toLocaleTimeString('en-US', {
     hour: 'numeric',
@@ -153,29 +187,102 @@ export default function NowDashboard({ onPlayerClick }: NowDashboardProps) {
     timeZone: 'America/Los_Angeles',
   });
 
+  const formattedDate = currentTime.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'America/Los_Angeles',
+  });
+
   const pstString = currentTime.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });
   const pstDate = new Date(pstString);
   const currentHour = pstDate.getHours();
   const currentMin = pstDate.getMinutes();
 
-  const isDay1 = pstDate.getDate() === 28;
-  const isDay2 = pstDate.getDate() === 29;
-  const dayPlayers = isDay1 ? players.filter(p => p.day === 1) : isDay2 ? players.filter(p => p.day === 2) : [];
+  const dayPlayers = eventDay ? players.filter(p => p.day === eventDay) : [];
+
+  // Date/time display component
+  const DateTimeDisplay = () => (
+    <div className="bg-[#141414] border border-[#2a2a2a] rounded-xl p-4 mb-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Calendar className="w-5 h-5 text-amber-400" />
+          <div>
+            <p className="font-medium text-white">{formattedDate}</p>
+            <p className="text-xs text-gray-500">PT (Los Angeles)</p>
+          </div>
+        </div>
+        <div className="text-right">
+          <p className="font-mono text-2xl text-amber-400">{formattedTime}</p>
+          {eventDay && (
+            <p className={`text-xs font-medium ${eventDay === 1 ? 'text-blue-400' : 'text-violet-400'}`}>
+              Day {eventDay} of Shoot
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
+  // Not on an event day
+  if (eventDay === null) {
+    const day1Date = new Date(EVENT_DATES.day1.year, EVENT_DATES.day1.month, EVENT_DATES.day1.day);
+    const day2Date = new Date(EVENT_DATES.day2.year, EVENT_DATES.day2.month, EVENT_DATES.day2.day);
+    const now = new Date(pstString);
+
+    const isBeforeEvent = now < day1Date;
+    const isAfterEvent = now > day2Date;
+
+    return (
+      <div className="space-y-6">
+        <DateTimeDisplay />
+        <div className="text-center py-12">
+          <div className="text-6xl mb-4">{isBeforeEvent ? '📅' : '✅'}</div>
+          <h2 className="text-2xl font-bold mb-2">
+            {isBeforeEvent ? 'Shoot Coming Soon' : 'Shoot Complete'}
+          </h2>
+          <p className="text-gray-500 mb-4">
+            {isBeforeEvent
+              ? 'The NWSL Media Day shoot is scheduled for January 28-29, 2026'
+              : 'The NWSL Media Day 2026 shoot has wrapped!'}
+          </p>
+          <div className="inline-flex flex-col gap-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl px-6 py-4">
+            <div className="flex items-center gap-3 text-blue-400">
+              <span className="font-medium">Day 1:</span>
+              <span>Wednesday, January 28, 2026</span>
+            </div>
+            <div className="flex items-center gap-3 text-violet-400">
+              <span className="font-medium">Day 2:</span>
+              <span>Thursday, January 29, 2026</span>
+            </div>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-4 text-center">
+          <div className="bg-[#141414] border border-[#2a2a2a] rounded-xl p-4">
+            <p className="text-3xl font-bold text-white">{players.length}</p>
+            <p className="text-xs text-gray-500">Total Players</p>
+          </div>
+          <div className="bg-[#141414] border border-[#2a2a2a] rounded-xl p-4">
+            <p className="text-3xl font-bold text-white">2</p>
+            <p className="text-xs text-gray-500">Shoot Days</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!currentPlayer) {
     if (currentHour < 9 || (currentHour === 9 && currentMin < 35)) {
       return (
         <div className="space-y-6">
+          <DateTimeDisplay />
           <div className="text-center py-12">
             <div className="text-6xl mb-4">🌅</div>
             <h2 className="text-2xl font-bold mb-2">Good Morning!</h2>
             <p className="text-gray-500 mb-4">
-              {isDay1 ? 'Day 1 starts at 10:05 AM' : isDay2 ? 'Day 2 starts at 9:35 AM' : 'Shoot starts soon'}
+              {eventDay === 1 ? 'Day 1 starts at 10:05 AM' : 'Day 2 starts at 9:35 AM'}
             </p>
-            <div className="inline-flex items-center gap-2 bg-[#141414] px-4 py-2 rounded-lg">
-              <Clock className="w-5 h-5 text-amber-400" />
-              <span className="font-mono text-2xl">{formattedTime}</span>
-            </div>
           </div>
           {nextPlayer && (
             <div className="max-w-md mx-auto">
@@ -190,14 +297,11 @@ export default function NowDashboard({ onPlayerClick }: NowDashboardProps) {
     if (currentHour >= 20) {
       return (
         <div className="space-y-6">
+          <DateTimeDisplay />
           <div className="text-center py-12">
             <div className="text-6xl mb-4">🎉</div>
             <h2 className="text-2xl font-bold mb-2">That's a Wrap!</h2>
             <p className="text-gray-500 mb-4">Great work today, team!</p>
-            <div className="inline-flex items-center gap-2 bg-[#141414] px-4 py-2 rounded-lg">
-              <Clock className="w-5 h-5 text-amber-400" />
-              <span className="font-mono text-2xl">{formattedTime}</span>
-            </div>
           </div>
         </div>
       );
@@ -205,14 +309,11 @@ export default function NowDashboard({ onPlayerClick }: NowDashboardProps) {
 
     return (
       <div className="space-y-6">
+        <DateTimeDisplay />
         <div className="text-center py-12">
           <div className="text-6xl mb-4">⏳</div>
           <h2 className="text-2xl font-bold mb-2">Break</h2>
           <p className="text-gray-500 mb-4">Next player coming up</p>
-          <div className="inline-flex items-center gap-2 bg-[#141414] px-4 py-2 rounded-lg">
-            <Clock className="w-5 h-5 text-amber-400" />
-            <span className="font-mono text-2xl">{formattedTime}</span>
-          </div>
         </div>
         {nextPlayer && (
           <div className="max-w-md mx-auto">
@@ -239,6 +340,8 @@ export default function NowDashboard({ onPlayerClick }: NowDashboardProps) {
 
   return (
     <div className="space-y-6">
+      <DateTimeDisplay />
+
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-2">
@@ -246,13 +349,6 @@ export default function NowDashboard({ onPlayerClick }: NowDashboardProps) {
             Live Now
           </h2>
           <p className="text-sm text-gray-500">Current player at Panini station</p>
-        </div>
-        <div className="text-right">
-          <div className="flex items-center gap-2 text-amber-400">
-            <Clock className="w-4 h-4" />
-            <span className="font-mono font-bold text-lg">{formattedTime}</span>
-          </div>
-          <p className="text-xs text-gray-500">PT (Los Angeles)</p>
         </div>
       </div>
 
