@@ -225,47 +225,97 @@ export default function NowDashboard({ onPlayerClick }: NowDashboardProps) {
     </div>
   );
 
-  // Not on an event day
+  // Not on an event day - show shoot info with schedule
   if (eventDay === null) {
     const day1Date = new Date(EVENT_DATES.day1.year, EVENT_DATES.day1.month, EVENT_DATES.day1.day);
-    const day2Date = new Date(EVENT_DATES.day2.year, EVENT_DATES.day2.month, EVENT_DATES.day2.day);
     const now = new Date(pstString);
-
     const isBeforeEvent = now < day1Date;
-    const isAfterEvent = now > day2Date;
+    const day1Players = players.filter(p => p.day === 1);
+    const day2Players = players.filter(p => p.day === 2);
+    const firstPlayer = day1Players[0];
 
     return (
       <div className="space-y-6">
         <DateTimeDisplay />
-        <div className="text-center py-12">
-          <div className="text-6xl mb-4">{isBeforeEvent ? '📅' : '✅'}</div>
-          <h2 className="text-2xl font-bold mb-2">
-            {isBeforeEvent ? 'Shoot Coming Soon' : 'Shoot Complete'}
-          </h2>
-          <p className="text-gray-500 mb-4">
-            {isBeforeEvent
-              ? 'The NWSL Media Day shoot is scheduled for January 28 and 29, 2026'
-              : 'The NWSL Media Day 2026 shoot has wrapped!'}
-          </p>
-          <div className="inline-flex flex-col gap-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl px-6 py-4">
-            <div className="flex items-center gap-3 text-blue-400">
-              <span className="font-medium">Day 1:</span>
-              <span>Wednesday, January 28, 2026</span>
-            </div>
-            <div className="flex items-center gap-3 text-violet-400">
-              <span className="font-medium">Day 2:</span>
-              <span>Thursday, January 29, 2026</span>
+
+        {/* Shoot status banner */}
+        <div className={`rounded-xl p-4 ${isBeforeEvent ? 'bg-blue-500/10 border border-blue-500/30' : 'bg-green-500/10 border border-green-500/30'}`}>
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">{isBeforeEvent ? '📅' : '✅'}</span>
+            <div>
+              <p className={`font-bold ${isBeforeEvent ? 'text-blue-400' : 'text-green-400'}`}>
+                {isBeforeEvent ? 'Shoot Coming Up' : 'Shoot Complete'}
+              </p>
+              <p className="text-sm text-gray-400">January 28 & 29, 2026 at MG Studio, Los Angeles</p>
             </div>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-4 text-center">
-          <div className="bg-[#141414] border border-[#2a2a2a] rounded-xl p-4">
-            <p className="text-3xl font-bold text-white">{players.length}</p>
-            <p className="text-xs text-gray-500">Total Players</p>
+
+        {/* Schedule overview */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-[#141414] border border-blue-500/30 rounded-xl p-4">
+            <p className="text-xs text-blue-400 font-medium mb-2">DAY 1</p>
+            <p className="font-bold text-white">Wednesday, Jan 28</p>
+            <p className="text-sm text-gray-400">{day1Players.length} players</p>
+            <p className="text-xs text-gray-500 mt-1">10:05 AM start</p>
           </div>
-          <div className="bg-[#141414] border border-[#2a2a2a] rounded-xl p-4">
-            <p className="text-3xl font-bold text-white">2</p>
-            <p className="text-xs text-gray-500">Shoot Days</p>
+          <div className="bg-[#141414] border border-violet-500/30 rounded-xl p-4">
+            <p className="text-xs text-violet-400 font-medium mb-2">DAY 2</p>
+            <p className="font-bold text-white">Thursday, Jan 29</p>
+            <p className="text-sm text-gray-400">{day2Players.length} players</p>
+            <p className="text-xs text-gray-500 mt-1">9:35 AM start</p>
+          </div>
+        </div>
+
+        {/* First player preview */}
+        {firstPlayer && (
+          <div>
+            <p className="text-sm text-gray-500 mb-2">FIRST UP (DAY 1):</p>
+            <NextPlayerCard player={firstPlayer} onPlayerClick={onPlayerClick} />
+          </div>
+        )}
+
+        {/* Station info */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-[#141414] border border-green-500/30 rounded-xl p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center text-xl">
+                🚶
+              </div>
+              <div>
+                <h3 className="font-bold text-green-400">TUNNEL</h3>
+                <p className="text-xs text-gray-500">Walk-in + Interview</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-[#141414] border border-amber-500/30 rounded-xl p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-amber-500 rounded-lg flex items-center justify-center text-xl">
+                📸
+              </div>
+              <div>
+                <h3 className="font-bold text-amber-400">PRODUCT</h3>
+                <p className="text-xs text-gray-500">Card Photography</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="bg-[#141414] border border-[#2a2a2a] rounded-xl p-4">
+          <div className="grid grid-cols-3 gap-4 text-center">
+            <div>
+              <p className="text-2xl font-bold text-white">{players.length}</p>
+              <p className="text-xs text-gray-500">Total Players</p>
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-white">2</p>
+              <p className="text-xs text-gray-500">Stations</p>
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-white">2</p>
+              <p className="text-xs text-gray-500">Shoot Days</p>
+            </div>
           </div>
         </div>
       </div>
