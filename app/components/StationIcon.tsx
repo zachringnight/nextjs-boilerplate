@@ -22,7 +22,7 @@ export const stationConfig = {
     bgColor: 'bg-amber-500',
     textColor: 'text-amber-500',
     borderColor: 'border-amber-500/30',
-    description: 'Card photography and poses - visual only',
+    description: 'Card photography and poses (visual only)',
     hasInterview: false,
   },
 };

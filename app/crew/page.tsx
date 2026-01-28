@@ -115,7 +115,7 @@ export default function CrewPage() {
                 <Type className="w-5 h-5" />
               </button>
               <div className="text-right">
-                <p className="text-sm text-[#FFD100] font-medium">Jan 28-29, 2026</p>
+                <p className="text-sm text-[#FFD100] font-medium">Jan 28 & 29, 2026</p>
                 <p className="text-xs text-gray-500">34 Players • 2 Days</p>
               </div>
             </div>
@@ -205,7 +205,7 @@ export default function CrewPage() {
                   }`}
                 >
                   <Filter className="w-4 h-4" />
-                  Day 1 - Wed ({dayCounts[1]})
+                  Day 1 (Wed) ({dayCounts[1]})
                 </button>
                 <button
                   onClick={() => setActiveDay(activeDay === 2 ? null : 2)}
@@ -216,7 +216,7 @@ export default function CrewPage() {
                   }`}
                 >
                   <Filter className="w-4 h-4" />
-                  Day 2 - Thu ({dayCounts[2]})
+                  Day 2 (Thu) ({dayCounts[2]})
                 </button>
                 <button
                   onClick={() => setShowEmbargoedOnly(!showEmbargoedOnly)}

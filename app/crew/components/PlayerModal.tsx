@@ -198,7 +198,7 @@ export default function PlayerModal({ player, onClose, largeText = false }: Play
           {/* Footer tip */}
           <div className="px-6 pb-6">
             <div className="bg-[#141414] border border-[#2a2a2a] rounded-lg p-3 text-xs text-gray-500">
-              <strong className="text-gray-400">15 min per station.</strong> Flex questions based on athlete comfort. Product station is visual only — no interview.
+              <strong className="text-gray-400">15 min per station.</strong> Flex questions based on athlete comfort. Product station is visual only (no interview).
             </div>
           </div>
         </div>

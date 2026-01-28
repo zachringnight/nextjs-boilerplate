@@ -6,7 +6,7 @@ import type { Player } from '../../data/players';
 import PlayerAvatar from './PlayerAvatar';
 import { Clock, Zap, ChevronRight, Volume2, AlertTriangle, Languages, Calendar } from 'lucide-react';
 
-// Event dates - January 28-29, 2026
+// Event dates: January 28 and 29, 2026
 const EVENT_DATES = {
   day1: { year: 2026, month: 0, day: 28 }, // month is 0-indexed (January = 0)
   day2: { year: 2026, month: 0, day: 29 },
@@ -244,7 +244,7 @@ export default function NowDashboard({ onPlayerClick }: NowDashboardProps) {
           </h2>
           <p className="text-gray-500 mb-4">
             {isBeforeEvent
-              ? 'The NWSL Media Day shoot is scheduled for January 28-29, 2026'
+              ? 'The NWSL Media Day shoot is scheduled for January 28 and 29, 2026'
               : 'The NWSL Media Day 2026 shoot has wrapped!'}
           </p>
           <div className="inline-flex flex-col gap-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl px-6 py-4">

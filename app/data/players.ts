@@ -55,7 +55,7 @@ const tunnelQuestions: string[] = [
   "What do you want collectors to know about this moment for the NWSL?",
   // Ad VO Questions
   'Finish this sentence: "The NWSL is ___."',
-  "In one line — why should fans be collecting NWSL right now?",
+  "In one line: why should fans be collecting NWSL right now?",
   "What's your message to the next generation of women's soccer players?",
   "One word for your mindset this season.",
   "What does it mean to see yourself on a Panini card?",
@@ -123,13 +123,13 @@ export const players: Player[] = [
     translatorNeeded: false,
     bio: [
       'Rising goalkeeper making a name with clutch performances',
-      'Big-game mentality — thrives under pressure',
+      'Big game mentality. Thrives under pressure.',
       'Known for signature celebration and personality',
       'Fan favorite with growing following',
     ],
     talkingPoints: [
-      'Clutch performer — big moments find her',
-      'Personality stands out — genuine and engaging',
+      'Clutch performer. Big moments find her.',
+      'Personality stands out. Genuine and engaging.',
       'Goalkeeper excellence in the NWSL',
     ],
     questions: [
@@ -197,7 +197,7 @@ export const players: Player[] = [
       'Quiet demeanor masks fierce competitive fire',
     ],
     talkingPoints: [
-      'Clinical finisher — makes hard chances look easy',
+      'Clinical finisher who makes hard chances look easy',
       'Growing Japanese presence in NWSL',
       "Utah's newest star building a following in the Mountain West",
     ],
@@ -231,9 +231,9 @@ export const players: Player[] = [
       'Vocal leader and defensive organizer',
     ],
     talkingPoints: [
-      'National team goalkeeper — represents the pinnacle',
+      'National team goalkeeper who represents the pinnacle',
       'International experience in France shaped her game',
-      'Commanding presence — organizes the entire defense',
+      'Commanding presence who organizes the entire defense',
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
@@ -300,8 +300,8 @@ export const players: Player[] = [
       'Quiet leader who lets her play speak for itself',
     ],
     talkingPoints: [
-      'Consistency is her superpower — shows up every single game',
-      'Defenders rarely get the spotlight — she deserves it',
+      'Consistency is her superpower: shows up every single game',
+      'Defenders rarely get the spotlight, but she deserves it',
       'Aerial presence makes her a threat on set pieces',
     ],
     questions: [
@@ -403,9 +403,9 @@ export const players: Player[] = [
       'Fashion-forward with an eye for style on and off the pitch',
     ],
     talkingPoints: [
-      'European pedigree — played in France, England, now NWSL',
+      'European pedigree: played in France, England, now NWSL',
       'Set-piece specialist with a dangerous delivery',
-      'Style icon — watch for sneaker game and fashion choices',
+      'Style icon; watch for sneaker game and fashion choices',
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
@@ -466,14 +466,14 @@ export const players: Player[] = [
     translatorNeeded: false,
     bio: [
       'Dynamic forward with a unique path through Liga MX Femenil',
-      'Known as "Big Fish" — built a brand around authentic self-expression',
+      'Known as "Big Fish" and built a brand around authentic self expression',
       'Social media savvy with a devoted fanbase',
       'Goal scorer with flair and personality to match',
     ],
     talkingPoints: [
-      '"Big Fish Energy" is her brand — owns her confidence',
+      '"Big Fish Energy" is her brand and she owns her confidence',
       'Blazed her own trail through Mexico before NWSL',
-      'Highly engaged fanbase — knows her audience',
+      'Highly engaged fanbase; knows her audience',
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
@@ -575,8 +575,8 @@ export const players: Player[] = [
       'Passionate about inspiring young girls back home in Colombia',
     ],
     talkingPoints: [
-      'Colombian pride — represents a nation passionate about football',
-      'Sticker culture is HUGE in Colombia — World Cup albums are legendary',
+      'Colombian pride, representing a nation passionate about football',
+      'Sticker culture is HUGE in Colombia; World Cup albums are legendary',
       'Bridge between Colombian fans and NWSL',
     ],
     questions: [
@@ -610,7 +610,7 @@ export const players: Player[] = [
       'Rising star connecting Japanese and American soccer cultures',
     ],
     talkingPoints: [
-      'Joy is her trademark — plays with visible happiness',
+      'Joy is her trademark; plays with visible happiness',
       'Represents growing Japan-NWSL pipeline',
       'Technical ability stands out even in a league full of talent',
     ],
@@ -819,7 +819,7 @@ export const players: Player[] = [
       'Known for creativity, skill moves, and clutch performances',
     ],
     talkingPoints: [
-      'Face of the NWSL — generational star',
+      'Face of the NWSL, a generational star',
       'USWNT cornerstone for the next decade',
       'Marketability and global appeal',
     ],
@@ -881,13 +881,13 @@ export const players: Player[] = [
     embargoed: true,
     translatorNeeded: false,
     bio: [
-      'Youngest player to sign NWSL contract — trailblazer',
+      'Youngest player to sign an NWSL contract; a true trailblazer',
       'Technical prodigy with elite ball skills',
       'Known for creativity and flair',
       'Growing into a USWNT contributor',
     ],
     talkingPoints: [
-      'Trailblazer — changed the rules of the game',
+      'Trailblazer who changed the rules of the game',
       'Portland Thorns homegrown star',
       'USWNT future building',
     ],
@@ -986,13 +986,13 @@ export const players: Player[] = [
     bio: [
       'Malawian international and sister of Tabitha Chawinga',
       'Represents an entire continent in NWSL',
-      'Name means "love" in Chichewa — plays with heart',
+      'Name means "love" in Chichewa; plays with heart',
       'Trailblazer for African women in professional soccer',
     ],
     talkingPoints: [
-      "African representation matters — she carries a continent's hopes",
-      'Sister duo with Tabitha — family legacy in the sport',
-      'Her name "Temwa" means love — beautiful story angle',
+      "African representation matters; she carries a continent's hopes",
+      'Sister duo with Tabitha, creating a family legacy in the sport',
+      'Her name "Temwa" means love; a beautiful story angle',
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
@@ -1025,7 +1025,7 @@ export const players: Player[] = [
     ],
     talkingPoints: [
       'USWNT legend status',
-      'Championship pedigree — World Cup winner',
+      'Championship pedigree with a World Cup win',
       'Veteran leadership for Chicago Stars',
     ],
     questions: [
@@ -1194,9 +1194,9 @@ export const players: Player[] = [
       'Brings East Coast grit to West Coast soccer',
     ],
     talkingPoints: [
-      'Rookie sensation — "Welcome to the league" energy',
-      'Angel City fanbase is massive — built-in audience',
-      'Jersey to LA journey — interesting contrast',
+      'Rookie sensation with "Welcome to the league" energy',
+      'Angel City fanbase is massive with a built in audience',
+      'Jersey to LA journey offers an interesting contrast',
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
@@ -1278,7 +1278,7 @@ export const stations = [
     icon: '📸',
     color: '#f59e0b',
     colorClass: 'amber-500',
-    description: 'Card photography and poses - visual only, no interview',
+    description: 'Card photography and poses (visual only, no interview)',
     hasInterview: false,
     duration: 15,
   },
@@ -1302,7 +1302,7 @@ export const tunnelInterviewQuestions = {
     title: 'AD VO QUESTIONS (Clean, Quotable Lines)',
     questions: [
       'Finish this sentence: "The NWSL is ___."',
-      "In one line — why should fans be collecting NWSL right now?",
+      "In one line: why should fans be collecting NWSL right now?",
       "What's your message to the next generation of women's soccer players?",
       "One word for your mindset this season.",
       "What does it mean to see yourself on a Panini card?",

@@ -346,7 +346,7 @@ export default function StationToolView({ largeText = false }: StationToolViewPr
               : 'bg-[#141414] text-gray-300 hover:bg-[#1a1a1a]'
           }`}
         >
-          Day 1 - Wed ({players.filter(p => p.day === 1).length})
+          Day 1 (Wed) ({players.filter(p => p.day === 1).length})
         </button>
         <button
           onClick={() => setActiveDay(2)}
@@ -356,7 +356,7 @@ export default function StationToolView({ largeText = false }: StationToolViewPr
               : 'bg-[#141414] text-gray-300 hover:bg-[#1a1a1a]'
           }`}
         >
-          Day 2 - Thu ({players.filter(p => p.day === 2).length})
+          Day 2 (Thu) ({players.filter(p => p.day === 2).length})
         </button>
       </div>
 
@@ -411,7 +411,7 @@ export default function StationToolView({ largeText = false }: StationToolViewPr
 
       {/* Footer tip */}
       <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-4 text-sm text-gray-500">
-        <strong className="text-gray-400">Tip:</strong> Tap any player card to expand their full profile, background, and interview questions. Product station is visual only — no interview needed.
+        <strong className="text-gray-400">Tip:</strong> Tap any player card to expand their full profile, background, and interview questions. Product station is visual only (no interview needed).
       </div>
     </div>
   );
