@@ -1,14 +1,14 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { players, rotationSchedule } from '../data/players';
+import { players } from '../data/players';
 import PlayerCard from './components/PlayerCard';
 import PlayerModal from './components/PlayerModal';
 import ScheduleView from './components/ScheduleView';
 import StationToolView from './components/StationToolView';
 import NowDashboard from './components/NowDashboard';
 import type { Player } from '../data/players';
-import { Search, Users, Filter, Calendar, User, Radio, Zap, X, Type } from 'lucide-react';
+import { Search, Users, Filter, Calendar, User, Radio, Zap, X, Type, AlertTriangle } from 'lucide-react';
 
 type ViewMode = 'now' | 'schedule' | 'station' | 'players';
 
@@ -16,8 +16,8 @@ export default function CrewPage() {
   const [viewMode, setViewMode] = useState<ViewMode>('now');
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeGroup, setActiveGroup] = useState<number | null>(null);
-  const [activeStation, setActiveStation] = useState<string | null>(null);
+  const [activeDay, setActiveDay] = useState<number | null>(null);
+  const [showEmbargoedOnly, setShowEmbargoedOnly] = useState(false);
   const [showGlobalSearch, setShowGlobalSearch] = useState(false);
   const [globalSearchQuery, setGlobalSearchQuery] = useState('');
   const [largeTextMode, setLargeTextMode] = useState(false);
@@ -61,14 +61,14 @@ export default function CrewPage() {
       player.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       player.team.toLowerCase().includes(searchQuery.toLowerCase()) ||
       player.nationality.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesGroup = activeGroup === null || player.group === activeGroup;
-    return matchesSearch && matchesGroup;
+    const matchesDay = activeDay === null || player.day === activeDay;
+    const matchesEmbargo = !showEmbargoedOnly || player.embargoed;
+    return matchesSearch && matchesDay && matchesEmbargo;
   });
 
-  const groupCounts = {
-    1: players.filter((p) => p.group === 1).length,
-    2: players.filter((p) => p.group === 2).length,
-    3: players.filter((p) => p.group === 3).length,
+  const dayCounts = {
+    1: players.filter((p) => p.day === 1).length,
+    2: players.filter((p) => p.day === 2).length,
   };
 
   const handlePlayerClick = (firstName: string) => {
@@ -87,8 +87,10 @@ export default function CrewPage() {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-2xl font-bold">CREW APP</h1>
-              <p className="text-sm text-gray-500">NWSL Media Day 2026 • Panini</p>
+              <h1 className="text-2xl font-bold">
+                <span className="text-[#FFD100]">PANINI</span> CREW APP
+              </h1>
+              <p className="text-sm text-gray-500">NWSL Media Day 2026 • MG Studio</p>
             </div>
             <div className="flex items-center gap-3">
               {/* Global Search Button */}
@@ -113,8 +115,8 @@ export default function CrewPage() {
                 <Type className="w-5 h-5" />
               </button>
               <div className="text-right">
-                <p className="text-sm text-amber-400 font-medium">Jan 28, 2026</p>
-                <p className="text-xs text-gray-500">MG Studio, LA</p>
+                <p className="text-sm text-[#FFD100] font-medium">Jan 28-29, 2026</p>
+                <p className="text-xs text-gray-500">34 Players • 2 Days</p>
               </div>
             </div>
           </div>
@@ -125,7 +127,7 @@ export default function CrewPage() {
               onClick={() => setViewMode('now')}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
                 viewMode === 'now'
-                  ? 'bg-amber-500 text-black'
+                  ? 'bg-[#FFD100] text-black'
                   : 'bg-[#141414] text-gray-300 hover:bg-[#1a1a1a]'
               }`}
             >
@@ -136,7 +138,7 @@ export default function CrewPage() {
               onClick={() => setViewMode('schedule')}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
                 viewMode === 'schedule'
-                  ? 'bg-amber-500 text-black'
+                  ? 'bg-[#FFD100] text-black'
                   : 'bg-[#141414] text-gray-300 hover:bg-[#1a1a1a]'
               }`}
             >
@@ -147,7 +149,7 @@ export default function CrewPage() {
               onClick={() => setViewMode('station')}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
                 viewMode === 'station'
-                  ? 'bg-amber-500 text-black'
+                  ? 'bg-[#FFD100] text-black'
                   : 'bg-[#141414] text-gray-300 hover:bg-[#1a1a1a]'
               }`}
             >
@@ -158,7 +160,7 @@ export default function CrewPage() {
               onClick={() => setViewMode('players')}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
                 viewMode === 'players'
-                  ? 'bg-amber-500 text-black'
+                  ? 'bg-[#FFD100] text-black'
                   : 'bg-[#141414] text-gray-300 hover:bg-[#1a1a1a]'
               }`}
             >
@@ -177,37 +179,56 @@ export default function CrewPage() {
                   placeholder="Search players, teams, or nationality..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-[#141414] border border-[#2a2a2a] rounded-xl pl-10 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-amber-500/50"
+                  className="w-full bg-[#141414] border border-[#2a2a2a] rounded-xl pl-10 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#FFD100]/50"
                 />
               </div>
 
-              {/* Group filters */}
+              {/* Day filters */}
               <div className="flex gap-2 overflow-x-auto pb-2">
                 <button
-                  onClick={() => setActiveGroup(null)}
+                  onClick={() => setActiveDay(null)}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
-                    activeGroup === null
-                      ? 'bg-amber-500 text-black'
+                    activeDay === null
+                      ? 'bg-[#FFD100] text-black'
                       : 'bg-[#141414] text-gray-300 hover:bg-[#1a1a1a]'
                   }`}
                 >
                   <Users className="w-4 h-4" />
                   All ({players.length})
                 </button>
-                {[1, 2, 3].map((group) => (
-                  <button
-                    key={group}
-                    onClick={() => setActiveGroup(activeGroup === group ? null : group)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
-                      activeGroup === group
-                        ? 'bg-amber-500 text-black'
-                        : 'bg-[#141414] text-gray-300 hover:bg-[#1a1a1a]'
-                    }`}
-                  >
-                    <Filter className="w-4 h-4" />
-                    Group {group} ({groupCounts[group as keyof typeof groupCounts]})
-                  </button>
-                ))}
+                <button
+                  onClick={() => setActiveDay(activeDay === 1 ? null : 1)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+                    activeDay === 1
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-[#141414] text-gray-300 hover:bg-[#1a1a1a]'
+                  }`}
+                >
+                  <Filter className="w-4 h-4" />
+                  Day 1 - Wed ({dayCounts[1]})
+                </button>
+                <button
+                  onClick={() => setActiveDay(activeDay === 2 ? null : 2)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+                    activeDay === 2
+                      ? 'bg-violet-500 text-white'
+                      : 'bg-[#141414] text-gray-300 hover:bg-[#1a1a1a]'
+                  }`}
+                >
+                  <Filter className="w-4 h-4" />
+                  Day 2 - Thu ({dayCounts[2]})
+                </button>
+                <button
+                  onClick={() => setShowEmbargoedOnly(!showEmbargoedOnly)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+                    showEmbargoedOnly
+                      ? 'bg-red-500 text-white'
+                      : 'bg-[#141414] text-gray-300 hover:bg-[#1a1a1a]'
+                  }`}
+                >
+                  <AlertTriangle className="w-4 h-4" />
+                  Embargoed ({players.filter(p => p.embargoed).length})
+                </button>
               </div>
             </>
           )}
@@ -221,7 +242,6 @@ export default function CrewPage() {
         )}
         {viewMode === 'schedule' && (
           <ScheduleView
-            schedule={rotationSchedule}
             onPlayerClick={handlePlayerClick}
           />
         )}
@@ -312,12 +332,17 @@ export default function CrewPage() {
                             {player.firstName} {player.lastName}
                           </p>
                           <p className="text-sm text-gray-500 truncate">
-                            {player.position} • {player.team} • Group {player.group}
+                            {player.position} • {player.team} • Day {player.day}
                           </p>
                         </div>
-                        <span className="text-xs text-gray-600">
-                          {player.groupTime}
-                        </span>
+                        <div className="text-right">
+                          <span className="text-xs text-gray-600">
+                            {player.scheduledTime}
+                          </span>
+                          {player.embargoed && (
+                            <span className="block text-xs text-red-400">EMBARGO</span>
+                          )}
+                        </div>
                       </button>
                     ))}
                   </div>
@@ -332,9 +357,7 @@ export default function CrewPage() {
       {selectedPlayer && (
         <PlayerModal
           player={selectedPlayer}
-          station={activeStation}
           onClose={() => setSelectedPlayer(null)}
-          onStationChange={setActiveStation}
           largeText={largeTextMode}
         />
       )}

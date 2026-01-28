@@ -1,246 +1,225 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { stationConfig } from '../../components/StationIcon';
-import { Clock, Zap } from 'lucide-react';
-
-// Get current time in PST
-function getPSTTime(date: Date): { hours: number; minutes: number; seconds: number } {
-  const pstString = date.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });
-  const pstDate = new Date(pstString);
-  return {
-    hours: pstDate.getHours(),
-    minutes: pstDate.getMinutes(),
-    seconds: pstDate.getSeconds(),
-  };
-}
-
-interface ScheduleGroup {
-  name: string;
-  time: string;
-  players: string[];
-  schedule: Array<{
-    time: string;
-    field: string;
-    social: string;
-    vnr: string;
-    packRip: string;
-  }>;
-}
+import { players } from '../../data/players';
+import type { Player } from '../../data/players';
+import { Clock, Zap, AlertTriangle, Languages, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface ScheduleViewProps {
-  schedule: {
-    group1: ScheduleGroup;
-    group2: ScheduleGroup;
-    group3: ScheduleGroup;
-  };
   onPlayerClick: (firstName: string) => void;
 }
 
-const groupStyles = {
+const dayStyles = {
   1: {
-    border: 'border-green-500/30',
-    header: 'bg-green-500/10',
-    badge: 'text-green-400',
+    border: 'border-blue-500/30',
+    header: 'bg-blue-500/10',
+    badge: 'text-blue-400',
   },
   2: {
-    border: 'border-amber-500/30',
-    header: 'bg-amber-500/10',
-    badge: 'text-amber-400',
-  },
-  3: {
     border: 'border-violet-500/30',
     header: 'bg-violet-500/10',
     badge: 'text-violet-400',
   },
 };
 
-const timeSlots = {
-  group1: [
-    { slot: 1, time: '9:00 to 9:20', startHour: 9, startMin: 0, endHour: 9, endMin: 20 },
-    { slot: 2, time: '9:20 to 9:40', startHour: 9, startMin: 20, endHour: 9, endMin: 40 },
-    { slot: 3, time: '9:40 to 10:00', startHour: 9, startMin: 40, endHour: 10, endMin: 0 },
-    { slot: 4, time: '10:00 to 10:20', startHour: 10, startMin: 0, endHour: 10, endMin: 20 },
-  ],
-  group2: [
-    { slot: 1, time: '10:30 to 10:50', startHour: 10, startMin: 30, endHour: 10, endMin: 50 },
-    { slot: 2, time: '10:50 to 11:10', startHour: 10, startMin: 50, endHour: 11, endMin: 10 },
-    { slot: 3, time: '11:10 to 11:30', startHour: 11, startMin: 10, endHour: 11, endMin: 30 },
-    { slot: 4, time: '11:30 to 11:50', startHour: 11, startMin: 30, endHour: 11, endMin: 50 },
-  ],
-  group3: [
-    { slot: 1, time: '1:00 to 1:20', startHour: 13, startMin: 0, endHour: 13, endMin: 20 },
-    { slot: 2, time: '1:20 to 1:40', startHour: 13, startMin: 20, endHour: 13, endMin: 40 },
-    { slot: 3, time: '1:40 to 2:00', startHour: 13, startMin: 40, endHour: 14, endMin: 0 },
-    { slot: 4, time: '2:00 to 2:20', startHour: 14, startMin: 0, endHour: 14, endMin: 20 },
-  ],
-};
+function parseTime(timeStr: string): { hours: number; minutes: number } {
+  const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+  if (!match) return { hours: 0, minutes: 0 };
 
-function isCurrentSlot(slot: { startHour: number; startMin: number; endHour: number; endMin: number }, currentTime: Date): boolean {
-  const pst = getPSTTime(currentTime);
-  const currentMinutes = pst.hours * 60 + pst.minutes;
-  const slotStart = slot.startHour * 60 + slot.startMin;
-  const slotEnd = slot.endHour * 60 + slot.endMin;
+  let hours = parseInt(match[1], 10);
+  const minutes = parseInt(match[2], 10);
+  const period = match[3].toUpperCase();
+
+  if (period === 'PM' && hours !== 12) hours += 12;
+  if (period === 'AM' && hours === 12) hours = 0;
+
+  return { hours, minutes };
+}
+
+function isCurrentPlayer(player: Player, currentTime: Date): boolean {
+  const { hours, minutes } = parseTime(player.scheduledTime);
+  const slotStart = hours * 60 + minutes;
+  const slotEnd = slotStart + 15;
+
+  const pstString = currentTime.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });
+  const pstDate = new Date(pstString);
+  const currentMinutes = pstDate.getHours() * 60 + pstDate.getMinutes();
+
   return currentMinutes >= slotStart && currentMinutes < slotEnd;
 }
 
-function isUpcomingSlot(slot: { startHour: number; startMin: number }, currentTime: Date): boolean {
-  const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
-  const slotStart = slot.startHour * 60 + slot.startMin;
-  return slotStart > currentMinutes && slotStart <= currentMinutes + 30; // Within next 30 min
+function isUpcomingPlayer(player: Player, currentTime: Date): boolean {
+  const { hours, minutes } = parseTime(player.scheduledTime);
+  const slotStart = hours * 60 + minutes;
+
+  const pstString = currentTime.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });
+  const pstDate = new Date(pstString);
+  const currentMinutes = pstDate.getHours() * 60 + pstDate.getMinutes();
+
+  return slotStart > currentMinutes && slotStart <= currentMinutes + 30;
 }
 
-function GroupSchedule({
-  group,
-  groupNumber,
-  slots,
+function DaySchedule({
+  day,
+  dayPlayers,
   onPlayerClick,
   currentTime,
+  isExpanded,
+  onToggle,
 }: {
-  group: ScheduleGroup;
-  groupNumber: 1 | 2 | 3;
-  slots: { slot: number; time: string; startHour: number; startMin: number; endHour: number; endMin: number }[];
+  day: 1 | 2;
+  dayPlayers: Player[];
   onPlayerClick: (name: string) => void;
   currentTime: Date;
+  isExpanded: boolean;
+  onToggle: () => void;
 }) {
-  const styles = groupStyles[groupNumber];
-
-  const renderCell = (name: string) => {
-    if (name === '-' || name === 'BREAK') {
-      return (
-        <span className="text-gray-600 text-sm italic">BREAK</span>
-      );
-    }
-    // Extract first name for the click handler
-    const firstName = name.split(' ')[0];
-    return (
-      <button
-        onClick={() => onPlayerClick(firstName)}
-        className="text-white hover:text-amber-400 transition-colors font-medium text-sm"
-      >
-        {name}
-      </button>
-    );
-  };
+  const styles = dayStyles[day];
+  const dayDate = day === 1 ? 'Wednesday, January 28' : 'Thursday, January 29';
+  const embargoedCount = dayPlayers.filter(p => p.embargoed).length;
+  const clearCount = dayPlayers.filter(p => !p.embargoed).length;
+  const hasCurrentPlayer = dayPlayers.some(p => isCurrentPlayer(p, currentTime));
 
   return (
     <div className={`bg-[#141414] border ${styles.border} rounded-xl overflow-hidden`}>
       {/* Header */}
-      <div className={`${styles.header} px-4 py-3 border-b border-[#2a2a2a]`}>
-        <div className="flex items-center justify-between">
-          <h3 className={`font-bold ${styles.badge}`}>{group.name}</h3>
-          <span className="text-sm text-gray-400">{group.time}</span>
-        </div>
-        <div className="flex flex-wrap gap-2 mt-2">
-          {group.players.map((player) => (
-            <span key={player} className="text-xs bg-[#0a0a0a] px-2 py-1 rounded text-gray-400">
-              {player}
+      <button
+        onClick={onToggle}
+        className={`w-full ${styles.header} px-4 py-3 border-b border-[#2a2a2a] flex items-center justify-between`}
+      >
+        <div className="flex items-center gap-3">
+          <h3 className={`font-bold ${styles.badge}`}>DAY {day}</h3>
+          <span className="text-sm text-gray-400">{dayDate}</span>
+          {hasCurrentPlayer && (
+            <span className="flex items-center gap-1 bg-amber-500 text-black px-2 py-0.5 rounded text-xs font-bold animate-pulse">
+              <Zap className="w-3 h-3" />
+              LIVE
             </span>
-          ))}
+          )}
         </div>
-      </div>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 text-xs">
+            <span className="text-gray-400">{dayPlayers.length} players</span>
+            <span className="text-green-400">{clearCount} clear</span>
+            <span className="text-red-400">{embargoedCount} embargo</span>
+          </div>
+          {isExpanded ? (
+            <ChevronUp className="w-5 h-5 text-gray-400" />
+          ) : (
+            <ChevronDown className="w-5 h-5 text-gray-400" />
+          )}
+        </div>
+      </button>
 
-      {/* Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-[#2a2a2a] bg-[#0a0a0a]">
-              <th className="text-left py-3 px-4 text-gray-500 font-medium w-32">Time Slot</th>
-              <th className="text-center py-3 px-3">
-                <div className="flex items-center justify-center gap-2">
-                  <span className={`w-5 h-5 ${stationConfig.field.bgColor} rounded flex items-center justify-center text-white text-xs`}>
-                    {stationConfig.field.icon}
-                  </span>
-                  <span className={stationConfig.field.textColor}>Field</span>
-                </div>
-              </th>
-              <th className="text-center py-3 px-3">
-                <div className="flex items-center justify-center gap-2">
-                  <span className={`w-5 h-5 ${stationConfig.social.bgColor} rounded flex items-center justify-center text-white text-xs`}>
-                    {stationConfig.social.icon}
-                  </span>
-                  <span className={stationConfig.social.textColor}>Social</span>
-                </div>
-              </th>
-              <th className="text-center py-3 px-3">
-                <div className="flex items-center justify-center gap-2">
-                  <span className={`w-5 h-5 ${stationConfig.vnr.bgColor} rounded flex items-center justify-center text-white text-xs`}>
-                    {stationConfig.vnr.icon}
-                  </span>
-                  <span className={stationConfig.vnr.textColor}>VNR</span>
-                </div>
-              </th>
-              <th className="text-center py-3 px-3">
-                <div className="flex items-center justify-center gap-2">
-                  <span className={`w-5 h-5 ${stationConfig.packRip.bgColor} rounded flex items-center justify-center text-white text-xs`}>
-                    {stationConfig.packRip.icon}
-                  </span>
-                  <span className={stationConfig.packRip.textColor}>Pack Rip</span>
-                </div>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {group.schedule.map((row, index) => {
-              const slot = slots[index];
-              const isCurrent = isCurrentSlot(slot, currentTime);
-              const isUpcoming = !isCurrent && isUpcomingSlot(slot, currentTime);
+      {/* Player List */}
+      {isExpanded && (
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-[#2a2a2a] bg-[#0a0a0a]">
+                <th className="text-left py-3 px-4 text-gray-500 font-medium w-24">Time</th>
+                <th className="text-left py-3 px-4 text-gray-500 font-medium">Player</th>
+                <th className="text-center py-3 px-4 text-gray-500 font-medium w-20">Team</th>
+                <th className="text-center py-3 px-4 text-gray-500 font-medium w-32">Status</th>
+                <th className="text-center py-3 px-4 text-gray-500 font-medium w-28">Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              {dayPlayers.map((player) => {
+                const isCurrent = isCurrentPlayer(player, currentTime);
+                const isUpcoming = !isCurrent && isUpcomingPlayer(player, currentTime);
 
-              return (
-                <tr
-                  key={index}
-                  className={`border-b border-[#2a2a2a] last:border-0 transition-colors ${
-                    isCurrent
-                      ? 'bg-amber-500/10 border-l-2 border-l-amber-500'
-                      : isUpcoming
-                      ? 'bg-blue-500/5'
-                      : 'hover:bg-[#1a1a1a]'
-                  }`}
-                >
-                  <td className="py-3 px-4">
-                    <div className="flex items-center gap-2">
-                      {isCurrent && (
-                        <span className="flex items-center gap-1 text-amber-400 text-xs font-bold animate-pulse">
-                          <Zap className="w-3 h-3" />
-                          NOW
+                return (
+                  <tr
+                    key={player.id}
+                    className={`border-b border-[#2a2a2a] last:border-0 transition-colors ${
+                      isCurrent
+                        ? 'bg-amber-500/10 border-l-2 border-l-amber-500'
+                        : isUpcoming
+                        ? 'bg-blue-500/5'
+                        : 'hover:bg-[#1a1a1a]'
+                    }`}
+                  >
+                    <td className="py-3 px-4">
+                      <div className="flex flex-col">
+                        {isCurrent && (
+                          <span className="flex items-center gap-1 text-amber-400 text-xs font-bold animate-pulse mb-1">
+                            <Zap className="w-3 h-3" />
+                            NOW
+                          </span>
+                        )}
+                        {isUpcoming && (
+                          <span className="flex items-center gap-1 text-blue-400 text-xs mb-1">
+                            <Clock className="w-3 h-3" />
+                            NEXT
+                          </span>
+                        )}
+                        <span className={`font-mono text-xs ${isCurrent ? 'text-amber-400 font-bold' : 'text-gray-300'}`}>
+                          {player.scheduledTime}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="py-3 px-4">
+                      <button
+                        onClick={() => onPlayerClick(player.firstName)}
+                        className="flex items-center gap-2 hover:text-amber-400 transition-colors"
+                      >
+                        <span className="text-lg">{player.flag}</span>
+                        <span className={`font-medium ${isCurrent ? 'text-amber-400' : 'text-white'}`}>
+                          {player.firstName} {player.lastName}
+                        </span>
+                      </button>
+                      {player.pronunciation && (
+                        <p className="text-xs text-gray-500 italic ml-7">{player.pronunciation}</p>
+                      )}
+                    </td>
+                    <td className="text-center py-3 px-4">
+                      <span className="text-xs text-gray-400 font-medium">{player.teamAbbr}</span>
+                    </td>
+                    <td className="text-center py-3 px-4">
+                      {player.embargoed ? (
+                        <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded bg-red-500/20 text-red-400">
+                          <AlertTriangle className="w-3 h-3" />
+                          EMBARGO
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded bg-green-500/20 text-green-400">
+                          Clear
                         </span>
                       )}
-                      {isUpcoming && !isCurrent && (
-                        <span className="flex items-center gap-1 text-blue-400 text-xs">
-                          <Clock className="w-3 h-3" />
-                          NEXT
+                    </td>
+                    <td className="text-center py-3 px-4">
+                      {player.translatorNeeded && (
+                        <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded bg-amber-500/20 text-amber-400">
+                          <Languages className="w-3 h-3" />
+                          Translator
                         </span>
                       )}
-                    </div>
-                    <div className="text-gray-500 text-xs mb-0.5">Slot {slot.slot}</div>
-                    <div className={`font-mono text-xs ${isCurrent ? 'text-amber-400 font-bold' : 'text-gray-300'}`}>
-                      {slot.time}
-                    </div>
-                  </td>
-                  <td className="text-center py-3 px-3">{renderCell(row.field)}</td>
-                  <td className="text-center py-3 px-3">{renderCell(row.social)}</td>
-                  <td className="text-center py-3 px-3">{renderCell(row.vnr)}</td>
-                  <td className="text-center py-3 px-3">{renderCell(row.packRip)}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
 
-export default function ScheduleView({ schedule, onPlayerClick }: ScheduleViewProps) {
+export default function ScheduleView({ onPlayerClick }: ScheduleViewProps) {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [expandedDays, setExpandedDays] = useState<Set<number>>(new Set([1, 2]));
 
-  // Update time every minute
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date());
     }, 60000);
     return () => clearInterval(interval);
   }, []);
+
+  const day1Players = players.filter(p => p.day === 1);
+  const day2Players = players.filter(p => p.day === 2);
 
   const formattedTime = currentTime.toLocaleTimeString('en-US', {
     hour: 'numeric',
@@ -249,25 +228,21 @@ export default function ScheduleView({ schedule, onPlayerClick }: ScheduleViewPr
     timeZone: 'America/Los_Angeles',
   });
 
-  // Determine which group/slot is current
-  const getCurrentGroup = (): number | null => {
-    const allSlots = [
-      ...timeSlots.group1.map(s => ({ ...s, group: 1 })),
-      ...timeSlots.group2.map(s => ({ ...s, group: 2 })),
-      ...timeSlots.group3.map(s => ({ ...s, group: 3 })),
-    ];
-    const current = allSlots.find(s => isCurrentSlot(s, currentTime));
-    return current ? current.group : null;
+  const toggleDay = (day: number) => {
+    const newExpanded = new Set(expandedDays);
+    if (newExpanded.has(day)) {
+      newExpanded.delete(day);
+    } else {
+      newExpanded.add(day);
+    }
+    setExpandedDays(newExpanded);
   };
 
-  const currentGroup = getCurrentGroup();
+  const currentPlayer = players.find(p => isCurrentPlayer(p, currentTime));
 
   const jumpToNow = () => {
-    if (currentGroup) {
-      const element = document.getElementById(`group-${currentGroup}`);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+    if (currentPlayer) {
+      setExpandedDays(new Set([currentPlayer.day]));
     }
   };
 
@@ -275,11 +250,11 @@ export default function ScheduleView({ schedule, onPlayerClick }: ScheduleViewPr
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Rotation Schedule</h2>
-          <p className="text-sm text-gray-500">20 min per station • Tap player name for profile</p>
+          <h2 className="text-2xl font-bold">Player Schedule</h2>
+          <p className="text-sm text-gray-500">15 min per player • 2 stations (Tunnel + Product)</p>
         </div>
         <div className="flex items-center gap-4">
-          {currentGroup && (
+          {currentPlayer && (
             <button
               onClick={jumpToNow}
               className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 transition-colors"
@@ -293,42 +268,51 @@ export default function ScheduleView({ schedule, onPlayerClick }: ScheduleViewPr
               <Clock className="w-4 h-4" />
               <span className="font-mono font-bold">{formattedTime}</span>
             </div>
-            <p className="text-xs text-gray-500">Current time</p>
+            <p className="text-xs text-gray-500">PT (Los Angeles)</p>
           </div>
         </div>
       </div>
 
-      <div id="group-1">
-        <GroupSchedule
-          group={schedule.group1}
-          groupNumber={1}
-          slots={timeSlots.group1}
-          onPlayerClick={onPlayerClick}
-          currentTime={currentTime}
-        />
-      </div>
-      <div id="group-2">
-        <GroupSchedule
-          group={schedule.group2}
-          groupNumber={2}
-          slots={timeSlots.group2}
-          onPlayerClick={onPlayerClick}
-          currentTime={currentTime}
-        />
-      </div>
-      <div id="group-3">
-        <GroupSchedule
-          group={schedule.group3}
-          groupNumber={3}
-          slots={timeSlots.group3}
-          onPlayerClick={onPlayerClick}
-          currentTime={currentTime}
-        />
+      {/* Summary Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-[#141414] border border-[#2a2a2a] rounded-lg p-4 text-center">
+          <p className="text-3xl font-bold text-white">{players.length}</p>
+          <p className="text-xs text-gray-500">Total Players</p>
+        </div>
+        <div className="bg-[#141414] border border-[#2a2a2a] rounded-lg p-4 text-center">
+          <p className="text-3xl font-bold text-green-400">{players.filter(p => !p.embargoed).length}</p>
+          <p className="text-xs text-gray-500">Clear for Use</p>
+        </div>
+        <div className="bg-[#141414] border border-[#2a2a2a] rounded-lg p-4 text-center">
+          <p className="text-3xl font-bold text-red-400">{players.filter(p => p.embargoed).length}</p>
+          <p className="text-xs text-gray-500">Embargoed</p>
+        </div>
+        <div className="bg-[#141414] border border-[#2a2a2a] rounded-lg p-4 text-center">
+          <p className="text-3xl font-bold text-amber-400">{players.filter(p => p.translatorNeeded).length}</p>
+          <p className="text-xs text-gray-500">Need Translator</p>
+        </div>
       </div>
 
+      <DaySchedule
+        day={1}
+        dayPlayers={day1Players}
+        onPlayerClick={onPlayerClick}
+        currentTime={currentTime}
+        isExpanded={expandedDays.has(1)}
+        onToggle={() => toggleDay(1)}
+      />
+
+      <DaySchedule
+        day={2}
+        dayPlayers={day2Players}
+        onPlayerClick={onPlayerClick}
+        currentTime={currentTime}
+        isExpanded={expandedDays.has(2)}
+        onToggle={() => toggleDay(2)}
+      />
+
       <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-4 text-sm text-gray-500">
-        <strong className="text-gray-400">Note:</strong> Signing station runs throughout the day.
-        Athletes rotate through interview stations only.
+        <strong className="text-gray-400">Note:</strong> Each player visits both stations (Tunnel + Product Photography). Tunnel station includes interview. Product is visual only.
       </div>
     </div>
   );
