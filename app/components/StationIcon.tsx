@@ -1,54 +1,29 @@
 interface StationIconProps {
-  station: 'field' | 'packRip' | 'social' | 'vnr' | 'signing';
+  station: 'tunnel' | 'product';
   size?: 'sm' | 'md' | 'lg';
   showLabel?: boolean;
 }
 
 export const stationConfig = {
-  field: {
-    icon: '⬢',
-    label: 'FIELD',
+  tunnel: {
+    icon: '🚶',
+    label: 'TUNNEL',
     color: 'bg-green-500',
     bgColor: 'bg-green-500',
     textColor: 'text-green-500',
     borderColor: 'border-green-500/30',
-    description: 'Hero Rollout - On-camera prompts',
+    description: 'Walk-in/hero footage + interview prompts',
+    hasInterview: true,
   },
-  social: {
-    icon: '◎',
-    label: 'PANINI',
-    color: 'bg-blue-500',
-    bgColor: 'bg-blue-500',
-    textColor: 'text-blue-500',
-    borderColor: 'border-blue-500/30',
-    description: 'Panini Product + Partnership',
-  },
-  vnr: {
-    icon: '◉',
-    label: 'SOCIAL',
-    color: 'bg-violet-500',
-    bgColor: 'bg-violet-500',
-    textColor: 'text-violet-500',
-    borderColor: 'border-violet-500/30',
-    description: 'Season Beats + Milestones',
-  },
-  packRip: {
-    icon: '▣',
-    label: 'VNR',
+  product: {
+    icon: '📸',
+    label: 'PRODUCT',
     color: 'bg-amber-500',
     bgColor: 'bg-amber-500',
     textColor: 'text-amber-500',
     borderColor: 'border-amber-500/30',
-    description: 'Local News Soundbites + B-Roll',
-  },
-  signing: {
-    icon: '✎',
-    label: 'SIGNING',
-    color: 'bg-pink-500',
-    bgColor: 'bg-pink-500',
-    textColor: 'text-pink-500',
-    borderColor: 'border-pink-500/30',
-    description: 'Behind-the-scenes + authenticity',
+    description: 'Card photography and poses (visual only)',
+    hasInterview: false,
   },
 };
 
@@ -78,13 +53,7 @@ export default function StationIcon({ station, size = 'md', showLabel = false }:
 }
 
 export function StationBar() {
-  const stations: Array<'field' | 'packRip' | 'social' | 'vnr' | 'signing'> = [
-    'field',
-    'packRip',
-    'social',
-    'vnr',
-    'signing',
-  ];
+  const stations: Array<'tunnel' | 'product'> = ['tunnel', 'product'];
 
   return (
     <div className="flex gap-6 items-center justify-center flex-wrap">
@@ -95,7 +64,7 @@ export function StationBar() {
   );
 }
 
-export function StationBadge({ station }: { station: 'field' | 'packRip' | 'social' | 'vnr' | 'signing' }) {
+export function StationBadge({ station }: { station: 'tunnel' | 'product' }) {
   const config = stationConfig[station];
 
   return (

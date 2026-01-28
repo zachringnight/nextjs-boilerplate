@@ -3,16 +3,17 @@
 :root {
   --background: #0a0a0a;
   --foreground: #ffffff;
-  --accent-gold: #c9a227;
-  --accent-blue: #0066cc;
-  --accent-nwsl: #1a1a2e;
+  --accent-gold: #FFD100;  /* Panini Yellow */
+  --accent-blue: #0033A0;  /* NWSL Blue */
+  --accent-panini: #FFD100;
+  --accent-nwsl: #0033A0;
   --card-bg: #141414;
   --card-border: #2a2a2a;
-  --station-field: #22c55e;
-  --station-pack: #f59e0b;
-  --station-social: #3b82f6;
-  --station-vnr: #8b5cf6;
-  --station-signing: #ec4899;
+  --station-tunnel: #22c55e;
+  --station-product: #f59e0b;
+  --embargoed: #ef4444;
+  --clear: #22c55e;
+  --translator: #f59e0b;
 }
 
 @theme inline {
@@ -20,13 +21,15 @@
   --color-foreground: var(--foreground);
   --color-accent-gold: var(--accent-gold);
   --color-accent-blue: var(--accent-blue);
+  --color-accent-panini: var(--accent-panini);
+  --color-accent-nwsl: var(--accent-nwsl);
   --color-card-bg: var(--card-bg);
   --color-card-border: var(--card-border);
-  --color-station-field: var(--station-field);
-  --color-station-pack: var(--station-pack);
-  --color-station-social: var(--station-social);
-  --color-station-vnr: var(--station-vnr);
-  --color-station-signing: var(--station-signing);
+  --color-station-tunnel: var(--station-tunnel);
+  --color-station-product: var(--station-product);
+  --color-embargoed: var(--embargoed);
+  --color-clear: var(--clear);
+  --color-translator: var(--translator);
 }
 
 body {

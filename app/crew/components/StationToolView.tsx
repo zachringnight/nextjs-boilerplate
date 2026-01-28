@@ -1,177 +1,77 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { players, rotationSchedule, stationUniversalQuestions } from '../../data/players';
-import { stationConfig } from '../../components/StationIcon';
+import { players, tunnelInterviewQuestions } from '../../data/players';
+import type { Player } from '../../data/players';
 import PlayerAvatar from './PlayerAvatar';
-import { ChevronDown, ChevronUp, Volume2, Clock, Zap } from 'lucide-react';
-
-type StationType = 'field' | 'social' | 'vnr' | 'packRip';
-
-// Get current time in PST
-function getPSTTime(date: Date): { hours: number; minutes: number; seconds: number } {
-  const pstString = date.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });
-  const pstDate = new Date(pstString);
-  return {
-    hours: pstDate.getHours(),
-    minutes: pstDate.getMinutes(),
-    seconds: pstDate.getSeconds(),
-  };
-}
+import { ChevronDown, ChevronUp, Volume2, Clock, Zap, AlertTriangle, Languages } from 'lucide-react';
 
 interface StationToolViewProps {
-  initialStation?: StationType;
   largeText?: boolean;
 }
 
-interface TimeSlotInfo {
-  group: string;
-  groupNumber: number;
-  time: string;
-  timeDisplay: string;
-  playerName: string;
-  startHour: number;
-  startMin: number;
-  endHour: number;
-  endMin: number;
+function parseTime(timeStr: string): { hours: number; minutes: number } {
+  const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+  if (!match) return { hours: 0, minutes: 0 };
+
+  let hours = parseInt(match[1], 10);
+  const minutes = parseInt(match[2], 10);
+  const period = match[3].toUpperCase();
+
+  if (period === 'PM' && hours !== 12) hours += 12;
+  if (period === 'AM' && hours === 12) hours = 0;
+
+  return { hours, minutes };
 }
 
-function isCurrentSlot(slot: TimeSlotInfo, currentTime: Date): boolean {
-  const pst = getPSTTime(currentTime);
-  const currentMinutes = pst.hours * 60 + pst.minutes;
-  const slotStart = slot.startHour * 60 + slot.startMin;
-  const slotEnd = slot.endHour * 60 + slot.endMin;
+function isCurrentPlayer(player: Player, currentTime: Date): boolean {
+  const { hours, minutes } = parseTime(player.scheduledTime);
+  const slotStart = hours * 60 + minutes;
+  const slotEnd = slotStart + 15;
+
+  const pstString = currentTime.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });
+  const pstDate = new Date(pstString);
+  const currentMinutes = pstDate.getHours() * 60 + pstDate.getMinutes();
+
   return currentMinutes >= slotStart && currentMinutes < slotEnd;
 }
 
-function isUpcomingSlot(slot: TimeSlotInfo, currentTime: Date): boolean {
-  const pst = getPSTTime(currentTime);
-  const currentMinutes = pst.hours * 60 + pst.minutes;
-  const slotStart = slot.startHour * 60 + slot.startMin;
+function isUpcomingPlayer(player: Player, currentTime: Date): boolean {
+  const { hours, minutes } = parseTime(player.scheduledTime);
+  const slotStart = hours * 60 + minutes;
+
+  const pstString = currentTime.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });
+  const pstDate = new Date(pstString);
+  const currentMinutes = pstDate.getHours() * 60 + pstDate.getMinutes();
+
   return slotStart > currentMinutes && slotStart <= currentMinutes + 30;
 }
 
-function getStationSchedule(station: StationType): TimeSlotInfo[] {
-  const schedule: TimeSlotInfo[] = [];
-
-  // Group 1
-  const group1Times = [
-    { timeDisplay: '9:00 to 9:20', startHour: 9, startMin: 0, endHour: 9, endMin: 20 },
-    { timeDisplay: '9:20 to 9:40', startHour: 9, startMin: 20, endHour: 9, endMin: 40 },
-    { timeDisplay: '9:40 to 10:00', startHour: 9, startMin: 40, endHour: 10, endMin: 0 },
-    { timeDisplay: '10:00 to 10:20', startHour: 10, startMin: 0, endHour: 10, endMin: 20 },
-  ];
-  rotationSchedule.group1.schedule.forEach((slot, index) => {
-    schedule.push({
-      group: 'Group 1',
-      groupNumber: 1,
-      time: slot.time,
-      playerName: slot[station],
-      ...group1Times[index],
-    });
-  });
-
-  // Group 2
-  const group2Times = [
-    { timeDisplay: '10:30 to 10:50', startHour: 10, startMin: 30, endHour: 10, endMin: 50 },
-    { timeDisplay: '10:50 to 11:10', startHour: 10, startMin: 50, endHour: 11, endMin: 10 },
-    { timeDisplay: '11:10 to 11:30', startHour: 11, startMin: 10, endHour: 11, endMin: 30 },
-    { timeDisplay: '11:30 to 11:50', startHour: 11, startMin: 30, endHour: 11, endMin: 50 },
-  ];
-  rotationSchedule.group2.schedule.forEach((slot, index) => {
-    schedule.push({
-      group: 'Group 2',
-      groupNumber: 2,
-      time: slot.time,
-      playerName: slot[station],
-      ...group2Times[index],
-    });
-  });
-
-  // Group 3
-  const group3Times = [
-    { timeDisplay: '1:00 to 1:20', startHour: 13, startMin: 0, endHour: 13, endMin: 20 },
-    { timeDisplay: '1:20 to 1:40', startHour: 13, startMin: 20, endHour: 13, endMin: 40 },
-    { timeDisplay: '1:40 to 2:00', startHour: 13, startMin: 40, endHour: 14, endMin: 0 },
-    { timeDisplay: '2:00 to 2:20', startHour: 14, startMin: 0, endHour: 14, endMin: 20 },
-  ];
-  rotationSchedule.group3.schedule.forEach((slot, index) => {
-    schedule.push({
-      group: 'Group 3',
-      groupNumber: 3,
-      time: slot.time,
-      playerName: slot[station],
-      ...group3Times[index],
-    });
-  });
-
-  return schedule;
-}
-
 function PlayerSlotCard({
-  slot,
-  station,
+  player,
   isExpanded,
   onToggle,
   currentTime,
+  largeText,
 }: {
-  slot: TimeSlotInfo;
-  station: StationType;
+  player: Player;
   isExpanded: boolean;
   onToggle: () => void;
   currentTime: Date;
+  largeText: boolean;
 }) {
-  const isBreak = slot.playerName === 'BREAK';
-  const player = !isBreak ? players.find(p =>
-    `${p.firstName} ${p.lastName}` === slot.playerName
-  ) : null;
+  const isCurrent = isCurrentPlayer(player, currentTime);
+  const isUpcoming = !isCurrent && isUpcomingPlayer(player, currentTime);
 
-  const isCurrent = isCurrentSlot(slot, currentTime);
-  const isUpcoming = !isCurrent && isUpcomingSlot(slot, currentTime);
-
-  const groupColors = {
-    1: 'border-green-500/30 bg-green-500/5',
-    2: 'border-amber-500/30 bg-amber-500/5',
-    3: 'border-violet-500/30 bg-violet-500/5',
+  const dayColors = {
+    1: 'border-blue-500/30 bg-blue-500/5',
+    2: 'border-violet-500/30 bg-violet-500/5',
   };
 
-  const groupBadgeColors = {
-    1: 'bg-green-500/20 text-green-400',
-    2: 'bg-amber-500/20 text-amber-400',
-    3: 'bg-violet-500/20 text-violet-400',
+  const dayBadgeColors = {
+    1: 'bg-blue-500/20 text-blue-400',
+    2: 'bg-violet-500/20 text-violet-400',
   };
-
-  if (isBreak) {
-    return (
-      <div className={`bg-[#141414] border rounded-xl p-4 ${isCurrent ? 'border-amber-500/50 bg-amber-500/5' : 'border-[#2a2a2a] opacity-50'}`}>
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-xl bg-[#0a0a0a] flex items-center justify-center text-gray-600">
-            <Clock className="w-6 h-6" />
-          </div>
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              {isCurrent && (
-                <span className="flex items-center gap-1 text-amber-400 text-xs font-bold animate-pulse">
-                  <Zap className="w-3 h-3" />
-                  NOW
-                </span>
-              )}
-              <span className={`text-xs px-2 py-0.5 rounded ${groupBadgeColors[slot.groupNumber as keyof typeof groupBadgeColors]}`}>
-                {slot.group}
-              </span>
-            </div>
-            <p className={`text-lg font-mono ${isCurrent ? 'text-amber-400' : 'text-gray-500'}`}>{slot.timeDisplay}</p>
-            <p className="text-sm text-gray-600 italic">Break</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!player) return null;
-
-  const stationQuestions = player.questions.find(q => q.station === station);
-  const config = stationConfig[station];
 
   return (
     <div className={`bg-[#141414] border rounded-xl overflow-hidden transition-all ${
@@ -179,7 +79,7 @@ function PlayerSlotCard({
         ? 'border-amber-500 ring-2 ring-amber-500/30 shadow-lg shadow-amber-500/10'
         : isUpcoming
         ? 'border-blue-500/50'
-        : groupColors[slot.groupNumber as keyof typeof groupColors]
+        : dayColors[player.day]
     }`}>
       {/* Header - always visible */}
       <button
@@ -190,7 +90,7 @@ function PlayerSlotCard({
       >
         <PlayerAvatar player={player} size="md" />
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
             {isCurrent && (
               <span className="flex items-center gap-1 bg-amber-500 text-black px-2 py-0.5 rounded text-xs font-bold animate-pulse">
                 <Zap className="w-3 h-3" />
@@ -203,16 +103,28 @@ function PlayerSlotCard({
                 NEXT
               </span>
             )}
-            <span className={`text-xs px-2 py-0.5 rounded ${groupBadgeColors[slot.groupNumber as keyof typeof groupBadgeColors]}`}>
-              {slot.group}
+            <span className={`text-xs px-2 py-0.5 rounded ${dayBadgeColors[player.day]}`}>
+              Day {player.day}
             </span>
             <span className="text-xl">{player.flag}</span>
+            {player.embargoed && (
+              <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded bg-red-500/20 text-red-400">
+                <AlertTriangle className="w-3 h-3" />
+                EMBARGO
+              </span>
+            )}
+            {player.translatorNeeded && (
+              <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded bg-amber-500/20 text-amber-400">
+                <Languages className="w-3 h-3" />
+                Translator
+              </span>
+            )}
           </div>
           <p className={`text-lg font-bold truncate ${isCurrent ? 'text-amber-400' : ''}`}>
             {player.firstName} {player.lastName}
           </p>
           <div className="flex items-center gap-3 text-sm text-gray-400">
-            <span className={`font-mono ${isCurrent ? 'text-amber-400 font-bold' : ''}`}>{slot.timeDisplay}</span>
+            <span className={`font-mono ${isCurrent ? 'text-amber-400 font-bold' : ''}`}>{player.scheduledTime}</span>
             <span>•</span>
             <span>{player.position}</span>
             <span>•</span>
@@ -267,61 +179,62 @@ function PlayerSlotCard({
             </div>
           </div>
 
-          {/* Station Questions */}
+          {/* Interview Questions */}
           <div className="p-4">
-            {/* Player-Specific Questions */}
-            {stationQuestions && stationQuestions.questions.length > 0 && (
-              <div className="mb-6">
-                <div className="mb-4">
-                  <h4 className={`text-sm font-bold ${config.textColor} flex items-center gap-2`}>
-                    <span className={`w-6 h-6 ${config.bgColor} rounded flex items-center justify-center text-white text-xs`}>
-                      {config.icon}
-                    </span>
-                    QUESTIONS FOR {player.firstName.toUpperCase()}
-                  </h4>
-                  <p className="text-xs text-gray-500 ml-8">Player specific prompts</p>
-                </div>
-                <ul className="space-y-4">
-                  {stationQuestions.questions.map((question, index) => (
-                    <li key={index} className="flex items-start gap-3">
-                      <span
-                        className={`w-8 h-8 ${config.bgColor} rounded-lg flex items-center justify-center text-sm font-bold text-white flex-shrink-0`}
-                      >
-                        {index + 1}
-                      </span>
-                      <span className="text-gray-100 leading-relaxed text-lg">{question}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+            <div className="mb-4">
+              <h4 className="text-sm font-bold text-green-400 flex items-center gap-2">
+                <span className="w-6 h-6 bg-green-500 rounded flex items-center justify-center text-white text-xs">
+                  🚶
+                </span>
+                TUNNEL INTERVIEW QUESTIONS
+              </h4>
+              <p className="text-xs text-gray-500 ml-8">Partnership + Ad VO prompts</p>
+            </div>
 
-            {/* Universal Questions */}
-            {stationUniversalQuestions[station].questions.length > 0 && (
-              <div>
-                <div className="mb-4">
-                  <h4 className="text-sm font-bold text-gray-400 flex items-center gap-2">
-                    <span className="w-6 h-6 bg-gray-600 rounded flex items-center justify-center text-white text-xs">
-                      📋
+            {/* Partnership Questions */}
+            <div className="mb-4">
+              <h5 className="text-xs font-semibold text-gray-400 mb-2">{tunnelInterviewQuestions.partnership.title}</h5>
+              <ul className={largeText ? 'space-y-4' : 'space-y-3'}>
+                {tunnelInterviewQuestions.partnership.questions.map((question, index) => (
+                  <li key={index} className="flex items-start gap-3">
+                    <span className={`${largeText ? 'w-7 h-7 text-sm' : 'w-6 h-6 text-xs'} bg-green-500 rounded-lg flex items-center justify-center font-bold text-white flex-shrink-0`}>
+                      {index + 1}
                     </span>
-                    UNIVERSAL QUESTIONS
-                  </h4>
-                  <p className="text-xs text-gray-500 ml-8">{stationUniversalQuestions[station].subtitle}</p>
-                </div>
-                <ul className="space-y-4">
-                  {stationUniversalQuestions[station].questions.map((question, index) => (
-                    <li key={index} className="flex items-start gap-3">
-                      <span
-                        className="w-8 h-8 bg-gray-600 rounded-lg flex items-center justify-center text-sm font-bold text-white flex-shrink-0"
-                      >
-                        {index + 1}
-                      </span>
-                      <span className="text-gray-300 leading-relaxed text-lg">{question}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+                    <span className={`text-gray-100 leading-relaxed ${largeText ? 'text-lg' : 'text-base'}`}>{question}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Ad VO Questions */}
+            <div className="mb-4">
+              <h5 className="text-xs font-semibold text-gray-400 mb-2">{tunnelInterviewQuestions.adVO.title}</h5>
+              <ul className={largeText ? 'space-y-4' : 'space-y-3'}>
+                {tunnelInterviewQuestions.adVO.questions.map((question, index) => (
+                  <li key={index} className="flex items-start gap-3">
+                    <span className={`${largeText ? 'w-7 h-7 text-sm' : 'w-6 h-6 text-xs'} bg-amber-500 rounded-lg flex items-center justify-center font-bold text-black flex-shrink-0`}>
+                      {index + 1}
+                    </span>
+                    <span className={`text-gray-100 leading-relaxed ${largeText ? 'text-lg' : 'text-base'}`}>{question}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Hybrid Questions */}
+            <div>
+              <h5 className="text-xs font-semibold text-gray-400 mb-2">{tunnelInterviewQuestions.hybrid.title}</h5>
+              <ul className={largeText ? 'space-y-4' : 'space-y-3'}>
+                {tunnelInterviewQuestions.hybrid.questions.map((question, index) => (
+                  <li key={index} className="flex items-start gap-3">
+                    <span className={`${largeText ? 'w-7 h-7 text-sm' : 'w-6 h-6 text-xs'} bg-blue-500 rounded-lg flex items-center justify-center font-bold text-white flex-shrink-0`}>
+                      {index + 1}
+                    </span>
+                    <span className={`text-gray-100 leading-relaxed ${largeText ? 'text-lg' : 'text-base'}`}>{question}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       )}
@@ -329,12 +242,11 @@ function PlayerSlotCard({
   );
 }
 
-export default function StationToolView({ initialStation = 'field', largeText = false }: StationToolViewProps) {
-  const [activeStation, setActiveStation] = useState<StationType>(initialStation);
-  const [expandedSlots, setExpandedSlots] = useState<Set<string>>(new Set());
+export default function StationToolView({ largeText = false }: StationToolViewProps) {
+  const [expandedPlayers, setExpandedPlayers] = useState<Set<string>>(new Set());
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [activeDay, setActiveDay] = useState<1 | 2 | 'all'>('all');
 
-  // Update time every minute
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date());
@@ -342,8 +254,9 @@ export default function StationToolView({ initialStation = 'field', largeText = 
     return () => clearInterval(interval);
   }, []);
 
-  const stationSchedule = getStationSchedule(activeStation);
-  const config = stationConfig[activeStation];
+  const filteredPlayers = activeDay === 'all'
+    ? players
+    : players.filter(p => p.day === activeDay);
 
   const formattedTime = currentTime.toLocaleTimeString('en-US', {
     hour: 'numeric',
@@ -352,44 +265,39 @@ export default function StationToolView({ initialStation = 'field', largeText = 
     timeZone: 'America/Los_Angeles',
   });
 
-  const toggleSlot = (slotKey: string) => {
-    const newExpanded = new Set(expandedSlots);
-    if (newExpanded.has(slotKey)) {
-      newExpanded.delete(slotKey);
+  const togglePlayer = (playerId: string) => {
+    const newExpanded = new Set(expandedPlayers);
+    if (newExpanded.has(playerId)) {
+      newExpanded.delete(playerId);
     } else {
-      newExpanded.add(slotKey);
+      newExpanded.add(playerId);
     }
-    setExpandedSlots(newExpanded);
+    setExpandedPlayers(newExpanded);
   };
 
   const expandAll = () => {
-    const allKeys = stationSchedule
-      .map((_, i) => `slot-${i}`)
-      .filter((_, i) => stationSchedule[i].playerName !== 'BREAK');
-    setExpandedSlots(new Set(allKeys));
+    setExpandedPlayers(new Set(filteredPlayers.map(p => p.id)));
   };
 
   const collapseAll = () => {
-    setExpandedSlots(new Set());
+    setExpandedPlayers(new Set());
   };
 
-  const playerCount = stationSchedule.filter(s => s.playerName !== 'BREAK').length;
+  // Find current player
+  const currentPlayerIndex = filteredPlayers.findIndex(p => isCurrentPlayer(p, currentTime));
 
-  // Find current slot index
-  const currentSlotIndex = stationSchedule.findIndex(slot => isCurrentSlot(slot, currentTime));
-
-  // Auto-expand current player on mount/station change
+  // Auto-expand current player on mount
   useEffect(() => {
-    if (currentSlotIndex >= 0 && stationSchedule[currentSlotIndex].playerName !== 'BREAK') {
-      setExpandedSlots(new Set([`slot-${currentSlotIndex}`]));
+    if (currentPlayerIndex >= 0) {
+      setExpandedPlayers(new Set([filteredPlayers[currentPlayerIndex].id]));
     }
-  }, [activeStation]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const jumpToNow = () => {
-    if (currentSlotIndex >= 0) {
-      setExpandedSlots(new Set([`slot-${currentSlotIndex}`]));
-      // Scroll to the element
-      const element = document.getElementById(`slot-${currentSlotIndex}`);
+    if (currentPlayerIndex >= 0) {
+      const player = filteredPlayers[currentPlayerIndex];
+      setExpandedPlayers(new Set([player.id]));
+      const element = document.getElementById(`player-${player.id}`);
       if (element) {
         element.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
@@ -402,57 +310,67 @@ export default function StationToolView({ initialStation = 'field', largeText = 
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-3">
-            <span className={`w-8 h-8 ${config.bgColor} rounded-lg flex items-center justify-center text-white`}>
-              {config.icon}
+            <span className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center text-white">
+              🚶
             </span>
-            Station Tool
+            Tunnel Station Tool
           </h2>
-          <p className="text-sm text-gray-500 mt-1">View all players coming to your station with questions and background</p>
+          <p className="text-sm text-gray-500 mt-1">View all players with interview questions and background</p>
         </div>
         <div className="text-right">
           <div className="flex items-center gap-2 text-amber-400">
             <Clock className="w-4 h-4" />
             <span className="font-mono font-bold">{formattedTime}</span>
           </div>
-          <p className="text-xs text-gray-500">Current time</p>
+          <p className="text-xs text-gray-500">PT (Los Angeles)</p>
         </div>
       </div>
 
-      {/* Station Selector */}
+      {/* Day Filter */}
       <div className="flex gap-2 overflow-x-auto pb-2">
-        {(['field', 'social', 'vnr', 'packRip'] as StationType[]).map((station) => {
-          const cfg = stationConfig[station];
-          const isActive = activeStation === station;
-          const displayName = station === 'packRip' ? 'PACK RIP' : station.toUpperCase();
-
-          return (
-            <button
-              key={station}
-              onClick={() => setActiveStation(station)}
-              className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${
-                isActive
-                  ? `${cfg.bgColor} text-white shadow-lg`
-                  : 'bg-[#141414] text-gray-400 hover:bg-[#1a1a1a]'
-              }`}
-            >
-              <span className="text-lg">{cfg.icon}</span>
-              {displayName}
-            </button>
-          );
-        })}
+        <button
+          onClick={() => setActiveDay('all')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+            activeDay === 'all'
+              ? 'bg-amber-500 text-black'
+              : 'bg-[#141414] text-gray-300 hover:bg-[#1a1a1a]'
+          }`}
+        >
+          All Days ({players.length})
+        </button>
+        <button
+          onClick={() => setActiveDay(1)}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+            activeDay === 1
+              ? 'bg-blue-500 text-white'
+              : 'bg-[#141414] text-gray-300 hover:bg-[#1a1a1a]'
+          }`}
+        >
+          Day 1 (Wed) ({players.filter(p => p.day === 1).length})
+        </button>
+        <button
+          onClick={() => setActiveDay(2)}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+            activeDay === 2
+              ? 'bg-violet-500 text-white'
+              : 'bg-[#141414] text-gray-300 hover:bg-[#1a1a1a]'
+          }`}
+        >
+          Day 2 (Thu) ({players.filter(p => p.day === 2).length})
+        </button>
       </div>
 
       {/* Station Info Bar */}
-      <div className={`bg-[#141414] border ${config.borderColor} rounded-xl p-4 flex items-center justify-between`}>
+      <div className="bg-[#141414] border border-green-500/30 rounded-xl p-4 flex items-center justify-between">
         <div>
-          <h3 className={`font-bold ${config.textColor} flex items-center gap-2`}>
-            <span>{config.icon}</span>
-            {activeStation === 'packRip' ? 'PACK RIP' : activeStation.toUpperCase()} STATION
+          <h3 className="font-bold text-green-400 flex items-center gap-2">
+            <span>🚶</span>
+            TUNNEL STATION
           </h3>
-          <p className="text-sm text-gray-500">{playerCount} players today • 20 min each</p>
+          <p className="text-sm text-gray-500">{filteredPlayers.length} players • 15 min each • Walk-in + Interview</p>
         </div>
         <div className="flex gap-2">
-          {currentSlotIndex >= 0 && (
+          {currentPlayerIndex >= 0 && (
             <button
               onClick={jumpToNow}
               className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 transition-colors"
@@ -478,14 +396,14 @@ export default function StationToolView({ initialStation = 'field', largeText = 
 
       {/* Player Timeline */}
       <div className="space-y-3">
-        {stationSchedule.map((slot, index) => (
-          <div key={`slot-${index}`} id={`slot-${index}`}>
+        {filteredPlayers.map((player) => (
+          <div key={player.id} id={`player-${player.id}`}>
             <PlayerSlotCard
-              slot={slot}
-              station={activeStation}
-              isExpanded={expandedSlots.has(`slot-${index}`)}
-              onToggle={() => toggleSlot(`slot-${index}`)}
+              player={player}
+              isExpanded={expandedPlayers.has(player.id)}
+              onToggle={() => togglePlayer(player.id)}
               currentTime={currentTime}
+              largeText={largeText}
             />
           </div>
         ))}
@@ -493,7 +411,7 @@ export default function StationToolView({ initialStation = 'field', largeText = 
 
       {/* Footer tip */}
       <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-4 text-sm text-gray-500">
-        <strong className="text-gray-400">Tip:</strong> Tap any player card to expand their full profile, background, and interview questions for this station.
+        <strong className="text-gray-400">Tip:</strong> Tap any player card to expand their full profile, background, and interview questions. Product station is visual only (no interview needed).
       </div>
     </div>
   );

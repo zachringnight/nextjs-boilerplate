@@ -1,30 +1,22 @@
 'use client';
 
-import { X, Volume2 } from 'lucide-react';
+import { X, Volume2, AlertTriangle, Languages } from 'lucide-react';
 import type { Player } from '../../data/players';
-import { stationUniversalQuestions } from '../../data/players';
+import { tunnelInterviewQuestions } from '../../data/players';
 import PlayerAvatar from './PlayerAvatar';
-import { stationConfig } from '../../components/StationIcon';
 
 interface PlayerModalProps {
   player: Player;
-  station: string | null;
   onClose: () => void;
-  onStationChange: (station: string | null) => void;
   largeText?: boolean;
 }
 
-const stationOrder: Array<'field' | 'social' | 'vnr' | 'packRip'> = ['field', 'social', 'vnr', 'packRip'];
-
-const groupColors = {
-  1: 'bg-green-500/20 text-green-400 border-green-500/30',
-  2: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
-  3: 'bg-violet-500/20 text-violet-400 border-violet-500/30',
+const dayColors = {
+  1: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+  2: 'bg-violet-500/20 text-violet-400 border-violet-500/30',
 };
 
-export default function PlayerModal({ player, station, onClose, onStationChange, largeText = false }: PlayerModalProps) {
-  const activeStation = station || 'field';
-
+export default function PlayerModal({ player, onClose, largeText = false }: PlayerModalProps) {
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Backdrop */}
@@ -46,11 +38,23 @@ export default function PlayerModal({ player, station, onClose, onStationChange,
             <div className="flex gap-5">
               <PlayerAvatar player={player} size="xl" />
               <div className="flex-1">
-                <div className="flex items-center gap-3 mb-1">
+                <div className="flex items-center gap-2 mb-1 flex-wrap">
                   <span className="text-3xl">{player.flag}</span>
-                  <span className={`text-xs px-2 py-1 rounded-full border ${groupColors[player.group as keyof typeof groupColors]}`}>
-                    Group {player.group}
+                  <span className={`text-xs px-2 py-1 rounded-full border ${dayColors[player.day]}`}>
+                    Day {player.day}
                   </span>
+                  {player.embargoed && (
+                    <span className="text-xs px-2 py-1 rounded-full bg-red-500/20 text-red-400 border border-red-500/30 flex items-center gap-1">
+                      <AlertTriangle className="w-3 h-3" />
+                      EMBARGOED
+                    </span>
+                  )}
+                  {player.translatorNeeded && (
+                    <span className="text-xs px-2 py-1 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center gap-1">
+                      <Languages className="w-3 h-3" />
+                      Translator
+                    </span>
+                  )}
                 </div>
                 <h2 className="text-3xl font-black mb-1">
                   {player.firstName} {player.lastName}
@@ -64,7 +68,7 @@ export default function PlayerModal({ player, station, onClose, onStationChange,
                 <p className="text-gray-400">
                   {player.position} • {player.team}
                 </p>
-                <p className="text-sm text-gray-500 mt-1">{player.groupTime}</p>
+                <p className="text-sm text-gray-500 mt-1">{player.scheduledTime}</p>
               </div>
             </div>
           </div>
@@ -97,61 +101,104 @@ export default function PlayerModal({ player, station, onClose, onStationChange,
             </div>
           </div>
 
-          {/* Station Tabs */}
-          <div className="px-6 pt-4 border-b border-[#2a2a2a]">
-            <div className="flex gap-1 overflow-x-auto pb-4">
-              {stationOrder.map((stationKey) => {
-                const config = stationConfig[stationKey];
-                const isActive = activeStation === stationKey;
-
-                return (
-                  <button
-                    key={stationKey}
-                    onClick={() => onStationChange(stationKey)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
-                      isActive
-                        ? `${config.bgColor} text-white`
-                        : 'bg-[#141414] text-gray-400 hover:bg-[#1a1a1a]'
-                    }`}
-                  >
-                    <span>{config.icon}</span>
-                    {config.label}
-                  </button>
-                );
-              })}
+          {/* Station Info */}
+          <div className="px-6 py-4 border-b border-[#2a2a2a] bg-[#0f0f0f]">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3 flex-1">
+                <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center text-xl">
+                  🚶
+                </div>
+                <div>
+                  <h3 className="font-bold text-green-400">TUNNEL STATION</h3>
+                  <p className="text-xs text-gray-500">Walk-in/hero footage + interview</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 flex-1">
+                <div className="w-10 h-10 bg-amber-500 rounded-lg flex items-center justify-center text-xl">
+                  📸
+                </div>
+                <div>
+                  <h3 className="font-bold text-amber-400">PRODUCT STATION</h3>
+                  <p className="text-xs text-gray-500">Card photography (no interview)</p>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Questions */}
+          {/* Interview Questions */}
           <div className={`p-6 ${largeText ? 'py-8' : ''}`}>
-            <div className="mb-4">
-              <h3 className={`font-bold ${stationConfig[activeStation as keyof typeof stationConfig].textColor} ${largeText ? 'text-base' : 'text-sm'}`}>
-                {stationUniversalQuestions[activeStation as keyof typeof stationUniversalQuestions].title}
+            <div className="mb-6">
+              <h3 className={`font-bold text-green-400 flex items-center gap-2 ${largeText ? 'text-lg' : 'text-base'}`}>
+                <span className="w-6 h-6 bg-green-500 rounded flex items-center justify-center text-white text-sm">
+                  🚶
+                </span>
+                TUNNEL INTERVIEW QUESTIONS
               </h3>
-              <p className="text-xs text-gray-500">
-                {stationUniversalQuestions[activeStation as keyof typeof stationUniversalQuestions].subtitle}
-              </p>
+              <p className="text-xs text-gray-500 ml-8">Partnership messaging + ad voiceover lines</p>
             </div>
-            <ul className={largeText ? 'space-y-6' : 'space-y-4'}>
-              {stationUniversalQuestions[activeStation as keyof typeof stationUniversalQuestions].questions.map((question, index) => {
-                return (
-                  <li key={index} className="flex items-start gap-4">
+
+            {/* Partnership Questions */}
+            <div className="mb-6">
+              <h4 className={`text-sm font-semibold text-gray-400 mb-3 ${largeText ? 'text-base' : ''}`}>
+                {tunnelInterviewQuestions.partnership.title}
+              </h4>
+              <ul className={largeText ? 'space-y-5' : 'space-y-3'}>
+                {tunnelInterviewQuestions.partnership.questions.map((question, index) => (
+                  <li key={index} className="flex items-start gap-3">
                     <span
-                      className={`${largeText ? 'w-10 h-10 text-lg' : 'w-8 h-8 text-sm'} bg-amber-500 rounded-lg flex items-center justify-center font-bold text-black flex-shrink-0`}
+                      className={`${largeText ? 'w-8 h-8 text-sm' : 'w-6 h-6 text-xs'} bg-green-500 rounded-lg flex items-center justify-center font-bold text-white flex-shrink-0`}
                     >
                       {index + 1}
                     </span>
-                    <span className={`text-gray-100 leading-relaxed ${largeText ? 'text-xl' : 'text-lg'}`}>{question}</span>
+                    <span className={`text-gray-100 leading-relaxed ${largeText ? 'text-xl' : 'text-base'}`}>{question}</span>
                   </li>
-                );
-              })}
-            </ul>
+                ))}
+              </ul>
+            </div>
+
+            {/* Ad VO Questions */}
+            <div className="mb-6">
+              <h4 className={`text-sm font-semibold text-gray-400 mb-3 ${largeText ? 'text-base' : ''}`}>
+                {tunnelInterviewQuestions.adVO.title}
+              </h4>
+              <ul className={largeText ? 'space-y-5' : 'space-y-3'}>
+                {tunnelInterviewQuestions.adVO.questions.map((question, index) => (
+                  <li key={index} className="flex items-start gap-3">
+                    <span
+                      className={`${largeText ? 'w-8 h-8 text-sm' : 'w-6 h-6 text-xs'} bg-amber-500 rounded-lg flex items-center justify-center font-bold text-black flex-shrink-0`}
+                    >
+                      {index + 1}
+                    </span>
+                    <span className={`text-gray-100 leading-relaxed ${largeText ? 'text-xl' : 'text-base'}`}>{question}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Hybrid Questions */}
+            <div>
+              <h4 className={`text-sm font-semibold text-gray-400 mb-3 ${largeText ? 'text-base' : ''}`}>
+                {tunnelInterviewQuestions.hybrid.title}
+              </h4>
+              <ul className={largeText ? 'space-y-5' : 'space-y-3'}>
+                {tunnelInterviewQuestions.hybrid.questions.map((question, index) => (
+                  <li key={index} className="flex items-start gap-3">
+                    <span
+                      className={`${largeText ? 'w-8 h-8 text-sm' : 'w-6 h-6 text-xs'} bg-blue-500 rounded-lg flex items-center justify-center font-bold text-white flex-shrink-0`}
+                    >
+                      {index + 1}
+                    </span>
+                    <span className={`text-gray-100 leading-relaxed ${largeText ? 'text-xl' : 'text-base'}`}>{question}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
 
           {/* Footer tip */}
           <div className="px-6 pb-6">
             <div className="bg-[#141414] border border-[#2a2a2a] rounded-lg p-3 text-xs text-gray-500">
-              Flex questions based on athlete comfort. Use generic banks as backup.
+              <strong className="text-gray-400">15 min per station.</strong> Flex questions based on athlete comfort. Product station is visual only (no interview).
             </div>
           </div>
         </div>
