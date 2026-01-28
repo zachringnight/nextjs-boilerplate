@@ -39,15 +39,15 @@ export const players: Player[] = [
     groupTime: '9:00 to 10:20 AM',
     playerNumber: 1,
     bio: [
+      'Colorado native and first-ever Denver Summit FC signing',
       'Speed demon and fan favorite known for explosive runs',
-      'Hometown hero bringing pro soccer back to Colorado',
-      'Former North Carolina Courage standout',
+      '2024 NWSL Champion with Orlando Pride',
       'Known for her work ethic and leadership on and off the pitch',
     ],
     talkingPoints: [
-      'Colorado connection. Playing at home means everything',
+      'Hometown hero bringing pro soccer to Denver',
       'Speed is her weapon. One of the fastest in the league',
-      'Community focused and heavily involved in local youth soccer',
+      'First player signed to Summit FC. Building something special',
     ],
     questions: [
       {
@@ -107,15 +107,15 @@ export const players: Player[] = [
     groupTime: '9:00 to 10:20 AM',
     playerNumber: 2,
     bio: [
+      'Two-time NWSL Champion joining Denver Summit FC for their inaugural season',
       'Rock-solid center back known for consistency and leadership',
-      'Anchors the back line with composure under pressure',
+      'NWSL ironwoman with incredible durability record',
       'Virginia Tech alum with a reputation for aerial dominance',
-      'Quiet leader who lets her play speak for itself',
     ],
     talkingPoints: [
+      'Helping build something new in Denver from day one',
+      'Championship experience she brings to an expansion team',
       'Consistency is her superpower. Shows up every single game',
-      'Defenders rarely get the spotlight. She deserves it',
-      'Aerial presence makes her a threat on set pieces',
     ],
     questions: [
       {
@@ -243,15 +243,15 @@ export const players: Player[] = [
     groupTime: '10:30 to 11:50 AM',
     playerNumber: 4,
     bio: [
-      'French international with elite technical skills',
+      'French international and 2025 Midfielder of the Year finalist',
       'Veteran presence who has played across Europe\'s top leagues',
       'Known for vision, creativity, and set-piece delivery',
-      'Fashion-forward with an eye for style on and off the pitch',
+      'Key piece of San Diego Wave\'s midfield',
     ],
     talkingPoints: [
       'European pedigree. Played in France, England, now NWSL',
       'Set-piece specialist with a dangerous delivery',
-      'Style icon. Watch for sneaker game and fashion choices',
+      'Bringing international experience to San Diego',
     ],
     questions: [
       {
@@ -445,15 +445,15 @@ export const players: Player[] = [
     groupTime: '10:30 to 11:50 AM',
     playerNumber: 7,
     bio: [
-      'USWNT goalkeeper and one of the best in the world',
+      '2024 Olympic gold medalist with USWNT',
+      'Joining Boston Legacy for their inaugural NWSL season',
       'Shot-stopper with commanding presence in goal',
       'Rutgers alum who developed in France before returning to NWSL',
-      'Vocal leader and defensive organizer',
     ],
     talkingPoints: [
+      'Olympic champion bringing winning culture to Boston',
       'National team goalkeeper. Represents the pinnacle',
-      'International experience in France shaped her game',
-      'Commanding presence. Organizes the entire defense',
+      'Helping build something new with an expansion franchise',
     ],
     questions: [
       {
