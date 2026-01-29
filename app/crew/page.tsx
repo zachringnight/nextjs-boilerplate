@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { players } from '../data/players';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { players, playerCounts, getPlayerByFirstName } from '../data/players';
 import PlayerCard from './components/PlayerCard';
 import PlayerModal from './components/PlayerModal';
 import ScheduleView from './components/ScheduleView';
@@ -9,8 +9,7 @@ import StationToolView from './components/StationToolView';
 import NowDashboard from './components/NowDashboard';
 import type { Player } from '../data/players';
 import { Search, Users, Filter, Calendar, User, Radio, Zap, X, Type, AlertTriangle } from 'lucide-react';
-
-type ViewMode = 'now' | 'schedule' | 'station' | 'players';
+import { ViewMode, EVENT_INFO } from '../lib/constants';
 
 export default function CrewPage() {
   const [viewMode, setViewMode] = useState<ViewMode>('now');
@@ -46,39 +45,54 @@ export default function CrewPage() {
     }
   }, [showGlobalSearch]);
 
-  // Filter players for global search
-  const globalSearchResults = globalSearchQuery.length > 0
-    ? players.filter(p =>
-        p.firstName.toLowerCase().includes(globalSearchQuery.toLowerCase()) ||
-        p.lastName.toLowerCase().includes(globalSearchQuery.toLowerCase()) ||
-        p.team.toLowerCase().includes(globalSearchQuery.toLowerCase()) ||
-        p.position.toLowerCase().includes(globalSearchQuery.toLowerCase())
-      )
-    : [];
-
-  const filteredPlayers = players.filter((player) => {
-    const matchesSearch =
-      player.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      player.team.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      player.nationality.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesDay = activeDay === null || player.day === activeDay;
-    const matchesEmbargo = !showEmbargoedOnly || player.embargoed;
-    return matchesSearch && matchesDay && matchesEmbargo;
-  });
-
-  const dayCounts = {
-    1: players.filter((p) => p.day === 1).length,
-    2: players.filter((p) => p.day === 2).length,
-  };
-
-  const handlePlayerClick = (firstName: string) => {
-    const player = players.find(
-      (p) => p.firstName.toLowerCase() === firstName.toLowerCase()
+  // Memoized global search results
+  const globalSearchResults = useMemo(() => {
+    if (globalSearchQuery.length === 0) return [];
+    const query = globalSearchQuery.toLowerCase();
+    return players.filter(p =>
+      p.firstName.toLowerCase().includes(query) ||
+      p.lastName.toLowerCase().includes(query) ||
+      p.team.toLowerCase().includes(query) ||
+      p.position.toLowerCase().includes(query)
     );
+  }, [globalSearchQuery]);
+
+  // Memoized filtered players for Players view
+  const filteredPlayers = useMemo(() => {
+    return players.filter((player) => {
+      const matchesSearch =
+        player.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        player.team.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        player.nationality.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesDay = activeDay === null || player.day === activeDay;
+      const matchesEmbargo = !showEmbargoedOnly || player.embargoed;
+      return matchesSearch && matchesDay && matchesEmbargo;
+    });
+  }, [searchQuery, activeDay, showEmbargoedOnly]);
+
+  // Memoized day counts (use pre-computed values)
+  const dayCounts = useMemo(() => ({
+    1: playerCounts.day1,
+    2: playerCounts.day2,
+  }), []);
+
+  // Optimized player lookup using Map
+  const handlePlayerClick = useCallback((firstName: string) => {
+    const player = getPlayerByFirstName(firstName);
     if (player) {
       setSelectedPlayer(player);
     }
-  };
+  }, []);
+
+  const closeGlobalSearch = useCallback(() => {
+    setShowGlobalSearch(false);
+    setGlobalSearchQuery('');
+  }, []);
+
+  const handleGlobalSearchSelect = useCallback((player: Player) => {
+    setSelectedPlayer(player);
+    closeGlobalSearch();
+  }, [closeGlobalSearch]);
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
@@ -90,7 +104,7 @@ export default function CrewPage() {
               <h1 className="text-2xl font-bold">
                 <span className="text-[#FFD100]">PANINI</span> CREW APP
               </h1>
-              <p className="text-sm text-gray-500">NWSL Media Day 2026 • MG Studio</p>
+              <p className="text-sm text-gray-500">{EVENT_INFO.name} - {EVENT_INFO.location}</p>
             </div>
             <div className="flex items-center gap-3">
               {/* Global Search Button */}
@@ -115,8 +129,8 @@ export default function CrewPage() {
                 <Type className="w-5 h-5" />
               </button>
               <div className="text-right">
-                <p className="text-sm text-[#FFD100] font-medium">Jan 28 & 29, 2026</p>
-                <p className="text-xs text-gray-500">34 Players • 2 Days</p>
+                <p className="text-sm text-[#FFD100] font-medium">{EVENT_INFO.dateDisplay}</p>
+                <p className="text-xs text-gray-500">{playerCounts.total} Players - {EVENT_INFO.totalDays} Days</p>
               </div>
             </div>
           </div>
@@ -194,7 +208,7 @@ export default function CrewPage() {
                   }`}
                 >
                   <Users className="w-4 h-4" />
-                  All ({players.length})
+                  All ({playerCounts.total})
                 </button>
                 <button
                   onClick={() => setActiveDay(activeDay === 1 ? null : 1)}
@@ -227,7 +241,7 @@ export default function CrewPage() {
                   }`}
                 >
                   <AlertTriangle className="w-4 h-4" />
-                  Embargoed ({players.filter(p => p.embargoed).length})
+                  Embargoed ({playerCounts.embargoed})
                 </button>
               </div>
             </>
@@ -241,9 +255,7 @@ export default function CrewPage() {
           <NowDashboard onPlayerClick={handlePlayerClick} />
         )}
         {viewMode === 'schedule' && (
-          <ScheduleView
-            onPlayerClick={handlePlayerClick}
-          />
+          <ScheduleView onPlayerClick={handlePlayerClick} />
         )}
         {viewMode === 'station' && (
           <StationToolView largeText={largeTextMode} />
@@ -274,10 +286,7 @@ export default function CrewPage() {
         <div className="fixed inset-0 z-50">
           <div
             className="fixed inset-0 bg-black/80 backdrop-blur-sm"
-            onClick={() => {
-              setShowGlobalSearch(false);
-              setGlobalSearchQuery('');
-            }}
+            onClick={closeGlobalSearch}
           />
           <div className="relative flex justify-center pt-[15vh] px-4">
             <div className="w-full max-w-xl bg-[#141414] border border-[#2a2a2a] rounded-xl shadow-2xl overflow-hidden">
@@ -293,10 +302,7 @@ export default function CrewPage() {
                   className="flex-1 bg-transparent px-4 py-4 text-white placeholder-gray-500 focus:outline-none"
                 />
                 <button
-                  onClick={() => {
-                    setShowGlobalSearch(false);
-                    setGlobalSearchQuery('');
-                  }}
+                  onClick={closeGlobalSearch}
                   className="p-1 hover:bg-[#2a2a2a] rounded"
                 >
                   <X className="w-5 h-5 text-gray-500" />
@@ -319,11 +325,7 @@ export default function CrewPage() {
                     {globalSearchResults.map((player) => (
                       <button
                         key={player.id}
-                        onClick={() => {
-                          setSelectedPlayer(player);
-                          setShowGlobalSearch(false);
-                          setGlobalSearchQuery('');
-                        }}
+                        onClick={() => handleGlobalSearchSelect(player)}
                         className="w-full px-4 py-3 flex items-center gap-3 hover:bg-[#1a1a1a] transition-colors text-left"
                       >
                         <span className="text-2xl">{player.flag}</span>
@@ -332,7 +334,7 @@ export default function CrewPage() {
                             {player.firstName} {player.lastName}
                           </p>
                           <p className="text-sm text-gray-500 truncate">
-                            {player.position} • {player.team} • Day {player.day}
+                            {player.position} - {player.team} - Day {player.day}
                           </p>
                         </div>
                         <div className="text-right">

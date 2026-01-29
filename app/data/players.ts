@@ -1380,3 +1380,41 @@ export const translationNeeds = [
   { name: 'Mina Tanaka', team: 'UTA', time: 'Wed 11:10 AM', language: 'Japanese' },
   { name: 'Manaka Matsukubo', team: 'NC', time: 'Wed 3:55 PM', language: 'Japanese' },
 ];
+
+// ============================================
+// PRE-COMPUTED DATA (Performance Optimization)
+// ============================================
+
+// Players filtered by day (computed once)
+export const day1Players = players.filter(p => p.day === 1);
+export const day2Players = players.filter(p => p.day === 2);
+
+// Counts for quick access
+export const playerCounts = {
+  total: players.length,
+  day1: day1Players.length,
+  day2: day2Players.length,
+  embargoed: players.filter(p => p.embargoed).length,
+  clear: players.filter(p => !p.embargoed).length,
+  translatorNeeded: players.filter(p => p.translatorNeeded).length,
+} as const;
+
+// Player lookup by ID for O(1) access
+export const playerById = new Map<string, Player>(
+  players.map(p => [p.id, p])
+);
+
+// Player lookup by first name (case-insensitive)
+export const playerByFirstName = new Map<string, Player>(
+  players.map(p => [p.firstName.toLowerCase(), p])
+);
+
+// Get player by first name (helper function)
+export function getPlayerByFirstName(firstName: string): Player | undefined {
+  return playerByFirstName.get(firstName.toLowerCase());
+}
+
+// Get player by ID (helper function)
+export function getPlayerById(id: string): Player | undefined {
+  return playerById.get(id);
+}

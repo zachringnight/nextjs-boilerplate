@@ -1,62 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { players } from '../../data/players';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { players, day1Players, day2Players, playerCounts } from '../../data/players';
 import type { Player } from '../../data/players';
-import { Clock, Zap, AlertTriangle, Languages, ChevronDown, ChevronUp } from 'lucide-react';
+import { StatusBadge, ClearBadge, LiveBadge } from '../../components/StatusBadge';
+import { Clock, Zap, ChevronDown, ChevronUp } from 'lucide-react';
+import { isCurrentPlayer, isUpcomingPlayer, formatTime, findCurrentPlayer } from '../../lib/schedule-utils';
+import { UPDATE_INTERVALS, DAY_STYLES } from '../../lib/constants';
 
 interface ScheduleViewProps {
   onPlayerClick: (firstName: string) => void;
-}
-
-const dayStyles = {
-  1: {
-    border: 'border-blue-500/30',
-    header: 'bg-blue-500/10',
-    badge: 'text-blue-400',
-  },
-  2: {
-    border: 'border-violet-500/30',
-    header: 'bg-violet-500/10',
-    badge: 'text-violet-400',
-  },
-};
-
-function parseTime(timeStr: string): { hours: number; minutes: number } {
-  const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
-  if (!match) return { hours: 0, minutes: 0 };
-
-  let hours = parseInt(match[1], 10);
-  const minutes = parseInt(match[2], 10);
-  const period = match[3].toUpperCase();
-
-  if (period === 'PM' && hours !== 12) hours += 12;
-  if (period === 'AM' && hours === 12) hours = 0;
-
-  return { hours, minutes };
-}
-
-function isCurrentPlayer(player: Player, currentTime: Date): boolean {
-  const { hours, minutes } = parseTime(player.scheduledTime);
-  const slotStart = hours * 60 + minutes;
-  const slotEnd = slotStart + 15;
-
-  const pstString = currentTime.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });
-  const pstDate = new Date(pstString);
-  const currentMinutes = pstDate.getHours() * 60 + pstDate.getMinutes();
-
-  return currentMinutes >= slotStart && currentMinutes < slotEnd;
-}
-
-function isUpcomingPlayer(player: Player, currentTime: Date): boolean {
-  const { hours, minutes } = parseTime(player.scheduledTime);
-  const slotStart = hours * 60 + minutes;
-
-  const pstString = currentTime.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });
-  const pstDate = new Date(pstString);
-  const currentMinutes = pstDate.getHours() * 60 + pstDate.getMinutes();
-
-  return slotStart > currentMinutes && slotStart <= currentMinutes + 30;
 }
 
 function DaySchedule({
@@ -74,11 +27,10 @@ function DaySchedule({
   isExpanded: boolean;
   onToggle: () => void;
 }) {
-  const styles = dayStyles[day];
-  const dayDate = day === 1 ? 'Wednesday, January 28' : 'Thursday, January 29';
-  const embargoedCount = dayPlayers.filter(p => p.embargoed).length;
-  const clearCount = dayPlayers.filter(p => !p.embargoed).length;
-  const hasCurrentPlayer = dayPlayers.some(p => isCurrentPlayer(p, currentTime));
+  const styles = DAY_STYLES[day];
+  const embargoedCount = useMemo(() => dayPlayers.filter(p => p.embargoed).length, [dayPlayers]);
+  const clearCount = useMemo(() => dayPlayers.filter(p => !p.embargoed).length, [dayPlayers]);
+  const hasCurrentPlayer = useMemo(() => dayPlayers.some(p => isCurrentPlayer(p, currentTime)), [dayPlayers, currentTime]);
 
   return (
     <div className={`bg-[#141414] border ${styles.border} rounded-xl overflow-hidden`}>
@@ -88,14 +40,9 @@ function DaySchedule({
         className={`w-full ${styles.header} px-4 py-3 border-b border-[#2a2a2a] flex items-center justify-between`}
       >
         <div className="flex items-center gap-3">
-          <h3 className={`font-bold ${styles.badge}`}>DAY {day}</h3>
-          <span className="text-sm text-gray-400">{dayDate}</span>
-          {hasCurrentPlayer && (
-            <span className="flex items-center gap-1 bg-amber-500 text-black px-2 py-0.5 rounded text-xs font-bold animate-pulse">
-              <Zap className="w-3 h-3" />
-              LIVE
-            </span>
-          )}
+          <h3 className={`font-bold ${styles.text}`}>DAY {day}</h3>
+          <span className="text-sm text-gray-400">{styles.dateDisplay}</span>
+          {hasCurrentPlayer && <LiveBadge />}
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 text-xs">
@@ -142,18 +89,8 @@ function DaySchedule({
                   >
                     <td className="py-3 px-4">
                       <div className="flex flex-col">
-                        {isCurrent && (
-                          <span className="flex items-center gap-1 text-amber-400 text-xs font-bold animate-pulse mb-1">
-                            <Zap className="w-3 h-3" />
-                            NOW
-                          </span>
-                        )}
-                        {isUpcoming && (
-                          <span className="flex items-center gap-1 text-blue-400 text-xs mb-1">
-                            <Clock className="w-3 h-3" />
-                            NEXT
-                          </span>
-                        )}
+                        {isCurrent && <StatusBadge type="current" />}
+                        {isUpcoming && <StatusBadge type="upcoming" />}
                         <span className={`font-mono text-xs ${isCurrent ? 'text-amber-400 font-bold' : 'text-gray-300'}`}>
                           {player.scheduledTime}
                         </span>
@@ -178,23 +115,13 @@ function DaySchedule({
                     </td>
                     <td className="text-center py-3 px-4">
                       {player.embargoed ? (
-                        <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded bg-red-500/20 text-red-400">
-                          <AlertTriangle className="w-3 h-3" />
-                          EMBARGO
-                        </span>
+                        <StatusBadge type="embargo" />
                       ) : (
-                        <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded bg-green-500/20 text-green-400">
-                          Clear
-                        </span>
+                        <ClearBadge />
                       )}
                     </td>
                     <td className="text-center py-3 px-4">
-                      {player.translatorNeeded && (
-                        <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded bg-amber-500/20 text-amber-400">
-                          <Languages className="w-3 h-3" />
-                          Translator
-                        </span>
-                      )}
+                      {player.translatorNeeded && <StatusBadge type="translator" />}
                     </td>
                   </tr>
                 );
@@ -214,44 +141,41 @@ export default function ScheduleView({ onPlayerClick }: ScheduleViewProps) {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date());
-    }, 60000);
+    }, UPDATE_INTERVALS.schedule);
     return () => clearInterval(interval);
   }, []);
 
-  const day1Players = players.filter(p => p.day === 1);
-  const day2Players = players.filter(p => p.day === 2);
+  const formattedTime = useMemo(() => formatTime(currentTime), [currentTime]);
 
-  const formattedTime = currentTime.toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
-    timeZone: 'America/Los_Angeles',
-  });
+  const toggleDay = useCallback((day: number) => {
+    setExpandedDays(prev => {
+      const newExpanded = new Set(prev);
+      if (newExpanded.has(day)) {
+        newExpanded.delete(day);
+      } else {
+        newExpanded.add(day);
+      }
+      return newExpanded;
+    });
+  }, []);
 
-  const toggleDay = (day: number) => {
-    const newExpanded = new Set(expandedDays);
-    if (newExpanded.has(day)) {
-      newExpanded.delete(day);
-    } else {
-      newExpanded.add(day);
-    }
-    setExpandedDays(newExpanded);
-  };
+  const currentPlayer = useMemo(
+    () => findCurrentPlayer(players, currentTime),
+    [currentTime]
+  );
 
-  const currentPlayer = players.find(p => isCurrentPlayer(p, currentTime));
-
-  const jumpToNow = () => {
+  const jumpToNow = useCallback(() => {
     if (currentPlayer) {
       setExpandedDays(new Set([currentPlayer.day]));
     }
-  };
+  }, [currentPlayer]);
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Player Schedule</h2>
-          <p className="text-sm text-gray-500">15 min per player • 2 stations (Tunnel + Product)</p>
+          <p className="text-sm text-gray-500">15 min per player - 2 stations (Tunnel + Product)</p>
         </div>
         <div className="flex items-center gap-4">
           {currentPlayer && (
@@ -276,19 +200,19 @@ export default function ScheduleView({ onPlayerClick }: ScheduleViewProps) {
       {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-[#141414] border border-[#2a2a2a] rounded-lg p-4 text-center">
-          <p className="text-3xl font-bold text-white">{players.length}</p>
+          <p className="text-3xl font-bold text-white">{playerCounts.total}</p>
           <p className="text-xs text-gray-500">Total Players</p>
         </div>
         <div className="bg-[#141414] border border-[#2a2a2a] rounded-lg p-4 text-center">
-          <p className="text-3xl font-bold text-green-400">{players.filter(p => !p.embargoed).length}</p>
+          <p className="text-3xl font-bold text-green-400">{playerCounts.clear}</p>
           <p className="text-xs text-gray-500">Clear for Use</p>
         </div>
         <div className="bg-[#141414] border border-[#2a2a2a] rounded-lg p-4 text-center">
-          <p className="text-3xl font-bold text-red-400">{players.filter(p => p.embargoed).length}</p>
+          <p className="text-3xl font-bold text-red-400">{playerCounts.embargoed}</p>
           <p className="text-xs text-gray-500">Embargoed</p>
         </div>
         <div className="bg-[#141414] border border-[#2a2a2a] rounded-lg p-4 text-center">
-          <p className="text-3xl font-bold text-amber-400">{players.filter(p => p.translatorNeeded).length}</p>
+          <p className="text-3xl font-bold text-amber-400">{playerCounts.translatorNeeded}</p>
           <p className="text-xs text-gray-500">Need Translator</p>
         </div>
       </div>
