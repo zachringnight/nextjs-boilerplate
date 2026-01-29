@@ -1,22 +1,23 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { players, day1Players, day2Players, playerCounts } from '../../data/players';
 import type { Player } from '../../data/players';
 import PlayerAvatar from './PlayerAvatar';
 import DateTimeDisplay from '../../components/DateTimeDisplay';
 import { StationGrid } from '../../components/StationInfoCard';
 import { StatusBadge } from '../../components/StatusBadge';
-import { ChevronRight, Volume2, Zap } from 'lucide-react';
+import { ChevronRight, Volume2, Zap, Play, RotateCcw, Plus, Minus, Clock } from 'lucide-react';
 import {
   getEventDay,
   isCurrentPlayer,
-  getTimeRemaining,
+  getTimeRemaining as getScheduledTimeRemaining,
   getNextPlayer,
   getCompletedCount,
   getCurrentMinutesPST,
 } from '../../lib/schedule-utils';
-import { UPDATE_INTERVALS, DAY_STYLES, EVENT_DATES, EVENT_INFO } from '../../lib/constants';
+import { UPDATE_INTERVALS, DAY_STYLES, EVENT_DATES, EVENT_INFO, SLOT_DURATION_MINUTES } from '../../lib/constants';
+import { useSessionTimer } from '../../lib/useSessionTimer';
 
 function CurrentPlayerCard({ player, onPlayerClick }: { player: Player; onPlayerClick: (name: string) => void }) {
   return (
@@ -52,13 +53,20 @@ function CurrentPlayerCard({ player, onPlayerClick }: { player: Player; onPlayer
   );
 }
 
-function NextPlayerCard({ player, onPlayerClick }: { player: Player; onPlayerClick: (name: string) => void }) {
+interface NextPlayerCardProps {
+  player: Player;
+  onPlayerClick: (name: string) => void;
+  onStartSession?: () => void;
+  showStartButton?: boolean;
+}
+
+function NextPlayerCard({ player, onPlayerClick, onStartSession, showStartButton }: NextPlayerCardProps) {
   return (
-    <button
-      onClick={() => onPlayerClick(player.firstName)}
-      className="w-full bg-[#141414] border border-blue-500/30 rounded-xl p-4 text-left hover:border-blue-500/50 transition-all"
-    >
-      <div className="flex items-center gap-3">
+    <div className="bg-[#141414] border border-blue-500/30 rounded-xl p-4">
+      <button
+        onClick={() => onPlayerClick(player.firstName)}
+        className="w-full flex items-center gap-3 text-left hover:opacity-80 transition-opacity"
+      >
         <PlayerAvatar player={player} size="md" />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
@@ -69,8 +77,20 @@ function NextPlayerCard({ player, onPlayerClick }: { player: Player; onPlayerCli
           <p className="text-sm text-gray-400">{player.scheduledTime}</p>
         </div>
         <ChevronRight className="w-5 h-5 text-gray-600" />
-      </div>
-    </button>
+      </button>
+      {showStartButton && onStartSession && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onStartSession();
+          }}
+          className="mt-3 w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors"
+        >
+          <Play className="w-4 h-4" />
+          Player Arrived - Start Timer
+        </button>
+      )}
+    </div>
   );
 }
 
@@ -95,12 +115,98 @@ function StatsGrid({ completedCount, remainingCount, totalCount }: { completedCo
   );
 }
 
+interface TimerControlsProps {
+  playerId: string;
+  timeRemaining: { minutes: number; seconds: number };
+  isManualSession: boolean;
+  onAdjust: (minutes: number) => void;
+  onReset: () => void;
+  scheduledTime: string;
+  day: 1 | 2;
+}
+
+function TimerControls({ playerId, timeRemaining, isManualSession, onAdjust, onReset, scheduledTime, day }: TimerControlsProps) {
+  const dayColorClass = DAY_STYLES[day].text;
+
+  return (
+    <div className="bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 rounded-xl p-4">
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <div className="flex items-center gap-2">
+            <p className="text-sm text-amber-400 font-medium">TIME REMAINING</p>
+            {isManualSession && (
+              <span className="text-xs px-2 py-0.5 rounded bg-green-500/20 text-green-400">
+                Manual
+              </span>
+            )}
+          </div>
+          <p className={`text-sm ${dayColorClass}`}>
+            Day {day} - {scheduledTime}
+          </p>
+        </div>
+        <div className="text-right">
+          <div className={`font-mono text-4xl font-bold ${timeRemaining.minutes < 5 ? 'text-red-400 animate-pulse' : 'text-white'}`}>
+            {String(timeRemaining.minutes).padStart(2, '0')}:{String(timeRemaining.seconds).padStart(2, '0')}
+          </div>
+          <p className="text-xs text-gray-500">minutes remaining</p>
+        </div>
+      </div>
+
+      {/* Timer adjustment controls */}
+      <div className="flex items-center justify-between pt-3 border-t border-amber-500/20">
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-gray-400">Adjust:</span>
+          <button
+            onClick={() => onAdjust(-1)}
+            className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#0a0a0a] hover:bg-[#1a1a1a] text-gray-400 hover:text-white transition-colors"
+            title="Subtract 1 minute"
+          >
+            <Minus className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => onAdjust(1)}
+            className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#0a0a0a] hover:bg-[#1a1a1a] text-gray-400 hover:text-white transition-colors"
+            title="Add 1 minute"
+          >
+            <Plus className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => onAdjust(-5)}
+            className="px-2 h-8 rounded-lg bg-[#0a0a0a] hover:bg-[#1a1a1a] text-gray-400 hover:text-white text-xs transition-colors"
+            title="Subtract 5 minutes"
+          >
+            -5m
+          </button>
+          <button
+            onClick={() => onAdjust(5)}
+            className="px-2 h-8 rounded-lg bg-[#0a0a0a] hover:bg-[#1a1a1a] text-gray-400 hover:text-white text-xs transition-colors"
+            title="Add 5 minutes"
+          >
+            +5m
+          </button>
+        </div>
+        {isManualSession && (
+          <button
+            onClick={onReset}
+            className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-400 text-xs transition-colors"
+            title="Reset to scheduled time"
+          >
+            <RotateCcw className="w-3 h-3" />
+            Reset
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 interface NowDashboardProps {
   onPlayerClick: (firstName: string) => void;
 }
 
 export default function NowDashboard({ onPlayerClick }: NowDashboardProps) {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const sessionTimer = useSessionTimer();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -118,10 +224,24 @@ export default function NowDashboard({ onPlayerClick }: NowDashboardProps) {
     return [];
   }, [eventDay]);
 
-  const currentPlayer = useMemo(
+  // Get player with active manual session
+  const manualActivePlayer = useMemo(() => {
+    for (const player of players) {
+      if (sessionTimer.isPlayerActive(player.id)) {
+        return player;
+      }
+    }
+    return null;
+  }, [sessionTimer, currentTime]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Get scheduled current player (based on time slots)
+  const scheduledCurrentPlayer = useMemo(
     () => players.find(p => isCurrentPlayer(p, currentTime, eventDay)),
     [currentTime, eventDay]
   );
+
+  // The active player is either manual or scheduled
+  const activePlayer = manualActivePlayer || scheduledCurrentPlayer;
 
   const nextPlayer = useMemo(
     () => getNextPlayer(players, currentTime, eventDay),
@@ -135,6 +255,44 @@ export default function NowDashboard({ onPlayerClick }: NowDashboardProps) {
 
   const currentHour = Math.floor(currentMinutes / 60);
   const currentMin = currentMinutes % 60;
+
+  // Handle starting a manual session for a player
+  const handleStartSession = useCallback((playerId: string) => {
+    sessionTimer.startSession(playerId, SLOT_DURATION_MINUTES);
+  }, [sessionTimer]);
+
+  // Handle adjusting time (negative = arrived late, adds time; positive = subtract time)
+  const handleAdjustTime = useCallback((playerId: string, offsetMinutes: number) => {
+    const session = sessionTimer.getSession(playerId);
+    if (session) {
+      // Adjust existing session
+      sessionTimer.adjustSession(playerId, -offsetMinutes); // Negative because we're adjusting start time backwards
+    } else {
+      // Create a session with adjusted start time
+      sessionTimer.startSession(playerId, SLOT_DURATION_MINUTES);
+      // Then adjust it
+      setTimeout(() => {
+        sessionTimer.adjustSession(playerId, -offsetMinutes);
+      }, 0);
+    }
+  }, [sessionTimer]);
+
+  // Handle resetting to scheduled time
+  const handleResetSession = useCallback((playerId: string) => {
+    sessionTimer.clearSession(playerId);
+  }, [sessionTimer]);
+
+  // Get time remaining - either from manual session or scheduled
+  const getActiveTimeRemaining = useCallback((player: Player) => {
+    const manualTime = sessionTimer.getTimeRemaining(player.id);
+    if (manualTime) return manualTime;
+    return getScheduledTimeRemaining(player, currentTime);
+  }, [sessionTimer, currentTime]);
+
+  // Check if player has manual session
+  const hasManualSession = useCallback((playerId: string) => {
+    return sessionTimer.getSession(playerId) !== null;
+  }, [sessionTimer]);
 
   // Not on an event day - show shoot info with schedule
   if (eventDay === null) {
@@ -209,7 +367,7 @@ export default function NowDashboard({ onPlayerClick }: NowDashboardProps) {
   }
 
   // Before shoot starts for the day
-  if (!currentPlayer) {
+  if (!activePlayer) {
     if (currentHour < 9 || (currentHour === 9 && currentMin < 35)) {
       return (
         <div className="space-y-6">
@@ -224,7 +382,12 @@ export default function NowDashboard({ onPlayerClick }: NowDashboardProps) {
           {nextPlayer && (
             <div className="max-w-md mx-auto">
               <p className="text-sm text-gray-500 mb-2">FIRST UP TODAY:</p>
-              <NextPlayerCard player={nextPlayer} onPlayerClick={onPlayerClick} />
+              <NextPlayerCard
+                player={nextPlayer}
+                onPlayerClick={onPlayerClick}
+                showStartButton
+                onStartSession={() => handleStartSession(nextPlayer.id)}
+              />
             </div>
           )}
         </div>
@@ -257,7 +420,12 @@ export default function NowDashboard({ onPlayerClick }: NowDashboardProps) {
         {nextPlayer && (
           <div className="max-w-md mx-auto">
             <p className="text-sm text-gray-500 mb-2">UP NEXT:</p>
-            <NextPlayerCard player={nextPlayer} onPlayerClick={onPlayerClick} />
+            <NextPlayerCard
+              player={nextPlayer}
+              onPlayerClick={onPlayerClick}
+              showStartButton
+              onStartSession={() => handleStartSession(nextPlayer.id)}
+            />
           </div>
         )}
       </div>
@@ -265,9 +433,9 @@ export default function NowDashboard({ onPlayerClick }: NowDashboardProps) {
   }
 
   // Active player - main view
-  const timeRemaining = getTimeRemaining(currentPlayer, currentTime);
+  const timeRemaining = getActiveTimeRemaining(activePlayer);
   const completedCount = getCompletedCount(dayPlayers, currentTime);
-  const dayColorClass = DAY_STYLES[currentPlayer.day].text;
+  const isManual = hasManualSession(activePlayer.id);
 
   return (
     <div className="space-y-6">
@@ -283,35 +451,39 @@ export default function NowDashboard({ onPlayerClick }: NowDashboardProps) {
         </div>
       </div>
 
-      <div className="bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 rounded-xl p-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm text-amber-400 font-medium">TIME REMAINING</p>
-            <p className={`text-sm ${dayColorClass}`}>
-              Day {currentPlayer.day} - {currentPlayer.scheduledTime}
-            </p>
-          </div>
-          <div className="text-right">
-            <div className={`font-mono text-4xl font-bold ${timeRemaining.minutes < 5 ? 'text-red-400 animate-pulse' : 'text-white'}`}>
-              {String(timeRemaining.minutes).padStart(2, '0')}:{String(timeRemaining.seconds).padStart(2, '0')}
-            </div>
-            <p className="text-xs text-gray-500">minutes remaining</p>
-          </div>
-        </div>
-      </div>
+      <TimerControls
+        playerId={activePlayer.id}
+        timeRemaining={timeRemaining}
+        isManualSession={isManual}
+        onAdjust={(minutes) => handleAdjustTime(activePlayer.id, minutes)}
+        onReset={() => handleResetSession(activePlayer.id)}
+        scheduledTime={activePlayer.scheduledTime}
+        day={activePlayer.day}
+      />
 
       <div>
         <p className="text-sm text-amber-400 font-medium mb-2 flex items-center gap-2">
           <Zap className="w-4 h-4" />
           NOW AT STATION
         </p>
-        <CurrentPlayerCard player={currentPlayer} onPlayerClick={onPlayerClick} />
+        <CurrentPlayerCard player={activePlayer} onPlayerClick={onPlayerClick} />
       </div>
 
-      {nextPlayer && (
+      {nextPlayer && nextPlayer.id !== activePlayer.id && (
         <div>
           <p className="text-sm text-gray-500 mb-2">UP NEXT:</p>
-          <NextPlayerCard player={nextPlayer} onPlayerClick={onPlayerClick} />
+          <NextPlayerCard
+            player={nextPlayer}
+            onPlayerClick={onPlayerClick}
+            showStartButton
+            onStartSession={() => {
+              // Clear current session and start new one
+              if (isManual) {
+                handleResetSession(activePlayer.id);
+              }
+              handleStartSession(nextPlayer.id);
+            }}
+          />
         </div>
       )}
 
