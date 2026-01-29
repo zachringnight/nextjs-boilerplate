@@ -1,97 +1,22 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { players } from '../../data/players';
+import { useState, useEffect, useMemo } from 'react';
+import { players, day1Players, day2Players, playerCounts } from '../../data/players';
 import type { Player } from '../../data/players';
 import PlayerAvatar from './PlayerAvatar';
-import { Clock, Zap, ChevronRight, Volume2, AlertTriangle, Languages, Calendar } from 'lucide-react';
-
-// Event dates: January 28 and 29, 2026
-const EVENT_DATES = {
-  day1: { year: 2026, month: 0, day: 28 }, // month is 0-indexed (January = 0)
-  day2: { year: 2026, month: 0, day: 29 },
-};
-
-function parseTime(timeStr: string): { hours: number; minutes: number } {
-  const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
-  if (!match) return { hours: 0, minutes: 0 };
-
-  let hours = parseInt(match[1], 10);
-  const minutes = parseInt(match[2], 10);
-  const period = match[3].toUpperCase();
-
-  if (period === 'PM' && hours !== 12) hours += 12;
-  if (period === 'AM' && hours === 12) hours = 0;
-
-  return { hours, minutes };
-}
-
-function getEventDay(date: Date): 1 | 2 | null {
-  const pstString = date.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });
-  const pstDate = new Date(pstString);
-
-  const year = pstDate.getFullYear();
-  const month = pstDate.getMonth();
-  const day = pstDate.getDate();
-
-  if (year === EVENT_DATES.day1.year && month === EVENT_DATES.day1.month && day === EVENT_DATES.day1.day) {
-    return 1;
-  }
-  if (year === EVENT_DATES.day2.year && month === EVENT_DATES.day2.month && day === EVENT_DATES.day2.day) {
-    return 2;
-  }
-  return null;
-}
-
-function isCurrentPlayer(player: Player, currentTime: Date, eventDay: 1 | 2 | null): boolean {
-  // Only match players on the current event day
-  if (eventDay === null || player.day !== eventDay) return false;
-
-  const { hours, minutes } = parseTime(player.scheduledTime);
-  const slotStart = hours * 60 + minutes;
-  const slotEnd = slotStart + 15;
-
-  const pstString = currentTime.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });
-  const pstDate = new Date(pstString);
-  const currentMinutes = pstDate.getHours() * 60 + pstDate.getMinutes();
-
-  return currentMinutes >= slotStart && currentMinutes < slotEnd;
-}
-
-function getTimeRemaining(player: Player, currentTime: Date): { minutes: number; seconds: number } {
-  const { hours, minutes } = parseTime(player.scheduledTime);
-  const slotEnd = (hours * 60 + minutes + 15) * 60;
-
-  const pstString = currentTime.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });
-  const pstDate = new Date(pstString);
-  const now = pstDate.getHours() * 60 * 60 + pstDate.getMinutes() * 60 + pstDate.getSeconds();
-
-  const remaining = Math.max(0, slotEnd - now);
-  return {
-    minutes: Math.floor(remaining / 60),
-    seconds: remaining % 60,
-  };
-}
-
-function getNextPlayer(currentTime: Date, eventDay: 1 | 2 | null): Player | null {
-  // Only look for next player on the current event day
-  if (eventDay === null) return null;
-
-  const pstString = currentTime.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });
-  const pstDate = new Date(pstString);
-  const currentMinutes = pstDate.getHours() * 60 + pstDate.getMinutes();
-
-  const dayPlayers = players.filter(p => p.day === eventDay);
-
-  for (const player of dayPlayers) {
-    const { hours, minutes } = parseTime(player.scheduledTime);
-    const slotStart = hours * 60 + minutes;
-    if (slotStart > currentMinutes) {
-      return player;
-    }
-  }
-  return null;
-}
+import DateTimeDisplay from '../../components/DateTimeDisplay';
+import { StationGrid } from '../../components/StationInfoCard';
+import { StatusBadge } from '../../components/StatusBadge';
+import { ChevronRight, Volume2, Zap } from 'lucide-react';
+import {
+  getEventDay,
+  isCurrentPlayer,
+  getTimeRemaining,
+  getNextPlayer,
+  getCompletedCount,
+  getCurrentMinutesPST,
+} from '../../lib/schedule-utils';
+import { UPDATE_INTERVALS, DAY_STYLES, EVENT_DATES, EVENT_INFO } from '../../lib/constants';
 
 function CurrentPlayerCard({ player, onPlayerClick }: { player: Player; onPlayerClick: (name: string) => void }) {
   return (
@@ -104,18 +29,8 @@ function CurrentPlayerCard({ player, onPlayerClick }: { player: Player; onPlayer
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1 flex-wrap">
             <span className="text-3xl">{player.flag}</span>
-            {player.embargoed && (
-              <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded bg-red-500/20 text-red-400">
-                <AlertTriangle className="w-3 h-3" />
-                EMBARGO
-              </span>
-            )}
-            {player.translatorNeeded && (
-              <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded bg-amber-500/20 text-amber-400">
-                <Languages className="w-3 h-3" />
-                Translator
-              </span>
-            )}
+            {player.embargoed && <StatusBadge type="embargo" />}
+            {player.translatorNeeded && <StatusBadge type="translator" />}
           </div>
           <p className="text-3xl font-black text-amber-400">{player.firstName}</p>
           <p className="text-2xl text-white">{player.lastName}</p>
@@ -125,7 +40,7 @@ function CurrentPlayerCard({ player, onPlayerClick }: { player: Player; onPlayer
               <span className="italic">{player.pronunciation}</span>
             </div>
           )}
-          <p className="text-gray-400 mt-2">{player.position} • {player.team}</p>
+          <p className="text-gray-400 mt-2">{player.position} - {player.team}</p>
         </div>
         <ChevronRight className="w-8 h-8 text-amber-500" />
       </div>
@@ -159,6 +74,27 @@ function NextPlayerCard({ player, onPlayerClick }: { player: Player; onPlayerCli
   );
 }
 
+function StatsGrid({ completedCount, remainingCount, totalCount }: { completedCount: number; remainingCount: number; totalCount: number }) {
+  return (
+    <div className="bg-[#141414] border border-[#2a2a2a] rounded-xl p-4">
+      <div className="grid grid-cols-3 gap-4 text-center">
+        <div>
+          <p className="text-2xl font-bold text-green-400">{completedCount}</p>
+          <p className="text-xs text-gray-500">Completed Today</p>
+        </div>
+        <div>
+          <p className="text-2xl font-bold text-amber-400">{remainingCount}</p>
+          <p className="text-xs text-gray-500">Remaining</p>
+        </div>
+        <div>
+          <p className="text-2xl font-bold text-violet-400">{totalCount}</p>
+          <p className="text-xs text-gray-500">Total Players</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 interface NowDashboardProps {
   onPlayerClick: (firstName: string) => void;
 }
@@ -169,100 +105,73 @@ export default function NowDashboard({ onPlayerClick }: NowDashboardProps) {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date());
-    }, 1000);
+    }, UPDATE_INTERVALS.realtime);
     return () => clearInterval(interval);
   }, []);
 
-  // Get the current event day (1, 2, or null if not during event)
-  const eventDay = getEventDay(currentTime);
+  // Memoize computed values
+  const eventDay = useMemo(() => getEventDay(currentTime), [currentTime]);
 
-  const currentPlayer = players.find(p => isCurrentPlayer(p, currentTime, eventDay));
-  const nextPlayer = getNextPlayer(currentTime, eventDay);
+  const dayPlayers = useMemo(() => {
+    if (eventDay === 1) return day1Players;
+    if (eventDay === 2) return day2Players;
+    return [];
+  }, [eventDay]);
 
-  const formattedTime = currentTime.toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: true,
-    timeZone: 'America/Los_Angeles',
-  });
-
-  const formattedDate = currentTime.toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    timeZone: 'America/Los_Angeles',
-  });
-
-  const pstString = currentTime.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });
-  const pstDate = new Date(pstString);
-  const currentHour = pstDate.getHours();
-  const currentMin = pstDate.getMinutes();
-
-  const dayPlayers = eventDay ? players.filter(p => p.day === eventDay) : [];
-
-  // Date/time display component
-  const DateTimeDisplay = () => (
-    <div className="bg-[#141414] border border-[#2a2a2a] rounded-xl p-4 mb-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Calendar className="w-5 h-5 text-amber-400" />
-          <div>
-            <p className="font-medium text-white">{formattedDate}</p>
-            <p className="text-xs text-gray-500">PT (Los Angeles)</p>
-          </div>
-        </div>
-        <div className="text-right">
-          <p className="font-mono text-2xl text-amber-400">{formattedTime}</p>
-          {eventDay && (
-            <p className={`text-xs font-medium ${eventDay === 1 ? 'text-blue-400' : 'text-violet-400'}`}>
-              Day {eventDay} of Shoot
-            </p>
-          )}
-        </div>
-      </div>
-    </div>
+  const currentPlayer = useMemo(
+    () => players.find(p => isCurrentPlayer(p, currentTime, eventDay)),
+    [currentTime, eventDay]
   );
+
+  const nextPlayer = useMemo(
+    () => getNextPlayer(players, currentTime, eventDay),
+    [currentTime, eventDay]
+  );
+
+  const currentMinutes = useMemo(
+    () => getCurrentMinutesPST(currentTime),
+    [currentTime]
+  );
+
+  const currentHour = Math.floor(currentMinutes / 60);
+  const currentMin = currentMinutes % 60;
 
   // Not on an event day - show shoot info with schedule
   if (eventDay === null) {
     const day1Date = new Date(EVENT_DATES.day1.year, EVENT_DATES.day1.month, EVENT_DATES.day1.day);
-    const now = new Date(pstString);
+    const now = new Date(currentTime.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
     const isBeforeEvent = now < day1Date;
-    const day1Players = players.filter(p => p.day === 1);
-    const day2Players = players.filter(p => p.day === 2);
     const firstPlayer = day1Players[0];
 
     return (
       <div className="space-y-6">
-        <DateTimeDisplay />
+        <DateTimeDisplay currentTime={currentTime} />
 
         {/* Shoot status banner */}
         <div className={`rounded-xl p-4 ${isBeforeEvent ? 'bg-blue-500/10 border border-blue-500/30' : 'bg-green-500/10 border border-green-500/30'}`}>
           <div className="flex items-center gap-3">
-            <span className="text-2xl">{isBeforeEvent ? '📅' : '✅'}</span>
+            <span className="text-2xl">{isBeforeEvent ? '\uD83D\uDCC5' : '\u2705'}</span>
             <div>
               <p className={`font-bold ${isBeforeEvent ? 'text-blue-400' : 'text-green-400'}`}>
                 {isBeforeEvent ? 'Shoot Coming Up' : 'Shoot Complete'}
               </p>
-              <p className="text-sm text-gray-400">January 28 & 29, 2026 at MG Studio, Los Angeles</p>
+              <p className="text-sm text-gray-400">{EVENT_INFO.dateDisplay} at {EVENT_INFO.location}</p>
             </div>
           </div>
         </div>
 
         {/* Schedule overview */}
         <div className="grid grid-cols-2 gap-4">
-          <div className="bg-[#141414] border border-blue-500/30 rounded-xl p-4">
-            <p className="text-xs text-blue-400 font-medium mb-2">DAY 1</p>
-            <p className="font-bold text-white">Wednesday, Jan 28</p>
-            <p className="text-sm text-gray-400">{day1Players.length} players</p>
+          <div className={`bg-[#141414] ${DAY_STYLES[1].border} border rounded-xl p-4`}>
+            <p className={`text-xs ${DAY_STYLES[1].text} font-medium mb-2`}>DAY 1</p>
+            <p className="font-bold text-white">{DAY_STYLES[1].dateDisplay}</p>
+            <p className="text-sm text-gray-400">{playerCounts.day1} players</p>
             <p className="text-xs text-gray-500 mt-1">10:05 AM start</p>
           </div>
-          <div className="bg-[#141414] border border-violet-500/30 rounded-xl p-4">
-            <p className="text-xs text-violet-400 font-medium mb-2">DAY 2</p>
-            <p className="font-bold text-white">Thursday, Jan 29</p>
-            <p className="text-sm text-gray-400">{day2Players.length} players</p>
+          <div className={`bg-[#141414] ${DAY_STYLES[2].border} border rounded-xl p-4`}>
+            <p className={`text-xs ${DAY_STYLES[2].text} font-medium mb-2`}>DAY 2</p>
+            <p className="font-bold text-white">{DAY_STYLES[2].dateDisplay}</p>
+            <p className="text-sm text-gray-400">{playerCounts.day2} players</p>
             <p className="text-xs text-gray-500 mt-1">9:35 AM start</p>
           </div>
         </div>
@@ -276,36 +185,13 @@ export default function NowDashboard({ onPlayerClick }: NowDashboardProps) {
         )}
 
         {/* Station info */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-[#141414] border border-green-500/30 rounded-xl p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center text-xl">
-                🚶
-              </div>
-              <div>
-                <h3 className="font-bold text-green-400">TUNNEL</h3>
-                <p className="text-xs text-gray-500">Walk-in + Interview</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-[#141414] border border-amber-500/30 rounded-xl p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-amber-500 rounded-lg flex items-center justify-center text-xl">
-                📸
-              </div>
-              <div>
-                <h3 className="font-bold text-amber-400">PRODUCT</h3>
-                <p className="text-xs text-gray-500">Card Photography</p>
-              </div>
-            </div>
-          </div>
-        </div>
+        <StationGrid />
 
         {/* Stats */}
         <div className="bg-[#141414] border border-[#2a2a2a] rounded-xl p-4">
           <div className="grid grid-cols-3 gap-4 text-center">
             <div>
-              <p className="text-2xl font-bold text-white">{players.length}</p>
+              <p className="text-2xl font-bold text-white">{playerCounts.total}</p>
               <p className="text-xs text-gray-500">Total Players</p>
             </div>
             <div>
@@ -322,13 +208,14 @@ export default function NowDashboard({ onPlayerClick }: NowDashboardProps) {
     );
   }
 
+  // Before shoot starts for the day
   if (!currentPlayer) {
     if (currentHour < 9 || (currentHour === 9 && currentMin < 35)) {
       return (
         <div className="space-y-6">
-          <DateTimeDisplay />
+          <DateTimeDisplay currentTime={currentTime} />
           <div className="text-center py-12">
-            <div className="text-6xl mb-4">🌅</div>
+            <div className="text-6xl mb-4">{'\uD83C\uDF05'}</div>
             <h2 className="text-2xl font-bold mb-2">Good Morning!</h2>
             <p className="text-gray-500 mb-4">
               {eventDay === 1 ? 'Day 1 starts at 10:05 AM' : 'Day 2 starts at 9:35 AM'}
@@ -344,12 +231,13 @@ export default function NowDashboard({ onPlayerClick }: NowDashboardProps) {
       );
     }
 
+    // After shoot ends
     if (currentHour >= 20) {
       return (
         <div className="space-y-6">
-          <DateTimeDisplay />
+          <DateTimeDisplay currentTime={currentTime} />
           <div className="text-center py-12">
-            <div className="text-6xl mb-4">🎉</div>
+            <div className="text-6xl mb-4">{'\uD83C\uDF89'}</div>
             <h2 className="text-2xl font-bold mb-2">That's a Wrap!</h2>
             <p className="text-gray-500 mb-4">Great work today, team!</p>
           </div>
@@ -357,11 +245,12 @@ export default function NowDashboard({ onPlayerClick }: NowDashboardProps) {
       );
     }
 
+    // Break between players
     return (
       <div className="space-y-6">
-        <DateTimeDisplay />
+        <DateTimeDisplay currentTime={currentTime} />
         <div className="text-center py-12">
-          <div className="text-6xl mb-4">⏳</div>
+          <div className="text-6xl mb-4">{'\u23F3'}</div>
           <h2 className="text-2xl font-bold mb-2">Break</h2>
           <p className="text-gray-500 mb-4">Next player coming up</p>
         </div>
@@ -375,22 +264,14 @@ export default function NowDashboard({ onPlayerClick }: NowDashboardProps) {
     );
   }
 
+  // Active player - main view
   const timeRemaining = getTimeRemaining(currentPlayer, currentTime);
-  const completedCount = dayPlayers.filter(p => {
-    const { hours, minutes } = parseTime(p.scheduledTime);
-    const slotEnd = hours * 60 + minutes + 15;
-    const currentMinutes = currentHour * 60 + currentMin;
-    return slotEnd <= currentMinutes;
-  }).length;
-
-  const dayColors = {
-    1: 'text-blue-400',
-    2: 'text-violet-400',
-  };
+  const completedCount = getCompletedCount(dayPlayers, currentTime);
+  const dayColorClass = DAY_STYLES[currentPlayer.day].text;
 
   return (
     <div className="space-y-6">
-      <DateTimeDisplay />
+      <DateTimeDisplay currentTime={currentTime} />
 
       <div className="flex items-center justify-between">
         <div>
@@ -406,8 +287,8 @@ export default function NowDashboard({ onPlayerClick }: NowDashboardProps) {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-amber-400 font-medium">TIME REMAINING</p>
-            <p className={`text-sm ${dayColors[currentPlayer.day]}`}>
-              Day {currentPlayer.day} • {currentPlayer.scheduledTime}
+            <p className={`text-sm ${dayColorClass}`}>
+              Day {currentPlayer.day} - {currentPlayer.scheduledTime}
             </p>
           </div>
           <div className="text-right">
@@ -434,47 +315,13 @@ export default function NowDashboard({ onPlayerClick }: NowDashboardProps) {
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-[#141414] border border-green-500/30 rounded-xl p-4">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center text-xl">
-              🚶
-            </div>
-            <div>
-              <h3 className="font-bold text-green-400">TUNNEL</h3>
-              <p className="text-xs text-gray-500">Walk-in + Interview</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-[#141414] border border-amber-500/30 rounded-xl p-4">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 bg-amber-500 rounded-lg flex items-center justify-center text-xl">
-              📸
-            </div>
-            <div>
-              <h3 className="font-bold text-amber-400">PRODUCT</h3>
-              <p className="text-xs text-gray-500">Card Photography</p>
-            </div>
-          </div>
-        </div>
-      </div>
+      <StationGrid />
 
-      <div className="bg-[#141414] border border-[#2a2a2a] rounded-xl p-4">
-        <div className="grid grid-cols-3 gap-4 text-center">
-          <div>
-            <p className="text-2xl font-bold text-green-400">{completedCount}</p>
-            <p className="text-xs text-gray-500">Completed Today</p>
-          </div>
-          <div>
-            <p className="text-2xl font-bold text-amber-400">{dayPlayers.length - completedCount - 1}</p>
-            <p className="text-xs text-gray-500">Remaining</p>
-          </div>
-          <div>
-            <p className="text-2xl font-bold text-violet-400">{players.length}</p>
-            <p className="text-xs text-gray-500">Total Players</p>
-          </div>
-        </div>
-      </div>
+      <StatsGrid
+        completedCount={completedCount}
+        remainingCount={dayPlayers.length - completedCount - 1}
+        totalCount={playerCounts.total}
+      />
     </div>
   );
 }

@@ -1,50 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { players, tunnelInterviewQuestions } from '../../data/players';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { players, day1Players, day2Players, tunnelInterviewQuestions } from '../../data/players';
 import type { Player } from '../../data/players';
 import PlayerAvatar from './PlayerAvatar';
-import { ChevronDown, ChevronUp, Volume2, Clock, Zap, AlertTriangle, Languages } from 'lucide-react';
+import { StatusBadge } from '../../components/StatusBadge';
+import { ChevronDown, ChevronUp, Volume2, Clock, Zap } from 'lucide-react';
+import { isCurrentPlayer, isUpcomingPlayer, formatTime } from '../../lib/schedule-utils';
+import { UPDATE_INTERVALS, DAY_STYLES, STATION_CONFIG } from '../../lib/constants';
 
 interface StationToolViewProps {
   largeText?: boolean;
-}
-
-function parseTime(timeStr: string): { hours: number; minutes: number } {
-  const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
-  if (!match) return { hours: 0, minutes: 0 };
-
-  let hours = parseInt(match[1], 10);
-  const minutes = parseInt(match[2], 10);
-  const period = match[3].toUpperCase();
-
-  if (period === 'PM' && hours !== 12) hours += 12;
-  if (period === 'AM' && hours === 12) hours = 0;
-
-  return { hours, minutes };
-}
-
-function isCurrentPlayer(player: Player, currentTime: Date): boolean {
-  const { hours, minutes } = parseTime(player.scheduledTime);
-  const slotStart = hours * 60 + minutes;
-  const slotEnd = slotStart + 15;
-
-  const pstString = currentTime.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });
-  const pstDate = new Date(pstString);
-  const currentMinutes = pstDate.getHours() * 60 + pstDate.getMinutes();
-
-  return currentMinutes >= slotStart && currentMinutes < slotEnd;
-}
-
-function isUpcomingPlayer(player: Player, currentTime: Date): boolean {
-  const { hours, minutes } = parseTime(player.scheduledTime);
-  const slotStart = hours * 60 + minutes;
-
-  const pstString = currentTime.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });
-  const pstDate = new Date(pstString);
-  const currentMinutes = pstDate.getHours() * 60 + pstDate.getMinutes();
-
-  return slotStart > currentMinutes && slotStart <= currentMinutes + 30;
 }
 
 function PlayerSlotCard({
@@ -62,16 +28,7 @@ function PlayerSlotCard({
 }) {
   const isCurrent = isCurrentPlayer(player, currentTime);
   const isUpcoming = !isCurrent && isUpcomingPlayer(player, currentTime);
-
-  const dayColors = {
-    1: 'border-blue-500/30 bg-blue-500/5',
-    2: 'border-violet-500/30 bg-violet-500/5',
-  };
-
-  const dayBadgeColors = {
-    1: 'bg-blue-500/20 text-blue-400',
-    2: 'bg-violet-500/20 text-violet-400',
-  };
+  const styles = DAY_STYLES[player.day];
 
   return (
     <div className={`bg-[#141414] border rounded-xl overflow-hidden transition-all ${
@@ -79,7 +36,7 @@ function PlayerSlotCard({
         ? 'border-amber-500 ring-2 ring-amber-500/30 shadow-lg shadow-amber-500/10'
         : isUpcoming
         ? 'border-blue-500/50'
-        : dayColors[player.day]
+        : `${styles.border} bg-opacity-5`
     }`}>
       {/* Header - always visible */}
       <button
@@ -91,43 +48,21 @@ function PlayerSlotCard({
         <PlayerAvatar player={player} size="md" />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1 flex-wrap">
-            {isCurrent && (
-              <span className="flex items-center gap-1 bg-amber-500 text-black px-2 py-0.5 rounded text-xs font-bold animate-pulse">
-                <Zap className="w-3 h-3" />
-                NOW
-              </span>
-            )}
-            {isUpcoming && (
-              <span className="flex items-center gap-1 bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded text-xs">
-                <Clock className="w-3 h-3" />
-                NEXT
-              </span>
-            )}
-            <span className={`text-xs px-2 py-0.5 rounded ${dayBadgeColors[player.day]}`}>
-              Day {player.day}
-            </span>
+            {isCurrent && <StatusBadge type="current" />}
+            {isUpcoming && <StatusBadge type="upcoming" />}
+            <StatusBadge type="day" day={player.day} />
             <span className="text-xl">{player.flag}</span>
-            {player.embargoed && (
-              <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded bg-red-500/20 text-red-400">
-                <AlertTriangle className="w-3 h-3" />
-                EMBARGO
-              </span>
-            )}
-            {player.translatorNeeded && (
-              <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded bg-amber-500/20 text-amber-400">
-                <Languages className="w-3 h-3" />
-                Translator
-              </span>
-            )}
+            {player.embargoed && <StatusBadge type="embargo" />}
+            {player.translatorNeeded && <StatusBadge type="translator" />}
           </div>
           <p className={`text-lg font-bold truncate ${isCurrent ? 'text-amber-400' : ''}`}>
             {player.firstName} {player.lastName}
           </p>
           <div className="flex items-center gap-3 text-sm text-gray-400">
             <span className={`font-mono ${isCurrent ? 'text-amber-400 font-bold' : ''}`}>{player.scheduledTime}</span>
-            <span>•</span>
+            <span>-</span>
             <span>{player.position}</span>
-            <span>•</span>
+            <span>-</span>
             <span>{player.team}</span>
           </div>
         </div>
@@ -182,9 +117,9 @@ function PlayerSlotCard({
           {/* Interview Questions */}
           <div className="p-4">
             <div className="mb-4">
-              <h4 className="text-sm font-bold text-green-400 flex items-center gap-2">
-                <span className="w-6 h-6 bg-green-500 rounded flex items-center justify-center text-white text-xs">
-                  🚶
+              <h4 className={`text-sm font-bold ${STATION_CONFIG.tunnel.textClass} flex items-center gap-2`}>
+                <span className={`w-6 h-6 ${STATION_CONFIG.tunnel.bgClass} rounded flex items-center justify-center text-white text-xs`}>
+                  {STATION_CONFIG.tunnel.emoji}
                 </span>
                 TUNNEL INTERVIEW QUESTIONS
               </h4>
@@ -250,41 +185,42 @@ export default function StationToolView({ largeText = false }: StationToolViewPr
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date());
-    }, 60000);
+    }, UPDATE_INTERVALS.schedule);
     return () => clearInterval(interval);
   }, []);
 
-  const filteredPlayers = activeDay === 'all'
-    ? players
-    : players.filter(p => p.day === activeDay);
+  const filteredPlayers = useMemo(() => {
+    if (activeDay === 'all') return players;
+    return activeDay === 1 ? day1Players : day2Players;
+  }, [activeDay]);
 
-  const formattedTime = currentTime.toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
-    timeZone: 'America/Los_Angeles',
-  });
+  const formattedTime = useMemo(() => formatTime(currentTime), [currentTime]);
 
-  const togglePlayer = (playerId: string) => {
-    const newExpanded = new Set(expandedPlayers);
-    if (newExpanded.has(playerId)) {
-      newExpanded.delete(playerId);
-    } else {
-      newExpanded.add(playerId);
-    }
-    setExpandedPlayers(newExpanded);
-  };
+  const togglePlayer = useCallback((playerId: string) => {
+    setExpandedPlayers(prev => {
+      const newExpanded = new Set(prev);
+      if (newExpanded.has(playerId)) {
+        newExpanded.delete(playerId);
+      } else {
+        newExpanded.add(playerId);
+      }
+      return newExpanded;
+    });
+  }, []);
 
-  const expandAll = () => {
+  const expandAll = useCallback(() => {
     setExpandedPlayers(new Set(filteredPlayers.map(p => p.id)));
-  };
+  }, [filteredPlayers]);
 
-  const collapseAll = () => {
+  const collapseAll = useCallback(() => {
     setExpandedPlayers(new Set());
-  };
+  }, []);
 
-  // Find current player
-  const currentPlayerIndex = filteredPlayers.findIndex(p => isCurrentPlayer(p, currentTime));
+  // Find current player index
+  const currentPlayerIndex = useMemo(
+    () => filteredPlayers.findIndex(p => isCurrentPlayer(p, currentTime)),
+    [filteredPlayers, currentTime]
+  );
 
   // Auto-expand current player on mount
   useEffect(() => {
@@ -293,7 +229,7 @@ export default function StationToolView({ largeText = false }: StationToolViewPr
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const jumpToNow = () => {
+  const jumpToNow = useCallback(() => {
     if (currentPlayerIndex >= 0) {
       const player = filteredPlayers[currentPlayerIndex];
       setExpandedPlayers(new Set([player.id]));
@@ -302,7 +238,7 @@ export default function StationToolView({ largeText = false }: StationToolViewPr
         element.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     }
-  };
+  }, [currentPlayerIndex, filteredPlayers]);
 
   return (
     <div className="space-y-6">
@@ -310,8 +246,8 @@ export default function StationToolView({ largeText = false }: StationToolViewPr
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-3">
-            <span className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center text-white">
-              🚶
+            <span className={`w-8 h-8 ${STATION_CONFIG.tunnel.bgClass} rounded-lg flex items-center justify-center text-white`}>
+              {STATION_CONFIG.tunnel.emoji}
             </span>
             Tunnel Station Tool
           </h2>
@@ -342,32 +278,32 @@ export default function StationToolView({ largeText = false }: StationToolViewPr
           onClick={() => setActiveDay(1)}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
             activeDay === 1
-              ? 'bg-blue-500 text-white'
+              ? `${DAY_STYLES[1].bg} text-white`
               : 'bg-[#141414] text-gray-300 hover:bg-[#1a1a1a]'
           }`}
         >
-          Day 1 (Wed) ({players.filter(p => p.day === 1).length})
+          Day 1 ({DAY_STYLES[1].shortDay}) ({day1Players.length})
         </button>
         <button
           onClick={() => setActiveDay(2)}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
             activeDay === 2
-              ? 'bg-violet-500 text-white'
+              ? `${DAY_STYLES[2].bg} text-white`
               : 'bg-[#141414] text-gray-300 hover:bg-[#1a1a1a]'
           }`}
         >
-          Day 2 (Thu) ({players.filter(p => p.day === 2).length})
+          Day 2 ({DAY_STYLES[2].shortDay}) ({day2Players.length})
         </button>
       </div>
 
       {/* Station Info Bar */}
-      <div className="bg-[#141414] border border-green-500/30 rounded-xl p-4 flex items-center justify-between">
+      <div className={`bg-[#141414] ${STATION_CONFIG.tunnel.borderClass} border rounded-xl p-4 flex items-center justify-between`}>
         <div>
-          <h3 className="font-bold text-green-400 flex items-center gap-2">
-            <span>🚶</span>
+          <h3 className={`font-bold ${STATION_CONFIG.tunnel.textClass} flex items-center gap-2`}>
+            <span>{STATION_CONFIG.tunnel.emoji}</span>
             TUNNEL STATION
           </h3>
-          <p className="text-sm text-gray-500">{filteredPlayers.length} players • 15 min each • Walk-in + Interview</p>
+          <p className="text-sm text-gray-500">{filteredPlayers.length} players - 15 min each - {STATION_CONFIG.tunnel.description}</p>
         </div>
         <div className="flex gap-2">
           {currentPlayerIndex >= 0 && (
