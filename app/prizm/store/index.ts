@@ -8,6 +8,12 @@ interface AppState {
   largeText: boolean;
   toggleLargeText: () => void;
 
+  // Notifications
+  notificationsEnabled: boolean;
+  setNotificationsEnabled: (enabled: boolean) => void;
+  notificationSound: boolean;
+  setNotificationSound: (enabled: boolean) => void;
+
   // Search
   searchOpen: boolean;
   setSearchOpen: (open: boolean) => void;
@@ -35,6 +41,12 @@ export const useAppStore = create<AppState>()(
       // Preferences
       largeText: false,
       toggleLargeText: () => set((state) => ({ largeText: !state.largeText })),
+
+      // Notifications
+      notificationsEnabled: true,
+      setNotificationsEnabled: (enabled) => set({ notificationsEnabled: enabled }),
+      notificationSound: true,
+      setNotificationSound: (enabled) => set({ notificationSound: enabled }),
 
       // Search
       searchOpen: false,
@@ -84,6 +96,8 @@ export const useAppStore = create<AppState>()(
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         largeText: state.largeText,
+        notificationsEnabled: state.notificationsEnabled,
+        notificationSound: state.notificationSound,
         recentSearches: state.recentSearches,
         schedule: state.schedule,
         selectedStation: state.selectedStation,
