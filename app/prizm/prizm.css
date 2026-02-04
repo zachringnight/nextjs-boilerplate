@@ -1,0 +1,147 @@
+/* Prizm Lounge Production Hub - Custom Styles */
+
+/* Safe area padding for mobile */
+.safe-area-pb {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+/* Large text mode */
+.prizm-app.large-text {
+  font-size: 1.25rem;
+}
+
+.prizm-app.large-text h1 {
+  font-size: 2rem;
+}
+
+.prizm-app.large-text h2 {
+  font-size: 1.75rem;
+}
+
+.prizm-app.large-text h3 {
+  font-size: 1.5rem;
+}
+
+.prizm-app.large-text p,
+.prizm-app.large-text span,
+.prizm-app.large-text button {
+  font-size: 1.125rem;
+}
+
+/* Station grid */
+.station-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .station-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Player grid */
+.player-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .player-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .player-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Countdown flash animation */
+@keyframes countdown-flash {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.countdown-flash {
+  animation: countdown-flash 1s ease-in-out infinite;
+}
+
+/* Tab transitions */
+.tab-content {
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Jump to Now button */
+.jump-to-now {
+  position: fixed;
+  bottom: 5rem;
+  right: 1rem;
+  z-index: 30;
+}
+
+/* Station tab colors */
+.station-tab-signing { border-color: #22c55e; }
+.station-tab-packRip { border-color: #f59e0b; }
+.station-tab-photoOp { border-color: #3b82f6; }
+.station-tab-interview { border-color: #8b5cf6; }
+
+/* Scrollbar styling */
+.prizm-app::-webkit-scrollbar {
+  width: 6px;
+}
+
+.prizm-app::-webkit-scrollbar-track {
+  background: #1A1A1A;
+}
+
+.prizm-app::-webkit-scrollbar-thumb {
+  background: #3A3A3A;
+  border-radius: 3px;
+}
+
+.prizm-app::-webkit-scrollbar-thumb:hover {
+  background: #4A4A4A;
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Focus styles */
+.prizm-app button:focus-visible,
+.prizm-app a:focus-visible {
+  outline: 2px solid #FFD100;
+  outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+  .prizm-app nav,
+  .prizm-app .jump-to-now {
+    display: none !important;
+  }
+
+  .prizm-app main {
+    padding-bottom: 0 !important;
+  }
+}
