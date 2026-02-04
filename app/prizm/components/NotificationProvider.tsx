@@ -2,7 +2,7 @@
 
 import { useEffect, useCallback, useRef } from 'react';
 import { useAppStore } from '../store';
-import { getCurrentSlot, getNextSlot, EVENT_DATES } from '../data/schedule';
+import { getNextSlot, EVENT_DATES } from '../data/schedule';
 import { getPlayerById } from '../data/players';
 import { getStationById } from '../data/stations';
 import { formatDate } from '../lib/time';

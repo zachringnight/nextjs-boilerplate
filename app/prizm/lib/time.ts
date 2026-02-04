@@ -32,9 +32,7 @@ export const formatDate = (date: Date): string => {
 
 // Parse time string (HH:MM) to Date object for a given date
 export const parseTimeToDate = (dateStr: string, timeStr: string): Date => {
-  const [hours, minutes] = timeStr.split(':').map(Number);
-  const date = new Date(`${dateStr}T${timeStr}:00`);
-  return date;
+  return new Date(`${dateStr}T${timeStr}:00`);
 };
 
 // Calculate seconds remaining until a time

@@ -222,12 +222,12 @@ export default function StationToolView({ largeText = false }: StationToolViewPr
     [filteredPlayers, currentTime]
   );
 
-  // Auto-expand current player on mount
+  // Auto-expand current player on mount and when player changes
   useEffect(() => {
     if (currentPlayerIndex >= 0) {
       setExpandedPlayers(new Set([filteredPlayers[currentPlayerIndex].id]));
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentPlayerIndex, filteredPlayers]);
 
   const jumpToNow = useCallback(() => {
     if (currentPlayerIndex >= 0) {

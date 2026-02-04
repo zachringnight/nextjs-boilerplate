@@ -136,12 +136,153 @@ html {
 
 /* Print styles */
 @media print {
+  /* Hide navigation and interactive elements */
   .prizm-app nav,
-  .prizm-app .jump-to-now {
+  .prizm-app .jump-to-now,
+  .prizm-app header button,
+  .prizm-app .no-print {
     display: none !important;
   }
 
   .prizm-app main {
     padding-bottom: 0 !important;
   }
+
+  /* Reset colors for printing */
+  .prizm-app {
+    background: white !important;
+    color: black !important;
+  }
+
+  .prizm-app header {
+    background: white !important;
+    border-bottom: 2px solid #000 !important;
+    position: relative !important;
+  }
+
+  .prizm-app header h1 {
+    color: black !important;
+  }
+
+  .prizm-app header div {
+    color: #666 !important;
+  }
+
+  /* Print-specific layout */
+  .print-schedule {
+    page-break-inside: avoid;
+  }
+
+  .print-schedule-header {
+    text-align: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #000;
+  }
+
+  .print-schedule-row {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #ddd;
+    page-break-inside: avoid;
+  }
+
+  .print-schedule-time {
+    width: 80px;
+    font-weight: bold;
+  }
+
+  .print-schedule-player {
+    flex: 1;
+    font-weight: 500;
+  }
+
+  .print-schedule-station {
+    width: 100px;
+    text-align: right;
+    font-size: 0.875rem;
+    color: #666;
+  }
+
+  /* Station badges for print */
+  .print-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border: 1px solid #000;
+  }
+
+  .print-badge-ledWall { background: #fce7f3; }
+  .print-badge-signing { background: #dcfce7; }
+  .print-badge-packRip { background: #fef3c7; }
+  .print-badge-prCall { background: #ede9fe; }
+  .print-badge-free { background: #f3f4f6; }
+
+  /* Force backgrounds to print */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Page settings */
+  @page {
+    margin: 0.5in;
+    size: letter portrait;
+  }
+
+  /* PR Call details for print */
+  .print-pr-info {
+    font-size: 0.75rem;
+    color: #666;
+    margin-top: 0.25rem;
+  }
+}
+
+/* Print preview container */
+.print-preview {
+  background: white;
+  color: black;
+  padding: 2rem;
+  min-height: 100vh;
+}
+
+.print-preview h1 {
+  color: black;
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.print-preview h2 {
+  color: #666;
+  font-size: 1rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid black;
+}
+
+.print-preview table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.print-preview th {
+  text-align: left;
+  padding: 0.5rem;
+  border-bottom: 2px solid black;
+  font-weight: 600;
+}
+
+.print-preview td {
+  padding: 0.5rem;
+  border-bottom: 1px solid #ddd;
+}
+
+.print-preview tr:nth-child(even) {
+  background: #f9f9f9;
 }
