@@ -1,27 +1,35 @@
 {
-  "name": "nwsl-media-day-crew-app",
-  "version": "1.0.0",
-  "description": "Production crew app for NWSL x Panini Media Day 2026",
+  "name": "prizm-lounge-production-hub",
+  "version": "1.1.0",
+  "description": "Production coordination for Panini America Prizm Lounge at Super Bowl LX",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
+    "build:analyze": "cross-env ANALYZE=true next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "type-check": "tsc --noEmit",
+    "validate": "npm run type-check && npm run lint",
+    "clean": "rm -rf .next out node_modules/.cache"
   },
   "dependencies": {
     "lucide-react": "^0.563.0",
     "next": "15.4.10",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "zod": "^4.3.6",
     "zustand": "^5.0.11"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",
+    "@next/bundle-analyzer": "^16.1.6",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "cross-env": "^10.1.0",
     "eslint": "^9.39.2",
     "eslint-config-next": "^16.1.6",
     "tailwindcss": "^4",
