@@ -1,0 +1,22 @@
+{
+  "name": "Prizm Lounge Production Hub",
+  "short_name": "Prizm Hub",
+  "description": "Production coordination for Panini America Prizm Lounge at Super Bowl LX",
+  "start_url": "/prizm",
+  "scope": "/prizm",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0D0D0D",
+  "theme_color": "#0D0D0D",
+  "icons": [
+    {
+      "src": "/prizm/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "sports"],
+  "lang": "en-US",
+  "dir": "ltr"
+}
