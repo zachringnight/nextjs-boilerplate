@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { ScheduleSlot, StationId, DayDate } from '../types';
+import { ScheduleSlot, StationId, DayDate, Note, NoteCategory, NotePriority, NoteStatus } from '../types';
 import { defaultSchedule } from '../data/schedule';
 
 interface AppState {
@@ -27,6 +27,14 @@ interface AppState {
   addSlot: (slot: ScheduleSlot) => void;
   removeSlot: (id: string) => void;
   resetSchedule: () => void;
+
+  // Notes / Issue Logger
+  notes: Note[];
+  addNote: (note: Omit<Note, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  updateNote: (id: string, updates: Partial<Note>) => void;
+  deleteNote: (id: string) => void;
+  resolveNote: (id: string) => void;
+  clearResolvedNotes: () => void;
 
   // UI
   selectedStation: StationId;
@@ -85,6 +93,50 @@ export const useAppStore = create<AppState>()(
         })),
       resetSchedule: () => set({ schedule: defaultSchedule }),
 
+      // Notes / Issue Logger
+      notes: [],
+      addNote: (noteData) => {
+        const now = new Date().toISOString();
+        const note: Note = {
+          ...noteData,
+          id: `note-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          createdAt: now,
+          updatedAt: now,
+        };
+        set((state) => ({
+          notes: [note, ...state.notes],
+        }));
+      },
+      updateNote: (id, updates) => {
+        set((state) => ({
+          notes: state.notes.map((note) =>
+            note.id === id
+              ? { ...note, ...updates, updatedAt: new Date().toISOString() }
+              : note
+          ),
+        }));
+      },
+      deleteNote: (id) => {
+        set((state) => ({
+          notes: state.notes.filter((note) => note.id !== id),
+        }));
+      },
+      resolveNote: (id) => {
+        const now = new Date().toISOString();
+        set((state) => ({
+          notes: state.notes.map((note) =>
+            note.id === id
+              ? { ...note, status: 'resolved' as NoteStatus, resolvedAt: now, updatedAt: now }
+              : note
+          ),
+        }));
+      },
+      clearResolvedNotes: () => {
+        set((state) => ({
+          notes: state.notes.filter((note) => note.status !== 'resolved'),
+        }));
+      },
+
       // UI
       selectedStation: 'signing',
       setSelectedStation: (id) => set({ selectedStation: id }),
@@ -100,6 +152,7 @@ export const useAppStore = create<AppState>()(
         notificationSound: state.notificationSound,
         recentSearches: state.recentSearches,
         schedule: state.schedule,
+        notes: state.notes,
         selectedStation: state.selectedStation,
         selectedDay: state.selectedDay,
       }),

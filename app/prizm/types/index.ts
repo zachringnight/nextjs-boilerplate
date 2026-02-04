@@ -45,6 +45,25 @@ export interface ScheduleSlot {
 
 export type DayDate = '2026-02-06' | '2026-02-07' | '2026-02-08';
 
+// Quick Notes / Issue Logger
+export type NoteCategory = 'general' | 'technical' | 'scheduling' | 'vip' | 'media' | 'urgent';
+export type NotePriority = 'low' | 'medium' | 'high';
+export type NoteStatus = 'open' | 'in-progress' | 'resolved';
+
+export interface Note {
+  id: string;
+  content: string;
+  category: NoteCategory;
+  priority: NotePriority;
+  status: NoteStatus;
+  stationId?: StationId;
+  playerId?: string;
+  createdAt: string; // ISO timestamp
+  updatedAt: string; // ISO timestamp
+  resolvedAt?: string; // ISO timestamp
+  createdBy?: string; // Optional crew member name
+}
+
 export interface AppState {
   // Preferences
   largeText: boolean;
