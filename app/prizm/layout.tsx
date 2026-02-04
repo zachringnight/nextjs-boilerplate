@@ -6,7 +6,7 @@ import './prizm.css';
 
 export const metadata: Metadata = {
   title: 'Prizm Lounge Production Hub',
-  description: 'Production coordination for Panini America Prizm Lounge at Super Bowl LX',
+  description: 'Production coordination for Panini America Prizm Lounge at Super Bowl LIX',
   manifest: '/prizm/manifest.json',
   appleWebApp: {
     capable: true,
@@ -22,8 +22,8 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  maximumScale: 5,
+  userScalable: true,
   themeColor: '#0D0D0D',
 };
 

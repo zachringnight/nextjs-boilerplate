@@ -60,6 +60,21 @@ export const getStationById = (id: StationId): Station | undefined => {
   return stations.find(s => s.id === id);
 };
 
+// Get short station name (removes "Station" suffix)
+export const getShortStationName = (name: string): string => {
+  return name.replace(' Station', '');
+};
+
+// Format station ID to display name (e.g., 'packRip' -> 'Pack Rip')
+export const formatStationId = (id: StationId): string => {
+  const station = getStationById(id);
+  if (station) {
+    return getShortStationName(station.name);
+  }
+  // Fallback: convert camelCase to space-separated words
+  return id.replace(/([A-Z])/g, ' $1').trim();
+};
+
 // Station lookup map for O(1) access
 export const stationMap = new Map<StationId, Station>(
   stations.map(s => [s.id, s])

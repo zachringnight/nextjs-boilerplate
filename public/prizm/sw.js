@@ -1,14 +1,9 @@
-const CACHE_NAME = 'prizm-lounge-v1';
 const STATIC_CACHE = 'prizm-static-v1';
 const DYNAMIC_CACHE = 'prizm-dynamic-v1';
 
-// Static assets to cache on install
+// Static assets to cache on install (only truly static assets to avoid serving stale dynamic pages)
 const STATIC_ASSETS = [
   '/prizm',
-  '/prizm/schedule',
-  '/prizm/stations',
-  '/prizm/players',
-  '/prizm/admin',
   '/prizm/manifest.json'
 ];
 
@@ -68,7 +63,9 @@ self.addEventListener('fetch', (event) => {
               cache.put(request, networkResponse);
             });
           }
-        }).catch(() => {});
+        }).catch((error) => {
+          console.error('[SW] Background cache update failed for request:', request.url, error);
+        });
 
         return cachedResponse;
       }

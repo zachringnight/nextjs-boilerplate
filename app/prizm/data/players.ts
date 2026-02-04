@@ -1,5 +1,8 @@
 import { Player } from '../types';
 
+// NOTE: Player photos reference '/prizm/players/*.jpg' paths.
+// These image files need to be added to the public/prizm/players directory.
+// Until then, fallback initials will be displayed in the UI.
 export const players: Player[] = [
   {
     id: 'trevor-lawrence',

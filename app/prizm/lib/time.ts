@@ -25,16 +25,25 @@ export const formatTime12 = (date: Date): string => {
   });
 };
 
-// Format date as YYYY-MM-DD
+// Format date as YYYY-MM-DD in the event timezone
+// Using 'en-CA' locale because it naturally formats dates as YYYY-MM-DD
 export const formatDate = (date: Date): string => {
   return date.toLocaleDateString('en-CA', { timeZone: EVENT_TIMEZONE });
 };
 
-// Parse time string (HH:MM) to Date object for a given date
+// Parse time string (HH:MM) to Date object for a given date, accounting for event timezone
 export const parseTimeToDate = (dateStr: string, timeStr: string): Date => {
-  const [hours, minutes] = timeStr.split(':').map(Number);
-  const date = new Date(`${dateStr}T${timeStr}:00`);
-  return date;
+  // Create a date string in ISO format and parse it in the event timezone
+  const dateTimeStr = `${dateStr}T${timeStr}:00`;
+  // This creates a date object, but we need to account for the timezone difference
+  const date = new Date(dateTimeStr);
+  
+  // Get the offset difference between local timezone and event timezone
+  const localDate = new Date(dateTimeStr);
+  const eventDate = new Date(localDate.toLocaleString('en-US', { timeZone: EVENT_TIMEZONE }));
+  const offset = localDate.getTime() - eventDate.getTime();
+  
+  return new Date(date.getTime() + offset);
 };
 
 // Calculate seconds remaining until a time

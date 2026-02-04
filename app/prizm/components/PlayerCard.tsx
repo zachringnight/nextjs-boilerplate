@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Player, ScheduleSlot } from '../types';
+import { formatStationId } from '../data/stations';
 import { useAppStore } from '../store';
 
 interface PlayerCardProps {
@@ -55,7 +56,7 @@ export default function PlayerCard({ player, nextSlot, showNextAppearance = true
             <span className="text-[#9CA3AF]">Next: </span>
             <span className="text-white">{nextSlot.startTime}</span>
             <span className="text-[#9CA3AF]"> • </span>
-            <span className="text-[#FFD100] capitalize">{nextSlot.station.replace(/([A-Z])/g, ' $1').trim()}</span>
+            <span className="text-[#FFD100] capitalize">{formatStationId(nextSlot.station)}</span>
           </div>
         )}
       </div>

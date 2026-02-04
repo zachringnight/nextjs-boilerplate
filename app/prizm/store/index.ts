@@ -1,33 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { ScheduleSlot, StationId, DayDate } from '../types';
+import { ScheduleSlot, StationId, DayDate, AppState } from '../types';
 import { defaultSchedule } from '../data/schedule';
-
-interface AppState {
-  // Preferences
-  largeText: boolean;
-  toggleLargeText: () => void;
-
-  // Search
-  searchOpen: boolean;
-  setSearchOpen: (open: boolean) => void;
-  recentSearches: string[];
-  addRecentSearch: (query: string) => void;
-  clearRecentSearches: () => void;
-
-  // Schedule (editable)
-  schedule: ScheduleSlot[];
-  updateSlot: (id: string, updates: Partial<ScheduleSlot>) => void;
-  addSlot: (slot: ScheduleSlot) => void;
-  removeSlot: (id: string) => void;
-  resetSchedule: () => void;
-
-  // UI
-  selectedStation: StationId;
-  setSelectedStation: (id: StationId) => void;
-  selectedDay: DayDate;
-  setSelectedDay: (date: DayDate) => void;
-}
 
 export const useAppStore = create<AppState>()(
   persist(
@@ -81,7 +55,18 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'prizm-lounge-storage',
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => {
+        // Handle SSR gracefully - only use localStorage in browser
+        if (typeof window !== 'undefined') {
+          return localStorage;
+        }
+        // Return a no-op storage for SSR
+        return {
+          getItem: () => null,
+          setItem: () => {},
+          removeItem: () => {},
+        };
+      }),
       partialize: (state) => ({
         largeText: state.largeText,
         recentSearches: state.recentSearches,

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search, X, Clock } from 'lucide-react';
 import { useAppStore } from '../store';
-import { players, searchPlayers } from '../data/players';
+import { searchPlayers } from '../data/players';
 import { getScheduleForPlayer, getNextSlot } from '../data/schedule';
 
 export default function GlobalSearch() {

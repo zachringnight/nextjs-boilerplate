@@ -34,13 +34,23 @@ export default function PlayersPage() {
     if (playerSchedule.length === 0) return null;
 
     const now = new Date();
-    for (const slot of playerSchedule) {
-      const nextSlot = getNextSlot(schedule, slot.station, now);
-      if (nextSlot && nextSlot.playerId === playerId) {
-        return nextSlot;
-      }
+    // Filter for future slots only
+    const futureSlots = playerSchedule.filter(slot => {
+      const slotStart = new Date(`${slot.date}T${slot.startTime}:00`);
+      return slotStart >= now;
+    });
+
+    if (futureSlots.length === 0) {
+      return null;
     }
-    return playerSchedule[0]; // Return first scheduled slot
+
+    // Sort by date and time, then return the first one
+    const sortedFutureSlots = [...futureSlots].sort((a, b) => {
+      if (a.date !== b.date) return a.date.localeCompare(b.date);
+      return a.startTime.localeCompare(b.startTime);
+    });
+
+    return sortedFutureSlots[0];
   };
 
   if (!mounted) {

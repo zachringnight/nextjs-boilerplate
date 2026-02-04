@@ -1,4 +1,5 @@
 import { ScheduleSlot, StationId } from '../types';
+import { formatDate, formatTime } from '../lib/time';
 
 // Event dates
 export const EVENT_DATES = ['2026-02-06', '2026-02-07', '2026-02-08'] as const;
@@ -135,26 +136,28 @@ export const getScheduleForPlayer = (schedule: ScheduleSlot[], playerId: string)
 };
 
 export const getCurrentSlot = (schedule: ScheduleSlot[], station: StationId, now: Date): ScheduleSlot | null => {
-  const today = now.toISOString().split('T')[0];
-  const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  const today = formatDate(now);
+  const currentTime = formatTime(now);
 
   return schedule.find(slot =>
     slot.station === station &&
     slot.date === today &&
     slot.status !== 'cancelled' &&
+    // String comparison works for HH:MM format (lexicographic order matches time order)
     slot.startTime <= currentTime &&
     slot.endTime > currentTime
   ) || null;
 };
 
 export const getNextSlot = (schedule: ScheduleSlot[], station: StationId, now: Date): ScheduleSlot | null => {
-  const today = now.toISOString().split('T')[0];
-  const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  const today = formatDate(now);
+  const currentTime = formatTime(now);
 
   const upcomingSlots = schedule
     .filter(slot =>
       slot.station === station &&
       slot.status !== 'cancelled' &&
+      // String comparison works for HH:MM format (lexicographic order matches time order)
       (slot.date > today || (slot.date === today && slot.startTime > currentTime))
     )
     .sort((a, b) => {

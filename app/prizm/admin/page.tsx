@@ -1,10 +1,15 @@
 'use client';
 
+// SECURITY NOTE: This admin page does not currently implement authentication.
+// In a production environment, this page should be protected with proper
+// authentication and authorization checks (e.g., middleware, session verification,
+// or role-based access control) to prevent unauthorized schedule modifications.
+
 import { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import { useAppStore } from '../store';
 import { players, getPlayerById } from '../data/players';
-import { getScheduleForDay, DAY_LABELS, EVENT_DATES, defaultSchedule } from '../data/schedule';
+import { getScheduleForDay, DAY_LABELS, EVENT_DATES } from '../data/schedule';
 import { stations, getStationById } from '../data/stations';
 import { StationId, ScheduleSlot } from '../types';
 import { RefreshCw, Plus, X, Save, Trash2, AlertTriangle } from 'lucide-react';

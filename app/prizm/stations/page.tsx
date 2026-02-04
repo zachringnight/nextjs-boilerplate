@@ -4,7 +4,7 @@ import { Suspense, useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Header from '../components/Header';
 import { useAppStore } from '../store';
-import { stations, getStationById } from '../data/stations';
+import { stations, getStationById, getShortStationName } from '../data/stations';
 import { getScheduleForStation } from '../data/schedule';
 import { getPlayerById } from '../data/players';
 import { isCurrentSlot, isPastSlot } from '../lib/time';
@@ -18,13 +18,17 @@ function StationsContent() {
   const [expandedSlots, setExpandedSlots] = useState<Set<string>>(new Set());
   const [expandAll, setExpandAll] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [hasSetInitialStation, setHasSetInitialStation] = useState(false);
+  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     setMounted(true);
-    if (initialStation && stations.some(s => s.id === initialStation)) {
+    // Only set the station from URL on initial mount
+    if (!hasSetInitialStation && initialStation && stations.some(s => s.id === initialStation)) {
       setSelectedStation(initialStation);
+      setHasSetInitialStation(true);
     }
-  }, [initialStation, setSelectedStation]);
+  }, [initialStation, setSelectedStation, hasSetInitialStation]);
 
   const station = getStationById(selectedStation);
   const stationSchedule = getScheduleForStation(schedule, selectedStation, selectedDay);
@@ -48,6 +52,10 @@ function StationsContent() {
       setExpandedSlots(new Set(stationSchedule.map(s => s.id)));
     }
     setExpandAll(!expandAll);
+  };
+
+  const handleImageError = (playerId: string) => {
+    setImageErrors(prev => new Set(prev).add(playerId));
   };
 
   // Auto-expand current slot
@@ -91,7 +99,7 @@ function StationsContent() {
               }}
             >
               <div className="text-xl">{s.icon}</div>
-              <div className="font-medium truncate">{s.name.replace(' Station', '')}</div>
+              <div className="font-medium truncate">{getShortStationName(s.name)}</div>
             </button>
           ))}
         </div>
@@ -152,16 +160,12 @@ function StationsContent() {
 
                   {/* Player Photo */}
                   <div className="w-12 h-12 rounded-full bg-[#2A2A2A] flex items-center justify-center text-lg font-bold text-white overflow-hidden flex-shrink-0">
-                    {player.photo ? (
+                    {player.photo && !imageErrors.has(player.id) ? (
                       <img
                         src={player.photo}
                         alt={player.name}
                         className="w-full h-full object-cover"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = 'none';
-                          target.parentElement!.innerHTML = player.name.charAt(0);
-                        }}
+                        onError={() => handleImageError(player.id)}
                       />
                     ) : (
                       player.name.charAt(0)
