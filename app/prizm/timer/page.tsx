@@ -39,7 +39,7 @@ const PRESET_TIMERS: PresetTimer[] = [
 ];
 
 export default function TimerPage() {
-  const { largeText, notificationSound } = useAppStore();
+  const { largeText } = useAppStore();
   const [mode, setMode] = useState<TimerMode>('countdown');
   const [time, setTime] = useState(15 * 60); // Default 15 minutes
   const [initialTime, setInitialTime] = useState(15 * 60);
@@ -62,6 +62,26 @@ export default function TimerPage() {
       }
     };
   }, []);
+
+  // Alert function (defined before timer effect that uses it)
+  const triggerAlert = useCallback(() => {
+    // Play sound
+    if (soundEnabled && audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch(() => {});
+    }
+
+    // Vibrate
+    hapticFeedback([300, 100, 300, 100, 300]);
+
+    // Browser notification
+    if (alertEnabled && Notification.permission === 'granted') {
+      new Notification('Timer Complete!', {
+        body: mode === 'countdown' ? 'Countdown has finished' : 'Stopwatch alert',
+        icon: '/prizm/icons/icon.svg',
+      });
+    }
+  }, [soundEnabled, alertEnabled, mode]);
 
   // Timer logic
   useEffect(() => {
@@ -100,26 +120,7 @@ export default function TimerPage() {
         clearInterval(intervalRef.current);
       }
     };
-  }, [isRunning, mode, alertEnabled, soundEnabled, hasAlerted]);
-
-  const triggerAlert = useCallback(() => {
-    // Play sound
-    if (soundEnabled && audioRef.current) {
-      audioRef.current.currentTime = 0;
-      audioRef.current.play().catch(() => {});
-    }
-
-    // Vibrate
-    hapticFeedback([300, 100, 300, 100, 300]);
-
-    // Browser notification
-    if (alertEnabled && Notification.permission === 'granted') {
-      new Notification('Timer Complete!', {
-        body: mode === 'countdown' ? 'Countdown has finished' : 'Stopwatch alert',
-        icon: '/prizm/icons/icon.svg',
-      });
-    }
-  }, [soundEnabled, alertEnabled, mode]);
+  }, [isRunning, mode, alertEnabled, soundEnabled, hasAlerted, triggerAlert]);
 
   const formatTime = (seconds: number): string => {
     const hrs = Math.floor(seconds / 3600);

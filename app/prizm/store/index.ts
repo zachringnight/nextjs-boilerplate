@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { ScheduleSlot, StationId, DayDate, Note, NoteCategory, NotePriority, NoteStatus } from '../types';
+import { ScheduleSlot, StationId, DayDate, Note, NoteStatus } from '../types';
 import { defaultSchedule } from '../data/schedule';
 
 interface AppState {
@@ -45,7 +45,7 @@ interface AppState {
 
 export const useAppStore = create<AppState>()(
   persist(
-    (set, get) => ({
+    (set, _get) => ({
       // Preferences
       largeText: false,
       toggleLargeText: () => set((state) => ({ largeText: !state.largeText })),

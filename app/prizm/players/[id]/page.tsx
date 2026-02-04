@@ -3,7 +3,7 @@
 import { use, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { getPlayerById, players } from '../../data/players';
+import { getPlayerById } from '../../data/players';
 import { getScheduleForPlayer, DAY_LABELS } from '../../data/schedule';
 import { getStationById } from '../../data/stations';
 import { useAppStore } from '../../store';

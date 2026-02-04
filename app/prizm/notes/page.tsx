@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import { useAppStore } from '../store';
-import { Note, NoteCategory, NotePriority, NoteStatus, StationId } from '../types';
+import { NoteCategory, NotePriority, NoteStatus, StationId } from '../types';
 import { getPlayerById, players } from '../data/players';
 import { stations } from '../data/stations';
 import {
