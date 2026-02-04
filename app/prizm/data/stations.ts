@@ -2,6 +2,19 @@ import { Station, StationId } from '../types';
 
 export const stations: Station[] = [
   {
+    id: 'ledWall',
+    name: 'LED Wall',
+    icon: '📺',
+    color: '#ec4899',
+    questions: [
+      'Strike your signature pose for the LED wall!',
+      'Show us your championship celebration!',
+      'Give us your game face!',
+      'What pose do fans request most?',
+      'Recreate an iconic moment!'
+    ]
+  },
+  {
     id: 'signing',
     name: 'Signing Station',
     icon: '✍️',
@@ -16,7 +29,7 @@ export const stations: Station[] = [
   },
   {
     id: 'packRip',
-    name: 'Pack Rip Station',
+    name: 'Pack Rips',
     icon: '📦',
     color: '#f59e0b',
     questions: [
@@ -28,22 +41,9 @@ export const stations: Station[] = [
     ]
   },
   {
-    id: 'photoOp',
-    name: 'Photo Op Station',
-    icon: '📸',
-    color: '#3b82f6',
-    questions: [
-      'Strike your signature pose!',
-      'Recreate your championship moment',
-      'Show us your celebration',
-      'Give us your game face',
-      'What pose do fans request most?'
-    ]
-  },
-  {
-    id: 'interview',
-    name: 'Interview Station',
-    icon: '🎙️',
+    id: 'prCall',
+    name: 'PR Call',
+    icon: '📞',
     color: '#8b5cf6',
     questions: [
       'Defining moment of your career?',
@@ -51,6 +51,18 @@ export const stations: Station[] = [
       'What does being on a Prizm card mean to you?',
       'Favorite memory with fans?',
       'What legacy do you want to leave?'
+    ]
+  },
+  {
+    id: 'free',
+    name: 'Free / Buffer',
+    icon: '⏸️',
+    color: '#6b7280',
+    questions: [
+      'Rest and preparation time',
+      'Available for impromptu media',
+      'Touch-up and refreshments',
+      'Review upcoming activities'
     ]
   }
 ];
@@ -65,5 +77,5 @@ export const stationMap = new Map<StationId, Station>(
   stations.map(s => [s.id, s])
 );
 
-// Station order for rotation
-export const stationOrder: StationId[] = ['signing', 'packRip', 'photoOp', 'interview'];
+// Station order for typical rotation
+export const stationOrder: StationId[] = ['ledWall', 'signing', 'packRip', 'prCall'];

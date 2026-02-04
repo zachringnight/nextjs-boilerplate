@@ -91,7 +91,7 @@ function StationsContent() {
               }}
             >
               <div className="text-xl">{s.icon}</div>
-              <div className="font-medium truncate">{s.name.replace(' Station', '')}</div>
+              <div className="font-medium truncate">{s.name.replace(' Station', '').replace(' / Buffer', '')}</div>
             </button>
           ))}
         </div>
@@ -204,6 +204,31 @@ function StationsContent() {
                 {/* Expanded Content */}
                 {isExpanded && (
                   <div className="px-4 pb-4 border-t border-[#2A2A2A] pt-4 space-y-4">
+                    {/* PR Call Info */}
+                    {slot.prCallInfo && (
+                      <div className="p-3 rounded-lg bg-[#8b5cf6]/10 border border-[#8b5cf6]/30">
+                        <h4 className={`font-semibold text-[#8b5cf6] mb-2 ${largeText ? 'text-base' : 'text-sm'}`}>
+                          📞 Media Contact
+                        </h4>
+                        <div className={`space-y-1 ${largeText ? 'text-base' : 'text-sm'}`}>
+                          <p className="text-white font-medium">{slot.prCallInfo.outlet}</p>
+                          {slot.prCallInfo.contact && (
+                            <p className="text-[#9CA3AF]">Contact: {slot.prCallInfo.contact}</p>
+                          )}
+                          {slot.prCallInfo.callIn && (
+                            <p className="text-white font-mono">Call-in: {slot.prCallInfo.callIn}</p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Notes */}
+                    {slot.notes && (
+                      <div className={`text-[#9CA3AF] italic ${largeText ? 'text-base' : 'text-sm'}`}>
+                        Note: {slot.notes}
+                      </div>
+                    )}
+
                     {/* Bio */}
                     <div>
                       <h4 className={`font-semibold text-[#FFD100] mb-2 ${largeText ? 'text-base' : 'text-sm'}`}>

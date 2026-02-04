@@ -14,95 +14,778 @@ export const DAY_LABELS: Record<string, string> = {
 // Event hours (PST)
 export const EVENT_START_TIME = '10:00';
 export const EVENT_END_TIME = '18:00';
-export const LUNCH_START = '12:00';
-export const LUNCH_END = '13:00';
 
-// Helper to generate slots for a player
-const generatePlayerSlots = (
-  playerId: string,
-  date: string,
-  startHour: number,
-  startMinute: number,
-  slotIdBase: number
-): ScheduleSlot[] => {
-  const stationOrder: StationId[] = ['signing', 'packRip', 'photoOp', 'interview'];
-  const slots: ScheduleSlot[] = [];
-
-  let currentHour = startHour;
-  let currentMinute = startMinute;
-
-  stationOrder.forEach((station, index) => {
-    const startTime = `${String(currentHour).padStart(2, '0')}:${String(currentMinute).padStart(2, '0')}`;
-
-    // Add 30 minutes
-    currentMinute += 30;
-    if (currentMinute >= 60) {
-      currentMinute -= 60;
-      currentHour += 1;
-    }
-
-    const endTime = `${String(currentHour).padStart(2, '0')}:${String(currentMinute).padStart(2, '0')}`;
-
-    slots.push({
-      id: `slot-${slotIdBase + index}`,
-      playerId,
-      date,
-      startTime,
-      endTime,
-      station,
-      status: 'scheduled'
-    });
-  });
-
-  return slots;
-};
-
-// Generate the complete schedule
-// Each player rotates through all 4 stations (30 min each = 2 hr appearance)
-// Multiple players can be at different stations simultaneously
-
+// Generate the complete schedule based on provided itinerary
 export const defaultSchedule: ScheduleSlot[] = [
-  // =====================
+  // =====================================================
   // THURSDAY FEB 6 - Day 1
-  // =====================
+  // =====================================================
 
-  // Morning Session 1: Trevor Lawrence (10:00 - 12:00)
-  ...generatePlayerSlots('trevor-lawrence', '2026-02-06', 10, 0, 1),
+  // ---------------
+  // 11:00 AM – 1:00 PM Session
+  // ---------------
 
-  // Morning Session 2: Aidan Hutchinson (10:30 - 12:30, overlapping)
-  ...generatePlayerSlots('aidan-hutchinson', '2026-02-06', 10, 30, 5),
+  // Jahmyr Gibbs — RB | Lions | Thu 11:00–1:00
+  {
+    id: 'thu-gibbs-1',
+    playerId: 'jahmyr-gibbs',
+    date: '2026-02-06',
+    startTime: '11:00',
+    endTime: '11:15',
+    station: 'ledWall',
+    status: 'scheduled'
+  },
+  {
+    id: 'thu-gibbs-2',
+    playerId: 'jahmyr-gibbs',
+    date: '2026-02-06',
+    startTime: '11:15',
+    endTime: '12:25',
+    station: 'signing',
+    status: 'scheduled'
+  },
+  {
+    id: 'thu-gibbs-3',
+    playerId: 'jahmyr-gibbs',
+    date: '2026-02-06',
+    startTime: '12:25',
+    endTime: '12:35',
+    station: 'packRip',
+    status: 'scheduled'
+  },
+  {
+    id: 'thu-gibbs-4',
+    playerId: 'jahmyr-gibbs',
+    date: '2026-02-06',
+    startTime: '12:35',
+    endTime: '12:45',
+    station: 'free',
+    status: 'scheduled'
+  },
+  {
+    id: 'thu-gibbs-5',
+    playerId: 'jahmyr-gibbs',
+    date: '2026-02-06',
+    startTime: '12:45',
+    endTime: '13:00',
+    station: 'prCall',
+    status: 'scheduled',
+    prCallInfo: {
+      outlet: 'Fox News Digital (Sports)',
+      contact: 'Scott Thompson',
+      callIn: '732-850-2940'
+    }
+  },
 
-  // Afternoon Session 1: Garrett Wilson (13:00 - 15:00, after lunch)
-  ...generatePlayerSlots('garrett-wilson', '2026-02-06', 13, 0, 9),
+  // Penei Sewell — OT | Lions | Thu 11:00–1:00 (Signing only)
+  {
+    id: 'thu-sewell-1',
+    playerId: 'penei-sewell',
+    date: '2026-02-06',
+    startTime: '11:00',
+    endTime: '13:00',
+    station: 'signing',
+    status: 'scheduled',
+    notes: 'Signing only'
+  },
 
-  // Afternoon Session 2: Julian Edelman (14:00 - 16:00)
-  ...generatePlayerSlots('julian-edelman', '2026-02-06', 14, 0, 13),
+  // Kyle Hamilton — S | Ravens | Thu 11:00–1:00 (Signing only)
+  {
+    id: 'thu-hamilton-1',
+    playerId: 'kyle-hamilton',
+    date: '2026-02-06',
+    startTime: '11:00',
+    endTime: '13:00',
+    station: 'signing',
+    status: 'scheduled',
+    notes: 'Signing only'
+  },
 
-  // =====================
+  // ---------------
+  // 2:30 PM – 4:30 PM Session
+  // ---------------
+
+  // Quinn Ewers — QB | Dolphins | Thu 2:30–4:30
+  {
+    id: 'thu-ewers-1',
+    playerId: 'quinn-ewers',
+    date: '2026-02-06',
+    startTime: '14:30',
+    endTime: '14:45',
+    station: 'ledWall',
+    status: 'scheduled'
+  },
+  {
+    id: 'thu-ewers-2',
+    playerId: 'quinn-ewers',
+    date: '2026-02-06',
+    startTime: '14:45',
+    endTime: '16:05',
+    station: 'signing',
+    status: 'scheduled'
+  },
+  {
+    id: 'thu-ewers-3',
+    playerId: 'quinn-ewers',
+    date: '2026-02-06',
+    startTime: '16:05',
+    endTime: '16:15',
+    station: 'packRip',
+    status: 'scheduled'
+  },
+  {
+    id: 'thu-ewers-4',
+    playerId: 'quinn-ewers',
+    date: '2026-02-06',
+    startTime: '16:15',
+    endTime: '16:30',
+    station: 'prCall',
+    status: 'scheduled',
+    prCallInfo: {
+      outlet: 'SiriusXM Radio',
+      callIn: '1-866-603-8317'
+    }
+  },
+
+  // Cole Kmet — TE | Bears | Thu 2:30–4:30 (Signing only)
+  {
+    id: 'thu-kmet-1',
+    playerId: 'cole-kmet',
+    date: '2026-02-06',
+    startTime: '14:30',
+    endTime: '16:30',
+    station: 'signing',
+    status: 'scheduled',
+    notes: 'Signing only'
+  },
+
+  // ---------------
+  // 3:30 PM – 4:30 PM Session
+  // ---------------
+
+  // Matt Leinart — QB | Retired | Thu 3:30–4:30
+  {
+    id: 'thu-leinart-1',
+    playerId: 'matt-leinart',
+    date: '2026-02-06',
+    startTime: '15:30',
+    endTime: '15:45',
+    station: 'ledWall',
+    status: 'scheduled'
+  },
+  {
+    id: 'thu-leinart-2',
+    playerId: 'matt-leinart',
+    date: '2026-02-06',
+    startTime: '15:45',
+    endTime: '16:00',
+    station: 'prCall',
+    status: 'scheduled',
+    prCallInfo: {
+      outlet: "Men's Journal",
+      contact: 'Kameron Duncan',
+      callIn: '240-688-9648'
+    }
+  },
+  {
+    id: 'thu-leinart-3',
+    playerId: 'matt-leinart',
+    date: '2026-02-06',
+    startTime: '16:00',
+    endTime: '16:10',
+    station: 'packRip',
+    status: 'scheduled'
+  },
+  {
+    id: 'thu-leinart-4',
+    playerId: 'matt-leinart',
+    date: '2026-02-06',
+    startTime: '16:10',
+    endTime: '16:30',
+    station: 'signing',
+    status: 'scheduled'
+  },
+
+  // ---------------
+  // Thursday TBD
+  // ---------------
+
+  // Michael Penix Jr. — QB | Falcons | Thu TBD
+  {
+    id: 'thu-penix-tbd',
+    playerId: 'michael-penix-jr',
+    date: '2026-02-06',
+    startTime: '00:00',
+    endTime: '00:00',
+    station: 'signing',
+    status: 'tbd',
+    notes: 'Schedule TBD - add when times + PR info land'
+  },
+
+  // =====================================================
   // FRIDAY FEB 7 - Day 2
-  // =====================
+  // =====================================================
 
-  // Morning Session 1: Ty Law (10:00 - 12:00)
-  ...generatePlayerSlots('ty-law', '2026-02-07', 10, 0, 17),
+  // ---------------
+  // 10:00 AM – 11:30 AM Session (Adjusted)
+  // ---------------
 
-  // Morning Session 2: Malcolm Butler (10:30 - 12:30)
-  ...generatePlayerSlots('malcolm-butler', '2026-02-07', 10, 30, 21),
+  // Trevor Lawrence — QB | Jaguars | Fri 10:00–11:30
+  {
+    id: 'fri-lawrence-1',
+    playerId: 'trevor-lawrence',
+    date: '2026-02-07',
+    startTime: '10:00',
+    endTime: '10:15',
+    station: 'ledWall',
+    status: 'scheduled'
+  },
+  {
+    id: 'fri-lawrence-2',
+    playerId: 'trevor-lawrence',
+    date: '2026-02-07',
+    startTime: '10:15',
+    endTime: '10:55',
+    station: 'signing',
+    status: 'scheduled'
+  },
+  {
+    id: 'fri-lawrence-3',
+    playerId: 'trevor-lawrence',
+    date: '2026-02-07',
+    startTime: '10:55',
+    endTime: '11:05',
+    station: 'packRip',
+    status: 'scheduled'
+  },
+  {
+    id: 'fri-lawrence-4',
+    playerId: 'trevor-lawrence',
+    date: '2026-02-07',
+    startTime: '11:05',
+    endTime: '11:15',
+    station: 'free',
+    status: 'scheduled',
+    notes: 'Free / Buffer'
+  },
+  {
+    id: 'fri-lawrence-5',
+    playerId: 'trevor-lawrence',
+    date: '2026-02-07',
+    startTime: '11:15',
+    endTime: '11:30',
+    station: 'prCall',
+    status: 'scheduled',
+    prCallInfo: {
+      outlet: 'The Mirror (US)',
+      contact: 'Damian Burchardt',
+      callIn: 'TBD'
+    }
+  },
 
-  // Afternoon Session 1: Eli Manning (13:00 - 15:00)
-  ...generatePlayerSlots('eli-manning', '2026-02-07', 13, 0, 25),
+  // Tyler Shough — QB | Saints | Fri 10:00–11:30
+  {
+    id: 'fri-shough-1',
+    playerId: 'tyler-shough',
+    date: '2026-02-07',
+    startTime: '10:15',
+    endTime: '10:30',
+    station: 'ledWall',
+    status: 'scheduled'
+  },
+  {
+    id: 'fri-shough-2',
+    playerId: 'tyler-shough',
+    date: '2026-02-07',
+    startTime: '10:30',
+    endTime: '11:05',
+    station: 'signing',
+    status: 'scheduled'
+  },
+  {
+    id: 'fri-shough-3',
+    playerId: 'tyler-shough',
+    date: '2026-02-07',
+    startTime: '11:05',
+    endTime: '11:15',
+    station: 'packRip',
+    status: 'scheduled'
+  },
+  {
+    id: 'fri-shough-4',
+    playerId: 'tyler-shough',
+    date: '2026-02-07',
+    startTime: '11:15',
+    endTime: '11:30',
+    station: 'prCall',
+    status: 'scheduled',
+    prCallInfo: {
+      outlet: 'Fox News Digital (Sports)',
+      contact: 'Scott Thompson',
+      callIn: '732-850-2940'
+    }
+  },
 
-  // Afternoon Session 2: Dante Moore (14:00 - 16:00)
-  ...generatePlayerSlots('dante-moore', '2026-02-07', 14, 0, 29),
+  // ---------------
+  // 11:00 AM – 1:00 PM Session
+  // ---------------
 
-  // =====================
+  // Rome Odunze — WR | Bears | Fri 11:00–1:00
+  {
+    id: 'fri-odunze-1',
+    playerId: 'rome-odunze',
+    date: '2026-02-07',
+    startTime: '11:00',
+    endTime: '11:15',
+    station: 'ledWall',
+    status: 'scheduled'
+  },
+  {
+    id: 'fri-odunze-2',
+    playerId: 'rome-odunze',
+    date: '2026-02-07',
+    startTime: '11:15',
+    endTime: '12:25',
+    station: 'signing',
+    status: 'scheduled'
+  },
+  {
+    id: 'fri-odunze-3',
+    playerId: 'rome-odunze',
+    date: '2026-02-07',
+    startTime: '12:25',
+    endTime: '12:35',
+    station: 'packRip',
+    status: 'scheduled'
+  },
+  {
+    id: 'fri-odunze-4',
+    playerId: 'rome-odunze',
+    date: '2026-02-07',
+    startTime: '12:35',
+    endTime: '12:45',
+    station: 'free',
+    status: 'scheduled'
+  },
+  {
+    id: 'fri-odunze-5',
+    playerId: 'rome-odunze',
+    date: '2026-02-07',
+    startTime: '12:45',
+    endTime: '13:00',
+    station: 'prCall',
+    status: 'scheduled',
+    prCallInfo: {
+      outlet: 'WestwoodOne Radio',
+      contact: 'John Lund',
+      callIn: 'TBD'
+    }
+  },
+
+  // ---------------
+  // 12:00 PM – 2:00 PM Session
+  // ---------------
+
+  // Champ Bailey — CB | Retired | Fri 12:00–2:00 (Signing only, no PR)
+  {
+    id: 'fri-bailey-1',
+    playerId: 'champ-bailey',
+    date: '2026-02-07',
+    startTime: '12:00',
+    endTime: '14:00',
+    station: 'signing',
+    status: 'scheduled',
+    notes: 'No PR listed; LED/Pack omitted to preserve single-station rules'
+  },
+
+  // Ty Law — CB | Retired | Fri 12:00–2:00
+  {
+    id: 'fri-law-1',
+    playerId: 'ty-law',
+    date: '2026-02-07',
+    startTime: '12:00',
+    endTime: '12:15',
+    station: 'ledWall',
+    status: 'scheduled'
+  },
+  {
+    id: 'fri-law-2',
+    playerId: 'ty-law',
+    date: '2026-02-07',
+    startTime: '12:15',
+    endTime: '13:35',
+    station: 'signing',
+    status: 'scheduled'
+  },
+  {
+    id: 'fri-law-3',
+    playerId: 'ty-law',
+    date: '2026-02-07',
+    startTime: '13:35',
+    endTime: '13:45',
+    station: 'packRip',
+    status: 'scheduled'
+  },
+  {
+    id: 'fri-law-4',
+    playerId: 'ty-law',
+    date: '2026-02-07',
+    startTime: '13:45',
+    endTime: '14:00',
+    station: 'prCall',
+    status: 'scheduled',
+    prCallInfo: {
+      outlet: 'WestwoodOne Radio',
+      contact: 'John Lund',
+      callIn: 'TBD'
+    }
+  },
+
+  // ---------------
+  // 12:30 PM – 2:30 PM Session
+  // ---------------
+
+  // Will Anderson Jr. — EDGE | Texans | Fri 12:30–2:30
+  {
+    id: 'fri-anderson-1',
+    playerId: 'will-anderson-jr',
+    date: '2026-02-07',
+    startTime: '12:30',
+    endTime: '12:45',
+    station: 'ledWall',
+    status: 'scheduled'
+  },
+  {
+    id: 'fri-anderson-2',
+    playerId: 'will-anderson-jr',
+    date: '2026-02-07',
+    startTime: '12:45',
+    endTime: '14:05',
+    station: 'signing',
+    status: 'scheduled'
+  },
+  {
+    id: 'fri-anderson-3',
+    playerId: 'will-anderson-jr',
+    date: '2026-02-07',
+    startTime: '14:05',
+    endTime: '14:15',
+    station: 'packRip',
+    status: 'scheduled'
+  },
+  {
+    id: 'fri-anderson-4',
+    playerId: 'will-anderson-jr',
+    date: '2026-02-07',
+    startTime: '14:15',
+    endTime: '14:30',
+    station: 'prCall',
+    status: 'scheduled',
+    prCallInfo: {
+      outlet: 'ESPN Radio LIVE',
+      contact: 'Amber Wilson / Ian Fitzsimmons',
+      callIn: 'TBD'
+    }
+  },
+
+  // ---------------
+  // 1:00 PM – 3:00 PM Session
+  // ---------------
+
+  // Ricky Williams — RB | Retired | Fri 1:00–3:00
+  {
+    id: 'fri-williams-1',
+    playerId: 'ricky-williams',
+    date: '2026-02-07',
+    startTime: '13:00',
+    endTime: '13:15',
+    station: 'ledWall',
+    status: 'scheduled'
+  },
+  {
+    id: 'fri-williams-2',
+    playerId: 'ricky-williams',
+    date: '2026-02-07',
+    startTime: '13:15',
+    endTime: '14:35',
+    station: 'signing',
+    status: 'scheduled'
+  },
+  {
+    id: 'fri-williams-3',
+    playerId: 'ricky-williams',
+    date: '2026-02-07',
+    startTime: '14:35',
+    endTime: '14:45',
+    station: 'packRip',
+    status: 'scheduled'
+  },
+  {
+    id: 'fri-williams-4',
+    playerId: 'ricky-williams',
+    date: '2026-02-07',
+    startTime: '14:45',
+    endTime: '15:00',
+    station: 'free',
+    status: 'scheduled',
+    notes: 'No PR listed'
+  },
+
+  // ---------------
+  // 2:00 PM – 3:30 PM Session
+  // ---------------
+
+  // Aidan Hutchinson — EDGE | Lions | Fri 2:00–3:30
+  {
+    id: 'fri-hutchinson-1',
+    playerId: 'aidan-hutchinson',
+    date: '2026-02-07',
+    startTime: '14:00',
+    endTime: '14:15',
+    station: 'ledWall',
+    status: 'scheduled'
+  },
+  {
+    id: 'fri-hutchinson-2',
+    playerId: 'aidan-hutchinson',
+    date: '2026-02-07',
+    startTime: '14:15',
+    endTime: '15:05',
+    station: 'signing',
+    status: 'scheduled'
+  },
+  {
+    id: 'fri-hutchinson-3',
+    playerId: 'aidan-hutchinson',
+    date: '2026-02-07',
+    startTime: '15:05',
+    endTime: '15:15',
+    station: 'packRip',
+    status: 'scheduled'
+  },
+  {
+    id: 'fri-hutchinson-4',
+    playerId: 'aidan-hutchinson',
+    date: '2026-02-07',
+    startTime: '15:15',
+    endTime: '15:30',
+    station: 'prCall',
+    status: 'scheduled',
+    prCallInfo: {
+      outlet: 'Forbes',
+      contact: 'DJ Siddiqi',
+      callIn: '561-281-6882'
+    }
+  },
+
+  // ---------------
+  // 2:30 PM – 4:30 PM Session
+  // ---------------
+
+  // Andre Reed — WR | Retired | Fri 2:30–4:30
+  {
+    id: 'fri-reed-1',
+    playerId: 'andre-reed',
+    date: '2026-02-07',
+    startTime: '14:30',
+    endTime: '14:45',
+    station: 'ledWall',
+    status: 'scheduled'
+  },
+  {
+    id: 'fri-reed-2',
+    playerId: 'andre-reed',
+    date: '2026-02-07',
+    startTime: '14:45',
+    endTime: '16:05',
+    station: 'signing',
+    status: 'scheduled'
+  },
+  {
+    id: 'fri-reed-3',
+    playerId: 'andre-reed',
+    date: '2026-02-07',
+    startTime: '16:05',
+    endTime: '16:15',
+    station: 'packRip',
+    status: 'scheduled'
+  },
+  {
+    id: 'fri-reed-4',
+    playerId: 'andre-reed',
+    date: '2026-02-07',
+    startTime: '16:15',
+    endTime: '16:30',
+    station: 'prCall',
+    status: 'scheduled',
+    prCallInfo: {
+      outlet: 'ESPN Radio LIVE',
+      contact: 'Amber Wilson / Ian Fitzsimmons',
+      callIn: 'TBD'
+    }
+  },
+
+  // ---------------
+  // 4:30 PM – 6:00 PM Session
+  // ---------------
+
+  // Dante Moore — QB | Oregon | Fri 4:30–6:00
+  {
+    id: 'fri-moore-1',
+    playerId: 'dante-moore',
+    date: '2026-02-07',
+    startTime: '16:30',
+    endTime: '16:45',
+    station: 'ledWall',
+    status: 'scheduled'
+  },
+  {
+    id: 'fri-moore-2',
+    playerId: 'dante-moore',
+    date: '2026-02-07',
+    startTime: '16:45',
+    endTime: '17:35',
+    station: 'signing',
+    status: 'scheduled'
+  },
+  {
+    id: 'fri-moore-3',
+    playerId: 'dante-moore',
+    date: '2026-02-07',
+    startTime: '17:35',
+    endTime: '17:45',
+    station: 'packRip',
+    status: 'scheduled'
+  },
+  {
+    id: 'fri-moore-4',
+    playerId: 'dante-moore',
+    date: '2026-02-07',
+    startTime: '17:45',
+    endTime: '18:00',
+    station: 'prCall',
+    status: 'scheduled',
+    prCallInfo: {
+      outlet: 'On3',
+      contact: 'Nick Schultz',
+      callIn: '815-685-1854'
+    }
+  },
+
+  // =====================================================
   // SATURDAY FEB 8 - Day 3
-  // =====================
+  // =====================================================
 
-  // Morning Session 1: Ricky Williams (10:00 - 12:00)
-  ...generatePlayerSlots('ricky-williams', '2026-02-08', 10, 0, 33),
+  // ---------------
+  // 11:00 AM – 1:00 PM Session
+  // ---------------
 
-  // Morning Session 2: Champ Bailey (10:30 - 12:30)
-  ...generatePlayerSlots('champ-bailey', '2026-02-08', 10, 30, 37),
+  // Keisean Henderson — QB | Houston (commit) | Sat 11:00–1:00
+  {
+    id: 'sat-henderson-1',
+    playerId: 'keisean-henderson',
+    date: '2026-02-08',
+    startTime: '11:00',
+    endTime: '11:15',
+    station: 'ledWall',
+    status: 'scheduled'
+  },
+  {
+    id: 'sat-henderson-2',
+    playerId: 'keisean-henderson',
+    date: '2026-02-08',
+    startTime: '11:15',
+    endTime: '12:45',
+    station: 'signing',
+    status: 'scheduled'
+  },
+  {
+    id: 'sat-henderson-3',
+    playerId: 'keisean-henderson',
+    date: '2026-02-08',
+    startTime: '12:45',
+    endTime: '12:55',
+    station: 'packRip',
+    status: 'scheduled'
+  },
+  {
+    id: 'sat-henderson-4',
+    playerId: 'keisean-henderson',
+    date: '2026-02-08',
+    startTime: '12:55',
+    endTime: '13:00',
+    station: 'free',
+    status: 'scheduled',
+    notes: 'No PR listed'
+  },
+
+  // ---------------
+  // 2:00 PM – 4:00 PM Session
+  // ---------------
+
+  // Julian Edelman — WR | Retired | Sat 2:00–4:00 (Eli Manning Show)
+  {
+    id: 'sat-edelman-1',
+    playerId: 'julian-edelman',
+    date: '2026-02-08',
+    startTime: '14:00',
+    endTime: '16:00',
+    station: 'signing',
+    status: 'scheduled',
+    notes: 'Eli Manning Show - Special Event'
+  },
+
+  // =====================================================
+  // TBD / SIGNING ONLY PLAYERS (Date/Time TBD, no media)
+  // =====================================================
+
+  // Cooper Kupp — WR | Seahawks (TBD)
+  {
+    id: 'tbd-kupp-1',
+    playerId: 'cooper-kupp',
+    date: '2026-02-06',
+    startTime: '00:00',
+    endTime: '00:00',
+    station: 'signing',
+    status: 'tbd',
+    notes: 'Signing only, Date/Time TBD (no media)'
+  },
+
+  // Antonio Gibson — RB | Patriots (TBD)
+  {
+    id: 'tbd-gibson-1',
+    playerId: 'antonio-gibson',
+    date: '2026-02-06',
+    startTime: '00:00',
+    endTime: '00:00',
+    station: 'signing',
+    status: 'tbd',
+    notes: 'Signing only, Date/Time TBD (no media)'
+  },
+
+  // Brian Robinson Jr. — RB | 49ers (TBD)
+  {
+    id: 'tbd-robinson-1',
+    playerId: 'brian-robinson-jr',
+    date: '2026-02-06',
+    startTime: '00:00',
+    endTime: '00:00',
+    station: 'signing',
+    status: 'tbd',
+    notes: 'Signing only, Date/Time TBD (no media)'
+  },
+
+  // Trey McBride — TE | Cardinals (TBD)
+  {
+    id: 'tbd-mcbride-1',
+    playerId: 'trey-mcbride',
+    date: '2026-02-06',
+    startTime: '00:00',
+    endTime: '00:00',
+    station: 'signing',
+    status: 'tbd',
+    notes: 'Signing only, Date/Time TBD (no media)'
+  }
 ];
 
 // Helper functions
@@ -141,7 +824,7 @@ export const getCurrentSlot = (schedule: ScheduleSlot[], station: StationId, now
   return schedule.find(slot =>
     slot.station === station &&
     slot.date === today &&
-    slot.status !== 'cancelled' &&
+    slot.status === 'scheduled' &&
     slot.startTime <= currentTime &&
     slot.endTime > currentTime
   ) || null;
@@ -154,7 +837,7 @@ export const getNextSlot = (schedule: ScheduleSlot[], station: StationId, now: D
   const upcomingSlots = schedule
     .filter(slot =>
       slot.station === station &&
-      slot.status !== 'cancelled' &&
+      slot.status === 'scheduled' &&
       (slot.date > today || (slot.date === today && slot.startTime > currentTime))
     )
     .sort((a, b) => {
@@ -169,16 +852,16 @@ export const getNextSlot = (schedule: ScheduleSlot[], station: StationId, now: D
 export const getPlayersForDay = (schedule: ScheduleSlot[], date: string): string[] => {
   const playerIds = new Set(
     schedule
-      .filter(slot => slot.date === date && slot.status !== 'cancelled')
+      .filter(slot => slot.date === date && slot.status === 'scheduled')
       .map(slot => slot.playerId)
   );
   return Array.from(playerIds);
 };
 
-// Count completed players for today (all 4 stations done)
+// Count completed players for today (all their slots done)
 export const getCompletedPlayerCount = (schedule: ScheduleSlot[], date: string, now: Date): number => {
   const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-  const todaySchedule = schedule.filter(slot => slot.date === date && slot.status !== 'cancelled');
+  const todaySchedule = schedule.filter(slot => slot.date === date && slot.status === 'scheduled');
 
   const playerSlots = new Map<string, ScheduleSlot[]>();
   todaySchedule.forEach(slot => {
@@ -194,4 +877,21 @@ export const getCompletedPlayerCount = (schedule: ScheduleSlot[], date: string, 
   });
 
   return completed;
+};
+
+// Get TBD slots that need scheduling
+export const getTBDSlots = (schedule: ScheduleSlot[]): ScheduleSlot[] => {
+  return schedule.filter(slot => slot.status === 'tbd');
+};
+
+// Get all PR calls for a day
+export const getPRCallsForDay = (schedule: ScheduleSlot[], date: string): ScheduleSlot[] => {
+  return schedule
+    .filter(slot =>
+      slot.date === date &&
+      slot.station === 'prCall' &&
+      slot.status === 'scheduled' &&
+      slot.prCallInfo
+    )
+    .sort((a, b) => a.startTime.localeCompare(b.startTime));
 };

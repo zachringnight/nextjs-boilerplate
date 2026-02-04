@@ -1,6 +1,93 @@
 import { Player } from '../types';
 
 export const players: Player[] = [
+  // =====================
+  // THURSDAY PLAYERS
+  // =====================
+  {
+    id: 'jahmyr-gibbs',
+    name: 'Jahmyr Gibbs',
+    team: 'Detroit Lions',
+    position: 'Running Back',
+    photo: '/prizm/players/jahmyr-gibbs.jpg',
+    bio: '#12 overall pick in 2023 NFL Draft from Alabama. Dynamic dual-threat running back who excels as both a rusher and receiver. Key piece of the Lions\' explosive offense alongside David Montgomery.',
+    stats: ['2023 #12 Overall Pick', 'Pro Bowl (2024)', '1,200+ rushing yards (2024)', '50+ receptions as RB'],
+    cardHistory: ['2023 Prizm Draft Picks #12', '2023 Prizm Rookie Autograph', '2024 Prizm Silver Prizm', '2024 Prizm Pro Bowl Insert'],
+    moments: ['NFL Debut touchdown vs Chiefs', 'Breakout game vs Cowboys', 'NFC Championship performance', 'Pro Bowl selection 2024']
+  },
+  {
+    id: 'penei-sewell',
+    name: 'Penei Sewell',
+    team: 'Detroit Lions',
+    position: 'Offensive Tackle',
+    photo: '/prizm/players/penei-sewell.jpg',
+    bio: '#7 overall pick in 2021 NFL Draft. Two-time Pro Bowler and cornerstone of the Lions offensive line. Opt-out from Oregon in 2020 who has become one of the premier tackles in the NFL.',
+    stats: ['2021 #7 Overall Pick', '2x Pro Bowl', 'First-team All-Pro (2024)', 'Youngest OT drafted top 10'],
+    cardHistory: ['2021 Prizm Draft Picks #7', '2021 Prizm Rookie', '2023 Prizm Pro Bowl', '2024 Prizm All-Pro Insert'],
+    moments: ['NFL Draft selection moment', 'First career start vs 49ers', 'Dominant playoff performance', 'All-Pro recognition'],
+    signingOnly: true
+  },
+  {
+    id: 'kyle-hamilton',
+    name: 'Kyle Hamilton',
+    team: 'Baltimore Ravens',
+    position: 'Safety',
+    photo: '/prizm/players/kyle-hamilton.jpg',
+    bio: '#14 overall pick in 2022 NFL Draft from Notre Dame. Versatile defensive playmaker with rare size and athleticism. Defensive centerpiece of the Ravens\' elite defense.',
+    stats: ['2022 #14 Overall Pick', 'Pro Bowl (2024)', 'First-team All-Pro (2024)', '10+ career interceptions'],
+    cardHistory: ['2022 Prizm Draft Picks #14', '2022 Prizm Rookie Autograph', '2023 Prizm Silver Prizm', '2024 Prizm All-Pro'],
+    moments: ['Notre Dame game-winning INT', 'NFL Draft day', 'First career pick-six', 'All-Pro selection'],
+    signingOnly: true
+  },
+  {
+    id: 'quinn-ewers',
+    name: 'Quinn Ewers',
+    team: 'Miami Dolphins',
+    position: 'Quarterback',
+    photo: '/prizm/players/quinn-ewers.jpg',
+    bio: 'Former #1 overall recruit and Texas Longhorns star. First-round pick who brings elite arm talent and poise under pressure. The future of the Dolphins franchise at quarterback.',
+    stats: ['2025 First Round Pick', '#1 HS Recruit (2021)', 'Texas Longhorns starter', 'Big 12 Championship'],
+    cardHistory: ['2025 Prizm Draft Picks Rookie', '2025 Prizm Silver Prizm RC', '2025 Prizm Rookie Autograph'],
+    moments: ['Texas commitment flip', 'First start at Texas', 'Big 12 Championship game', 'NFL Draft selection']
+  },
+  {
+    id: 'cole-kmet',
+    name: 'Cole Kmet',
+    team: 'Chicago Bears',
+    position: 'Tight End',
+    photo: '/prizm/players/cole-kmet.jpg',
+    bio: 'Second-round pick from Notre Dame in 2020. Homegrown Illinois product who has developed into one of the Bears\' most reliable targets. Key part of Chicago\'s offensive future.',
+    stats: ['2020 2nd Round Pick', '200+ career receptions', '2,000+ receiving yards', 'Team captain'],
+    cardHistory: ['2020 Prizm Draft Picks', '2020 Prizm Rookie', '2023 Prizm Base', '2024 Prizm Bears Collection'],
+    moments: ['Notre Dame career highlights', 'First NFL touchdown', 'Career-high receiving game', 'Team captain selection'],
+    signingOnly: true
+  },
+  {
+    id: 'matt-leinart',
+    name: 'Matt Leinart',
+    team: 'Retired',
+    position: 'Legend - Quarterback',
+    photo: '/prizm/players/matt-leinart.jpg',
+    bio: 'Heisman Trophy winner and two-time national champion at USC. #10 overall pick in 2006. Member of one of college football\'s greatest dynasties. Now a respected media analyst.',
+    stats: ['Heisman Trophy (2004)', '2x National Champion', '2006 #10 Overall Pick', 'USC legend'],
+    cardHistory: ['2006 Topps Rookie', '2006 Prizm Preview', '2015 Prizm Legends', '2020 Prizm College Legends'],
+    moments: ['Heisman Trophy ceremony', 'Bush Push game vs Notre Dame', 'Back-to-back national titles', 'NFL Draft day']
+  },
+  {
+    id: 'michael-penix-jr',
+    name: 'Michael Penix Jr.',
+    team: 'Atlanta Falcons',
+    position: 'Quarterback',
+    photo: '/prizm/players/michael-penix-jr.jpg',
+    bio: 'Heisman Trophy runner-up from Washington. First-round pick known for his incredible arm talent and comeback from multiple knee injuries. Symbol of perseverance and elite quarterback play.',
+    stats: ['2024 First Round Pick', 'Heisman Runner-up (2023)', 'Pac-12 Champion', 'College Football Playoff'],
+    cardHistory: ['2024 Prizm Draft Picks Rookie', '2024 Prizm Silver Prizm RC', '2024 Prizm Rookie Autograph'],
+    moments: ['Transfer to Washington', 'Heisman ceremony', 'CFP semifinal performance', 'NFL Draft surprise pick']
+  },
+
+  // =====================
+  // FRIDAY PLAYERS
+  // =====================
   {
     id: 'trevor-lawrence',
     name: 'Trevor Lawrence',
@@ -13,48 +100,37 @@ export const players: Player[] = [
     moments: ['Clemson National Championship MVP', 'First NFL win vs Miami 2021', '2022 Playoff comeback vs Chargers (27-point deficit)', 'AFC Wild Card victory']
   },
   {
-    id: 'aidan-hutchinson',
-    name: 'Aidan Hutchinson',
-    team: 'Detroit Lions',
-    position: 'Defensive End',
-    photo: '/prizm/players/aidan-hutchinson.jpg',
-    bio: '#2 overall pick in 2022 NFL Draft. Heisman Trophy finalist and consensus All-American at Michigan. The leader of Detroit\'s dominant defensive line and a key piece of the Lions\' resurgence.',
-    stats: ['2022 #2 Overall Pick', '2x Pro Bowl', 'Defensive Rookie of the Year finalist', '30+ career sacks'],
-    cardHistory: ['2022 Prizm Draft Picks #2', '2022 Prizm Rookie Autograph', '2023 Prizm Blue Wave /199', '2024 Prizm Gold Prizm /10'],
-    moments: ['Michigan vs Ohio State 2021 performance', 'NFL Debut sack vs Eagles', '3-sack game vs Packers', 'Playoffs vs Buccaneers dominant showing']
-  },
-  {
-    id: 'garrett-wilson',
-    name: 'Garrett Wilson',
-    team: 'New York Jets',
-    position: 'Wide Receiver',
-    photo: '/prizm/players/garrett-wilson.jpg',
-    bio: '#10 overall pick in 2022 NFL Draft. 2022 NFL Offensive Rookie of the Year. Two-time First-team All-Big Ten at Ohio State. The Jets\' top playmaker and one of the premier young receivers in the league.',
-    stats: ['2022 NFL Offensive Rookie of the Year', '2x Pro Bowl', '3,000+ career receiving yards', '20+ career TDs'],
-    cardHistory: ['2022 Prizm Draft Picks #10', '2022 Prizm Rookie of the Year Insert', '2023 Prizm Silver Prizm', '2024 Prizm Color Blast'],
-    moments: ['Rookie of the Year acceptance', 'First career TD vs Browns', 'Game-winning catch vs Bills', '150+ yard game vs Eagles']
-  },
-  {
-    id: 'dante-moore',
-    name: 'Dante Moore',
-    team: 'Los Angeles Chargers',
+    id: 'tyler-shough',
+    name: 'Tyler Shough',
+    team: 'New Orleans Saints',
     position: 'Quarterback',
-    photo: '/prizm/players/dante-moore.jpg',
-    bio: 'First-round pick in 2025 NFL Draft from UCLA. Top high school recruit in the 2023 class. Electrifying dual-threat quarterback with elite arm talent and exceptional mobility.',
-    stats: ['2025 First Round Pick', 'Top HS Recruit 2023', '5-star prospect', 'UCLA starter at 18 years old'],
-    cardHistory: ['2025 Prizm Draft Picks Rookie', '2025 Prizm Silver Prizm RC', '2025 Prizm Rookie Autograph'],
-    moments: ['UCLA commitment announcement', 'First collegiate start', 'Debut win vs Crosstown rival', 'NFL Draft selection day']
+    photo: '/prizm/players/tyler-shough.jpg',
+    bio: 'Former Oregon and Texas Tech quarterback selected in the 2025 NFL Draft. Known for his strong arm and leadership. Bringing his experience to the Saints as a developmental quarterback.',
+    stats: ['2025 NFL Draft Pick', 'Oregon starter (2020)', 'Texas Tech starter', 'Multiple program experience'],
+    cardHistory: ['2025 Prizm Draft Picks Rookie', '2025 Prizm Rookie Autograph'],
+    moments: ['Oregon starting role', 'Transfer to Texas Tech', 'Breakout games', 'NFL Draft day']
   },
   {
-    id: 'julian-edelman',
-    name: 'Julian Edelman',
-    team: 'New England Patriots',
-    position: 'Legend - Wide Receiver',
-    photo: '/prizm/players/julian-edelman.jpg',
-    bio: 'Super Bowl LIII MVP and three-time Super Bowl champion. Undrafted college quarterback who became one of the most clutch receivers in NFL history. Patriots legend and Brady\'s go-to target.',
-    stats: ['3x Super Bowl Champion', 'Super Bowl LIII MVP', '6,822 career receiving yards', '620 career receptions'],
-    cardHistory: ['2009 Topps Rookie', '2015 Prizm Base', '2019 Prizm Super Bowl MVP Insert', '2020 Prizm Retirement Tribute'],
-    moments: ['Super Bowl XLIX catch vs Seahawks', 'Super Bowl LI comeback catch', 'Super Bowl LIII MVP performance', 'The Catch vs Falcons in OT']
+    id: 'rome-odunze',
+    name: 'Rome Odunze',
+    team: 'Chicago Bears',
+    position: 'Wide Receiver',
+    photo: '/prizm/players/rome-odunze.jpg',
+    bio: 'First-round pick from Washington in 2024. Electric playmaker who helped lead the Huskies to the College Football Playoff. Part of the Bears\' dynamic young receiving corps.',
+    stats: ['2024 #9 Overall Pick', 'Biletnikoff Award finalist', '1,600+ yards (2023)', 'College Football Playoff'],
+    cardHistory: ['2024 Prizm Draft Picks #9', '2024 Prizm Rookie Autograph', '2024 Prizm Silver Prizm RC'],
+    moments: ['Washington breakout season', 'CFP semifinal performance', 'NFL Combine showcase', 'Draft selection by Bears']
+  },
+  {
+    id: 'champ-bailey',
+    name: 'Champ Bailey',
+    team: 'Denver Broncos',
+    position: 'Legend - Cornerback',
+    photo: '/prizm/players/champ-bailey.jpg',
+    bio: 'Pro Football Hall of Fame cornerback and 12-time Pro Bowler. Considered one of the greatest cover corners in NFL history. Dominant with both the Redskins and Broncos.',
+    stats: ['Pro Football Hall of Fame (2019)', '12x Pro Bowl', '3x First-team All-Pro', '52 career interceptions'],
+    cardHistory: ['1999 Topps Rookie', '2004 Prizm Preview', '2019 Prizm Hall of Fame Insert', '2020 Prizm Broncos Legends'],
+    moments: ['100-yard INT return in AFC Championship', 'Trade to Broncos blockbuster', '10 INT season 2006', 'Hall of Fame induction']
   },
   {
     id: 'ty-law',
@@ -68,26 +144,15 @@ export const players: Player[] = [
     moments: ['Super Bowl XXXVI pick-six vs Rams', '3 INT game vs Peyton Manning', 'AFC Championship dominance', 'Hall of Fame induction speech']
   },
   {
-    id: 'malcolm-butler',
-    name: 'Malcolm Butler',
-    team: 'New England Patriots',
-    position: 'Legend - Cornerback',
-    photo: '/prizm/players/malcolm-butler.jpg',
-    bio: 'Made the most famous play in Super Bowl history with his goal-line interception in Super Bowl XLIX. Undrafted free agent who became a Pro Bowl cornerback.',
-    stats: ['Super Bowl XLIX Hero', 'Pro Bowl (2015)', '2x Super Bowl Champion', '17 career interceptions'],
-    cardHistory: ['2014 Topps Rookie', '2015 Prizm Super Bowl Moment', '2016 Prizm Pro Bowl Insert', '2018 Prizm Patriots Collection'],
-    moments: ['THE Interception - Super Bowl XLIX', 'Pro Bowl selection 2015', '4 INT season 2016', 'Super Bowl LI championship']
-  },
-  {
-    id: 'eli-manning',
-    name: 'Eli Manning',
-    team: 'New York Giants',
-    position: 'Legend - Quarterback',
-    photo: '/prizm/players/eli-manning.jpg',
-    bio: 'Two-time Super Bowl MVP and four-time Pro Bowler. Spent entire 16-year career with the New York Giants. Famous for defeating the undefeated Patriots twice in the Super Bowl.',
-    stats: ['2x Super Bowl MVP', '4x Pro Bowl', '57,023 career passing yards', '366 career TD passes'],
-    cardHistory: ['2004 Topps Rookie', '2008 Prizm Preview', '2012 Prizm Super Bowl MVP', '2020 Prizm Career Tribute'],
-    moments: ['Helmet Catch drive - Super Bowl XLII', 'Super Bowl XLVI game-winning drive', 'Defeating 18-0 Patriots', 'Manning Bowl games vs Peyton']
+    id: 'will-anderson-jr',
+    name: 'Will Anderson Jr.',
+    team: 'Houston Texans',
+    position: 'EDGE',
+    photo: '/prizm/players/will-anderson-jr.jpg',
+    bio: '#3 overall pick in 2023 NFL Draft from Alabama. Two-time SEC Defensive Player of the Year and unanimous All-American. Dominant pass rusher who is the cornerstone of the Texans defense.',
+    stats: ['2023 #3 Overall Pick', '2x SEC DPOY', 'Unanimous All-American', 'Bronko Nagurski Award'],
+    cardHistory: ['2023 Prizm Draft Picks #3', '2023 Prizm Rookie Autograph', '2024 Prizm Silver Prizm', '2024 Prizm Defensive Stars'],
+    moments: ['Alabama dominance', 'SEC Championship performances', 'NFL Draft day', 'First NFL sack']
   },
   {
     id: 'ricky-williams',
@@ -101,15 +166,126 @@ export const players: Player[] = [
     moments: ['Heisman Trophy ceremony', '1,853 yard season with Dolphins', 'NCAA rushing record at Texas', 'Memorable Dolphins runs']
   },
   {
-    id: 'champ-bailey',
-    name: 'Champ Bailey',
-    team: 'Denver Broncos',
-    position: 'Legend - Cornerback',
-    photo: '/prizm/players/champ-bailey.jpg',
-    bio: 'Pro Football Hall of Fame cornerback and 12-time Pro Bowler. Considered one of the greatest cover corners in NFL history. Dominant with both the Redskins and Broncos.',
-    stats: ['Pro Football Hall of Fame (2019)', '12x Pro Bowl', '3x First-team All-Pro', '52 career interceptions'],
-    cardHistory: ['1999 Topps Rookie', '2004 Prizm Preview', '2019 Prizm Hall of Fame Insert', '2020 Prizm Broncos Legends'],
-    moments: ['100-yard INT return in AFC Championship', 'Trade to Broncos blockbuster', '10 INT season 2006', 'Hall of Fame induction']
+    id: 'aidan-hutchinson',
+    name: 'Aidan Hutchinson',
+    team: 'Detroit Lions',
+    position: 'EDGE',
+    photo: '/prizm/players/aidan-hutchinson.jpg',
+    bio: '#2 overall pick in 2022 NFL Draft. Heisman Trophy finalist and consensus All-American at Michigan. The leader of Detroit\'s dominant defensive line and a key piece of the Lions\' resurgence.',
+    stats: ['2022 #2 Overall Pick', '2x Pro Bowl', 'Defensive Rookie of the Year finalist', '30+ career sacks'],
+    cardHistory: ['2022 Prizm Draft Picks #2', '2022 Prizm Rookie Autograph', '2023 Prizm Blue Wave /199', '2024 Prizm Gold Prizm /10'],
+    moments: ['Michigan vs Ohio State 2021 performance', 'NFL Debut sack vs Eagles', '3-sack game vs Packers', 'Playoffs vs Buccaneers dominant showing']
+  },
+  {
+    id: 'andre-reed',
+    name: 'Andre Reed',
+    team: 'Buffalo Bills',
+    position: 'Legend - Wide Receiver',
+    photo: '/prizm/players/andre-reed.jpg',
+    bio: 'Pro Football Hall of Fame wide receiver and four-time AFC Champion. Seven-time Pro Bowler who was the heart of the Bills\' K-Gun offense. One of the most clutch receivers in NFL history.',
+    stats: ['Pro Football Hall of Fame (2014)', '7x Pro Bowl', '4x AFC Champion', '951 career receptions'],
+    cardHistory: ['1986 Topps Rookie', '1992 Prizm Preview', '2014 Prizm Hall of Fame Insert', '2020 Prizm Bills Legends'],
+    moments: ['The Comeback - 32 point deficit vs Oilers', 'Four consecutive Super Bowl appearances', 'Hall of Fame induction', '13,000+ receiving yards']
+  },
+  {
+    id: 'dante-moore',
+    name: 'Dante Moore',
+    team: 'Oregon',
+    position: 'Quarterback',
+    photo: '/prizm/players/dante-moore.jpg',
+    bio: 'Top high school recruit in the 2023 class who chose Oregon over UCLA and other top programs. Electrifying dual-threat quarterback with elite arm talent and exceptional mobility.',
+    stats: ['Top HS Recruit 2023', '5-star prospect', 'Oregon Ducks starter', 'Elite 11 MVP'],
+    cardHistory: ['2023 Prizm Draft Picks Preview', '2024 Prizm College Silver', '2025 Prizm Draft Prospects'],
+    moments: ['Oregon commitment announcement', 'First collegiate start', 'Debut touchdown pass', 'Big Ten Conference games']
+  },
+
+  // =====================
+  // SATURDAY PLAYERS
+  // =====================
+  {
+    id: 'keisean-henderson',
+    name: 'Keisean Henderson',
+    team: 'Houston (Commit)',
+    position: 'Quarterback',
+    photo: '/prizm/players/keisean-henderson.jpg',
+    bio: 'Top quarterback prospect committed to the University of Houston. Rising star known for his arm strength and playmaking ability. One of the most exciting young QB prospects in the country.',
+    stats: ['Houston Commit', 'Top QB Prospect', '4-star recruit', 'Elite 11 participant'],
+    cardHistory: ['2025 Prizm Draft Prospects Preview', 'Future Prizm Rookie'],
+    moments: ['Houston commitment', 'High school state championship', 'Elite 11 performance', 'Recruiting visits']
+  },
+  {
+    id: 'julian-edelman',
+    name: 'Julian Edelman',
+    team: 'New England Patriots',
+    position: 'Legend - Wide Receiver',
+    photo: '/prizm/players/julian-edelman.jpg',
+    bio: 'Super Bowl LIII MVP and three-time Super Bowl champion. Undrafted college quarterback who became one of the most clutch receivers in NFL history. Patriots legend and Brady\'s go-to target.',
+    stats: ['3x Super Bowl Champion', 'Super Bowl LIII MVP', '6,822 career receiving yards', '620 career receptions'],
+    cardHistory: ['2009 Topps Rookie', '2015 Prizm Base', '2019 Prizm Super Bowl MVP Insert', '2020 Prizm Retirement Tribute'],
+    moments: ['Super Bowl XLIX catch vs Seahawks', 'Super Bowl LI comeback catch', 'Super Bowl LIII MVP performance', 'The Catch vs Falcons in OT']
+  },
+  {
+    id: 'eli-manning',
+    name: 'Eli Manning',
+    team: 'New York Giants',
+    position: 'Legend - Quarterback',
+    photo: '/prizm/players/eli-manning.jpg',
+    bio: 'Two-time Super Bowl MVP and four-time Pro Bowler. Spent entire 16-year career with the New York Giants. Famous for defeating the undefeated Patriots twice in the Super Bowl.',
+    stats: ['2x Super Bowl MVP', '4x Pro Bowl', '57,023 career passing yards', '366 career TD passes'],
+    cardHistory: ['2004 Topps Rookie', '2008 Prizm Preview', '2012 Prizm Super Bowl MVP', '2020 Prizm Career Tribute'],
+    moments: ['Helmet Catch drive - Super Bowl XLII', 'Super Bowl XLVI game-winning drive', 'Defeating 18-0 Patriots', 'Manning Bowl games vs Peyton']
+  },
+
+  // =====================
+  // TBD / SIGNING ONLY PLAYERS
+  // =====================
+  {
+    id: 'cooper-kupp',
+    name: 'Cooper Kupp',
+    team: 'Seattle Seahawks',
+    position: 'Wide Receiver',
+    photo: '/prizm/players/cooper-kupp.jpg',
+    bio: 'Super Bowl LVI MVP and Triple Crown winner. Third-round pick who became the most productive receiver in the NFL. Known for his elite route running and clutch performances.',
+    stats: ['Super Bowl LVI MVP', 'Triple Crown (2021)', '2x Pro Bowl', '1,947 receiving yards (2021)'],
+    cardHistory: ['2017 Prizm Rookie', '2021 Prizm MVP Insert', '2022 Prizm Super Bowl MVP', '2024 Prizm Seahawks'],
+    moments: ['Super Bowl LVI game-winning TD', 'Triple Crown season', 'Record-breaking 2021', 'Trade to Seahawks'],
+    signingOnly: true
+  },
+  {
+    id: 'antonio-gibson',
+    name: 'Antonio Gibson',
+    team: 'New England Patriots',
+    position: 'Running Back',
+    photo: '/prizm/players/antonio-gibson.jpg',
+    bio: 'Versatile running back who began his career with Washington. Known for his receiving ability and explosive playmaking. Now contributing to the Patriots backfield.',
+    stats: ['2020 3rd Round Pick', '2,500+ career rushing yards', '100+ career receptions', 'Dual-threat RB'],
+    cardHistory: ['2020 Prizm Rookie', '2021 Prizm Silver Prizm', '2024 Prizm Patriots'],
+    moments: ['First NFL touchdown', 'Breakout rookie season', 'Multi-TD games', 'Patriots signing'],
+    signingOnly: true
+  },
+  {
+    id: 'brian-robinson-jr',
+    name: 'Brian Robinson Jr.',
+    team: 'San Francisco 49ers',
+    position: 'Running Back',
+    photo: '/prizm/players/brian-robinson-jr.jpg',
+    bio: 'Third-round pick from Alabama known for his powerful running style. Overcame adversity to become a productive NFL starter. Now bringing his physical style to San Francisco.',
+    stats: ['2022 3rd Round Pick', 'National Champion (Alabama)', '2,000+ career rushing yards', 'Comeback story'],
+    cardHistory: ['2022 Prizm Rookie', '2023 Prizm Base', '2024 Prizm 49ers'],
+    moments: ['Alabama career', 'Rookie comeback story', 'First NFL 100-yard game', '49ers trade'],
+    signingOnly: true
+  },
+  {
+    id: 'trey-mcbride',
+    name: 'Trey McBride',
+    team: 'Arizona Cardinals',
+    position: 'Tight End',
+    photo: '/prizm/players/trey-mcbride.jpg',
+    bio: 'Second-round pick from Colorado State and John Mackey Award winner. Has emerged as one of the top young tight ends in the NFL. The centerpiece of the Cardinals\' offensive attack.',
+    stats: ['2022 2nd Round Pick', 'John Mackey Award (2021)', 'Pro Bowl (2024)', '100+ receptions (2024)'],
+    cardHistory: ['2022 Prizm Rookie', '2023 Prizm Silver Prizm', '2024 Prizm Pro Bowl Insert'],
+    moments: ['Colorado State dominance', 'John Mackey Award', 'First Pro Bowl', 'Breakout 2024 season'],
+    signingOnly: true
   }
 ];
 
@@ -135,3 +311,13 @@ export const searchPlayers = (query: string): Player[] => {
 export const playerMap = new Map<string, Player>(
   players.map(p => [p.id, p])
 );
+
+// Get players who are signing only (no rotation)
+export const getSigningOnlyPlayers = (): Player[] => {
+  return players.filter(p => p.signingOnly);
+};
+
+// Get players with full rotation schedule
+export const getRotationPlayers = (): Player[] => {
+  return players.filter(p => !p.signingOnly);
+};

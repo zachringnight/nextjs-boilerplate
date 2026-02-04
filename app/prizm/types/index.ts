@@ -10,6 +10,7 @@ export interface Player {
   stats: string[];
   cardHistory: string[];
   moments: string[];
+  signingOnly?: boolean; // Player only does signing, no rotation
 }
 
 export interface Station {
@@ -20,7 +21,15 @@ export interface Station {
   questions: string[];
 }
 
-export type StationId = 'signing' | 'packRip' | 'photoOp' | 'interview';
+export type StationId = 'ledWall' | 'signing' | 'packRip' | 'prCall' | 'free';
+
+// PR Call information for media interviews
+export interface PRCallInfo {
+  outlet: string;        // e.g., "Fox News Digital (Sports)"
+  contact?: string;      // e.g., "Scott Thompson"
+  callIn?: string;       // e.g., "732-850-2940"
+  notes?: string;        // Any additional notes
+}
 
 export interface ScheduleSlot {
   id: string;
@@ -29,7 +38,9 @@ export interface ScheduleSlot {
   startTime: string; // 'HH:MM'
   endTime: string;
   station: StationId;
-  status?: 'scheduled' | 'cancelled';
+  status?: 'scheduled' | 'cancelled' | 'tbd';
+  prCallInfo?: PRCallInfo; // PR call details when station is 'prCall'
+  notes?: string; // Additional notes for the slot
 }
 
 export type DayDate = '2026-02-06' | '2026-02-07' | '2026-02-08';
