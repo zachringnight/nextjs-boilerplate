@@ -258,7 +258,7 @@ export default function AdminPage() {
                     {player?.name || 'Unknown'}
                   </p>
                   <p className={`truncate ${largeText ? 'text-base' : 'text-sm'}`} style={{ color: station?.color }}>
-                    {station?.icon} {station && getShortStationName(station.name)}
+                    {station?.icon} {station?.name && getShortStationName(station.name)}
                   </p>
                 </div>
 

@@ -35,15 +35,13 @@ export const formatDate = (date: Date): string => {
 export const parseTimeToDate = (dateStr: string, timeStr: string): Date => {
   // Create a date string in ISO format and parse it in the event timezone
   const dateTimeStr = `${dateStr}T${timeStr}:00`;
-  // This creates a date object, but we need to account for the timezone difference
-  const date = new Date(dateTimeStr);
   
   // Get the offset difference between local timezone and event timezone
   const localDate = new Date(dateTimeStr);
   const eventDate = new Date(localDate.toLocaleString('en-US', { timeZone: EVENT_TIMEZONE }));
   const offset = localDate.getTime() - eventDate.getTime();
   
-  return new Date(date.getTime() + offset);
+  return new Date(localDate.getTime() + offset);
 };
 
 // Calculate seconds remaining until a time
