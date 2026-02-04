@@ -10,7 +10,7 @@ import Header from '../components/Header';
 import { useAppStore } from '../store';
 import { players, getPlayerById } from '../data/players';
 import { getScheduleForDay, DAY_LABELS, EVENT_DATES } from '../data/schedule';
-import { stations, getStationById } from '../data/stations';
+import { stations, getStationById, getShortStationName } from '../data/stations';
 import { StationId, ScheduleSlot } from '../types';
 import { RefreshCw, Plus, X, Save, Trash2, AlertTriangle } from 'lucide-react';
 
@@ -258,7 +258,7 @@ export default function AdminPage() {
                     {player?.name || 'Unknown'}
                   </p>
                   <p className={`truncate ${largeText ? 'text-base' : 'text-sm'}`} style={{ color: station?.color }}>
-                    {station?.icon} {station?.name.replace(' Station', '')}
+                    {station?.icon} {station && getShortStationName(station.name)}
                   </p>
                 </div>
 

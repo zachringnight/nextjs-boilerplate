@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Station, ScheduleSlot } from '../types';
+import { getShortStationName } from '../data/stations';
 import { getPlayerById } from '../data/players';
 import CountdownTimer from './CountdownTimer';
 import { useAppStore } from '../store';
@@ -27,7 +28,7 @@ export default function StationCard({ station, currentSlot, nextSlot }: StationC
         <div className="flex items-center gap-2 mb-3">
           <span className={largeText ? 'text-2xl' : 'text-xl'}>{station.icon}</span>
           <h3 className={`font-semibold text-white ${largeText ? 'text-lg' : 'text-base'}`}>
-            {station.name.replace(' Station', '')}
+            {getShortStationName(station.name)}
           </h3>
         </div>
 

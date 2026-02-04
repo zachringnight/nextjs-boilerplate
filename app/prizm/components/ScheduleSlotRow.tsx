@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { ScheduleSlot } from '../types';
 import { getPlayerById } from '../data/players';
-import { getStationById } from '../data/stations';
+import { getStationById, getShortStationName } from '../data/stations';
 import { isCurrentSlot, isPastSlot } from '../lib/time';
 import { useAppStore } from '../store';
 
@@ -84,7 +84,7 @@ export default function ScheduleSlotRow({ slot }: ScheduleSlotRowProps) {
             color: station.color
           }}
         >
-          {station.icon} {station.name.replace(' Station', '')}
+          {station.icon} {getShortStationName(station.name)}
         </div>
 
         {/* Status Badge */}
