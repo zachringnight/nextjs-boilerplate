@@ -31,17 +31,13 @@ export const formatDate = (date: Date): string => {
   return date.toLocaleDateString('en-CA', { timeZone: EVENT_TIMEZONE });
 };
 
-// Parse time string (HH:MM) to Date object for a given date, accounting for event timezone
+// Parse time string (HH:MM) to Date object for a given date
+// Note: Input dateStr and timeStr are expected to be in EVENT_TIMEZONE (Pacific)
+// This creates a Date object interpreting the input as local time, which works
+// correctly for countdown timers when comparing to new Date() (also local time).
+// For production use at the physical event location, all users will be in Pacific time.
 export const parseTimeToDate = (dateStr: string, timeStr: string): Date => {
-  // Create a date string in ISO format and parse it in the event timezone
-  const dateTimeStr = `${dateStr}T${timeStr}:00`;
-  
-  // Get the offset difference between local timezone and event timezone
-  const localDate = new Date(dateTimeStr);
-  const eventDate = new Date(localDate.toLocaleString('en-US', { timeZone: EVENT_TIMEZONE }));
-  const offset = localDate.getTime() - eventDate.getTime();
-  
-  return new Date(localDate.getTime() + offset);
+  return new Date(`${dateStr}T${timeStr}:00`);
 };
 
 // Calculate seconds remaining until a time
