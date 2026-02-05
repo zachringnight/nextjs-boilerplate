@@ -14,6 +14,15 @@ export interface Player {
   cardHistory: string[];
   moments: string[];
   signingOnly?: boolean; // Player only does signing, no rotation
+  questions?: {
+    signing?: QuestionPrompt[];
+    packRip?: QuestionPrompt[];
+  };
+}
+
+export interface QuestionPrompt {
+  type: 'question' | 'checklist';
+  text: string;
 }
 
 export interface Station {
