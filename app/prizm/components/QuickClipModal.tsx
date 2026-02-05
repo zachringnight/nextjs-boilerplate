@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useAppStore } from '../store';
-import { getSupabase } from '../lib/supabase';
 import { ClipCategory, MediaType } from '../types/database';
 import { players } from '../data/players';
 import { stations } from '../data/stations';
@@ -10,40 +9,13 @@ import { StationId } from '../types';
 import {
   X,
   Check,
-  Video,
-  Camera,
-  Mic,
   Star,
   StarOff,
   Tag,
-  Sparkles,
-  MessageSquare,
-  Film,
-  Laugh,
-  User,
-  Play,
-  Share2,
 } from 'lucide-react';
 import { cn } from '../lib/utils';
-
-// Category configuration
-const CATEGORY_CONFIG: Record<ClipCategory, { label: string; icon: typeof Video; color: string }> = {
-  highlight: { label: 'Highlight', icon: Sparkles, color: '#FFD100' },
-  interview: { label: 'Interview', icon: MessageSquare, color: '#3B82F6' },
-  broll: { label: 'B-Roll', icon: Film, color: '#8B5CF6' },
-  reaction: { label: 'Reaction', icon: Laugh, color: '#F59E0B' },
-  signing: { label: 'Signing', icon: User, color: '#22C55E' },
-  pack_rip: { label: 'Pack Rip', icon: Play, color: '#EF4444' },
-  general: { label: 'General', icon: Video, color: '#9CA3AF' },
-  blooper: { label: 'Blooper', icon: Laugh, color: '#EC4899' },
-  social: { label: 'Social', icon: Share2, color: '#06B6D4' },
-};
-
-const MEDIA_CONFIG: Record<MediaType, { label: string; icon: typeof Video }> = {
-  video: { label: 'Video', icon: Video },
-  photo: { label: 'Photo', icon: Camera },
-  audio: { label: 'Audio', icon: Mic },
-};
+import { CATEGORY_CONFIG, MEDIA_CONFIG } from '../lib/clip-constants';
+import { syncClipInsert } from '../lib/clip-sync';
 
 export default function QuickClipModal() {
   const {
@@ -75,32 +47,6 @@ export default function QuickClipModal() {
     }
   }, [clipModalOpen, quickMarkCategory]);
 
-  // Sync to Supabase
-  const syncClipToSupabase = useCallback(async (clipData: Parameters<typeof addClip>[0]) => {
-    const supabase = getSupabase();
-    if (supabase && navigator.onLine) {
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await (supabase as any).from('clip_markers').insert({
-          timestamp: new Date().toISOString(),
-          category: clipData.category || 'general',
-          media_type: clipData.media_type || 'video',
-          status: 'marked',
-          tags: clipData.tags || [],
-          notes: clipData.notes || null,
-          player_id: clipData.player_id || null,
-          station_id: clipData.station_id || null,
-          timecode: clipData.timecode || null,
-          camera: clipData.camera || null,
-          crew_member: clipData.crew_member || null,
-          rating: clipData.rating || null,
-        });
-      } catch (err) {
-        console.error('Error syncing clip to Supabase:', err);
-      }
-    }
-  }, []);
-
   // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -119,7 +65,7 @@ export default function QuickClipModal() {
     };
 
     addClip(clipData);
-    syncClipToSupabase(clipData);
+    syncClipInsert(clipData);
     setQuickMarkCategory(category);
 
     // Reset form

@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { useAppStore } from '../store';
-import { getSupabase } from '../lib/supabase';
 import { ClipCategory } from '../types/database';
 import { StationId } from '../types';
 import { stations as stationData, getStationById } from '../data/stations';
@@ -12,34 +11,16 @@ import { formatDate, isCurrentSlot } from '../lib/time';
 import {
   Clapperboard,
   ChevronUp,
-  Sparkles,
-  MessageSquare,
-  Film,
-  Laugh,
-  User,
-  Play,
-  Video,
-  Share2,
   X,
   Check,
   Clock,
   Zap,
+  Film,
   Eye,
 } from 'lucide-react';
 import { cn, hapticFeedback } from '../lib/utils';
-
-// Category configuration
-const CATEGORY_CONFIG: Record<ClipCategory, { label: string; icon: typeof Video; color: string; shortcut: string }> = {
-  highlight: { label: 'Highlight', icon: Sparkles, color: '#FFD100', shortcut: 'H' },
-  interview: { label: 'Interview', icon: MessageSquare, color: '#3B82F6', shortcut: 'I' },
-  broll: { label: 'B-Roll', icon: Film, color: '#8B5CF6', shortcut: 'B' },
-  reaction: { label: 'Reaction', icon: Laugh, color: '#F59E0B', shortcut: 'R' },
-  signing: { label: 'Signing', icon: User, color: '#22C55E', shortcut: 'S' },
-  pack_rip: { label: 'Pack Rip', icon: Play, color: '#EF4444', shortcut: 'P' },
-  general: { label: 'General', icon: Video, color: '#9CA3AF', shortcut: 'G' },
-  blooper: { label: 'Blooper', icon: Laugh, color: '#EC4899', shortcut: 'L' },
-  social: { label: 'Social', icon: Share2, color: '#06B6D4', shortcut: 'O' },
-};
+import { CATEGORY_CONFIG } from '../lib/clip-constants';
+import { syncClipInsert } from '../lib/clip-sync';
 
 // Map station IDs to likely clip categories
 const STATION_CATEGORY_MAP: Partial<Record<StationId, ClipCategory>> = {
@@ -82,12 +63,19 @@ export default function QuickClipButton() {
   // Don't show on the clips page itself
   const isClipsPage = pathname === '/prizm/clips';
 
+  // Tick counter that increments every 30s to refresh active-station checks
+  const [tick, setTick] = useState(0);
+
   useEffect(() => {
     setMounted(true);
+    const id = setInterval(() => setTick(t => t + 1), 30_000);
+    return () => clearInterval(id);
   }, []);
 
   // Get currently active stations from the live schedule
   const activeStations = useMemo((): ActiveStationInfo[] => {
+    // `tick` is listed so the memo recalculates as time passes
+    void tick;
     const now = new Date();
     const today = formatDate(now);
 
@@ -112,7 +100,7 @@ export default function QuickClipButton() {
           endTime: slot.endTime,
         };
       });
-  }, [schedule]);
+  }, [schedule, tick]);
 
   // Get recent clips (last 3)
   const recentClips = useMemo(() => {
@@ -134,39 +122,19 @@ export default function QuickClipButton() {
     });
   }, [clips]);
 
-  // Sync with Supabase when a clip is added
-  const syncClipToSupabase = useCallback(async (clipData: Parameters<typeof addClip>[0]) => {
-    const supabase = getSupabase();
-    if (supabase && navigator.onLine) {
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await (supabase as any).from('clip_markers').insert({
-          timestamp: new Date().toISOString(),
-          category: clipData.category || 'general',
-          media_type: clipData.media_type || 'video',
-          status: 'marked',
-          tags: clipData.tags || [],
-          notes: clipData.notes || null,
-          player_id: clipData.player_id || null,
-          station_id: clipData.station_id || null,
-          timecode: clipData.timecode || null,
-          camera: clipData.camera || null,
-          crew_member: clipData.crew_member || null,
-          rating: clipData.rating || null,
-        });
-      } catch (err) {
-        console.error('Error syncing clip to Supabase:', err);
-      }
-    }
-  }, []);
+  // Toast timeout ref for cleanup on rapid-fire marking
+  const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const toastClearRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  // Show success feedback
+  // Show success feedback (clears previous timeouts on rapid marking)
   const showFeedback = useCallback((info: { station?: string; player?: string; category: string }) => {
+    clearTimeout(toastTimeoutRef.current);
+    clearTimeout(toastClearRef.current);
     setSuccessInfo(info);
     setShowSuccess(true);
     hapticFeedback([50, 30, 50]);
-    setTimeout(() => setShowSuccess(false), 1200);
-    setTimeout(() => setSuccessInfo(null), 2500);
+    toastTimeoutRef.current = setTimeout(() => setShowSuccess(false), 1200);
+    toastClearRef.current = setTimeout(() => setSuccessInfo(null), 2500);
   }, []);
 
   // Quick mark for a specific active station (auto-fills player + station + category)
@@ -178,7 +146,7 @@ export default function QuickClipButton() {
       player_id: stationInfo.playerId,
     };
     addClip(clipData);
-    syncClipToSupabase(clipData);
+    syncClipInsert(clipData);
 
     showFeedback({
       station: stationInfo.stationName,
@@ -186,28 +154,28 @@ export default function QuickClipButton() {
       category: CATEGORY_CONFIG[category].label,
     });
     setExpanded(false);
-  }, [quickMarkCategory, addClip, syncClipToSupabase, showFeedback]);
+  }, [quickMarkCategory, addClip, showFeedback]);
 
   // Quick mark - one tap to mark a clip (uses current category)
   const quickMark = useCallback(() => {
     const clipData = { category: quickMarkCategory };
     addClip(clipData);
-    syncClipToSupabase(clipData);
+    syncClipInsert(clipData);
 
     showFeedback({ category: CATEGORY_CONFIG[quickMarkCategory].label });
     setExpanded(false);
-  }, [quickMarkCategory, addClip, syncClipToSupabase, showFeedback]);
+  }, [quickMarkCategory, addClip, showFeedback]);
 
   // Mark with specific category
   const markWithCategory = useCallback((category: ClipCategory) => {
     const clipData = { category };
     addClip(clipData);
-    syncClipToSupabase(clipData);
+    syncClipInsert(clipData);
     setQuickMarkCategory(category);
 
     showFeedback({ category: CATEGORY_CONFIG[category].label });
     setExpanded(false);
-  }, [addClip, syncClipToSupabase, setQuickMarkCategory, showFeedback]);
+  }, [addClip, setQuickMarkCategory, showFeedback]);
 
   // Mark a specific station from the "all stations" grid (not necessarily live)
   const markStationById = useCallback((stationId: StationId) => {
@@ -223,7 +191,7 @@ export default function QuickClipButton() {
       player_id: liveStation?.playerId || null,
     };
     addClip(clipData);
-    syncClipToSupabase(clipData);
+    syncClipInsert(clipData);
 
     showFeedback({
       station: station?.name || stationId,
@@ -231,7 +199,7 @@ export default function QuickClipButton() {
       category: CATEGORY_CONFIG[category].label,
     });
     setExpanded(false);
-  }, [quickMarkCategory, activeStations, addClip, syncClipToSupabase, showFeedback]);
+  }, [quickMarkCategory, activeStations, addClip, showFeedback]);
 
   // Keyboard shortcuts
   useEffect(() => {
