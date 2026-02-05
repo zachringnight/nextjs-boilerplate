@@ -1,19 +1,47 @@
 'use client';
 
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Radio, Calendar, Layers, Users, MessageSquare, Clapperboard } from 'lucide-react';
+import {
+  Radio,
+  Calendar,
+  Layers,
+  Users,
+  MoreHorizontal,
+  Clapperboard,
+  Video,
+  CheckSquare,
+  FileBox,
+  StickyNote,
+  Timer,
+  Printer,
+  Settings,
+  X,
+} from 'lucide-react';
 
 const navItems = [
   { href: '/prizm', label: 'Now', icon: Radio },
   { href: '/prizm/schedule', label: 'Schedule', icon: Calendar },
   { href: '/prizm/stations', label: 'Stations', icon: Layers },
   { href: '/prizm/players', label: 'Players', icon: Users },
-  { href: '/prizm/clips', label: 'Clips', icon: Clapperboard },
+];
+
+const moreItems = [
+  { href: '/prizm/clips', label: 'Clip Markers', icon: Clapperboard, color: 'text-pink-400' },
+  { href: '/prizm/content', label: 'Content Tracking', icon: Video, color: 'text-purple-400' },
+  { href: '/prizm/checklist', label: 'Checklist', icon: CheckSquare, color: 'text-green-400' },
+  { href: '/prizm/deliverables', label: 'Deliverables', icon: FileBox, color: 'text-amber-400' },
+  { href: '/prizm/notes', label: 'Notes', icon: StickyNote, color: 'text-cyan-400' },
+  { href: '/prizm/timer', label: 'Timer', icon: Timer, color: 'text-red-400' },
+  { href: '/prizm/print', label: 'Print', icon: Printer, color: 'text-zinc-400' },
+  { href: '/prizm/admin', label: 'Admin', icon: Settings, color: 'text-zinc-400' },
 ];
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const [showMore, setShowMore] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const isActive = (href: string) => {
     if (href === '/prizm') {
@@ -22,38 +50,137 @@ export default function BottomNav() {
     return pathname.startsWith(href);
   };
 
-  return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[#0D0D0D] border-t border-[#2A2A2A] safe-area-pb">
-      <div className="flex justify-around items-center h-16 max-w-lg mx-auto">
-        {navItems.map((item) => {
-          const active = isActive(item.href);
-          const Icon = item.icon;
+  const isMoreActive = moreItems.some((item) => pathname.startsWith(item.href));
 
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex flex-col items-center justify-center w-full h-full px-2 transition-colors ${
-                active
-                  ? 'text-[#FFD100]'
-                  : 'text-[#9CA3AF] hover:text-white'
-              }`}
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMore(false);
+      }
+    };
+
+    if (showMore) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showMore]);
+
+  // Close menu on navigation
+  useEffect(() => {
+    setShowMore(false);
+  }, [pathname]);
+
+  return (
+    <>
+      {/* More Menu Overlay */}
+      {showMore && (
+        <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm" onClick={() => setShowMore(false)} />
+      )}
+
+      {/* More Menu */}
+      {showMore && (
+        <div
+          ref={menuRef}
+          className="fixed bottom-20 right-4 left-4 z-50 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl overflow-hidden max-w-md mx-auto"
+        >
+          <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800">
+            <span className="font-medium text-white">More Tools</span>
+            <button
+              onClick={() => setShowMore(false)}
+              className="text-zinc-400 hover:text-white"
             >
-              <Icon
-                size={24}
-                strokeWidth={active ? 2.5 : 2}
-                className={active ? 'drop-shadow-[0_0_8px_rgba(255,209,0,0.5)]' : ''}
-              />
-              <span className={`text-xs mt-1 font-medium ${active ? 'text-[#FFD100]' : ''}`}>
-                {item.label}
-              </span>
-              {active && (
-                <div className="absolute bottom-0 w-12 h-0.5 bg-[#FFD100] rounded-full" />
-              )}
-            </Link>
-          );
-        })}
-      </div>
-    </nav>
+              <X size={20} />
+            </button>
+          </div>
+          <div className="grid grid-cols-4 gap-1 p-2">
+            {moreItems.map((item) => {
+              const active = isActive(item.href);
+              const Icon = item.icon;
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex flex-col items-center justify-center p-3 rounded-lg transition-colors ${
+                    active
+                      ? 'bg-[#FFD100]/10 text-[#FFD100]'
+                      : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
+                  }`}
+                >
+                  <Icon
+                    size={24}
+                    strokeWidth={active ? 2.5 : 2}
+                    className={active ? 'text-[#FFD100]' : item.color}
+                  />
+                  <span className="text-xs mt-1.5 text-center leading-tight">
+                    {item.label}
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Bottom Navigation */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[#0D0D0D] border-t border-[#2A2A2A] safe-area-pb">
+        <div className="flex justify-around items-center h-16 max-w-lg mx-auto">
+          {navItems.map((item) => {
+            const active = isActive(item.href);
+            const Icon = item.icon;
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex flex-col items-center justify-center w-full h-full px-2 transition-colors ${
+                  active
+                    ? 'text-[#FFD100]'
+                    : 'text-[#9CA3AF] hover:text-white'
+                }`}
+              >
+                <Icon
+                  size={24}
+                  strokeWidth={active ? 2.5 : 2}
+                  className={active ? 'drop-shadow-[0_0_8px_rgba(255,209,0,0.5)]' : ''}
+                />
+                <span className={`text-xs mt-1 font-medium ${active ? 'text-[#FFD100]' : ''}`}>
+                  {item.label}
+                </span>
+                {active && (
+                  <div className="absolute bottom-0 w-12 h-0.5 bg-[#FFD100] rounded-full" />
+                )}
+              </Link>
+            );
+          })}
+
+          {/* More Button */}
+          <button
+            onClick={() => setShowMore(!showMore)}
+            className={`flex flex-col items-center justify-center w-full h-full px-2 transition-colors ${
+              showMore || isMoreActive
+                ? 'text-[#FFD100]'
+                : 'text-[#9CA3AF] hover:text-white'
+            }`}
+          >
+            <MoreHorizontal
+              size={24}
+              strokeWidth={showMore || isMoreActive ? 2.5 : 2}
+              className={showMore || isMoreActive ? 'drop-shadow-[0_0_8px_rgba(255,209,0,0.5)]' : ''}
+            />
+            <span className={`text-xs mt-1 font-medium ${showMore || isMoreActive ? 'text-[#FFD100]' : ''}`}>
+              More
+            </span>
+            {isMoreActive && !showMore && (
+              <div className="absolute bottom-0 w-12 h-0.5 bg-[#FFD100] rounded-full" />
+            )}
+          </button>
+        </div>
+      </nav>
+    </>
   );
 }
