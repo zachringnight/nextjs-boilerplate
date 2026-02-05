@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useAppStore } from '../store';
 import {
   Radio,
   Calendar,
@@ -24,11 +25,11 @@ const navItems = [
   { href: '/prizm', label: 'Now', icon: Radio },
   { href: '/prizm/schedule', label: 'Schedule', icon: Calendar },
   { href: '/prizm/stations', label: 'Stations', icon: Layers },
-  { href: '/prizm/players', label: 'Players', icon: Users },
+  { href: '/prizm/clips', label: 'Clips', icon: Clapperboard, showBadge: true },
 ];
 
 const moreItems = [
-  { href: '/prizm/clips', label: 'Clip Markers', icon: Clapperboard, color: 'text-pink-400' },
+  { href: '/prizm/players', label: 'Players', icon: Users, color: 'text-blue-400' },
   { href: '/prizm/content', label: 'Content Tracking', icon: Video, color: 'text-purple-400' },
   { href: '/prizm/checklist', label: 'Checklist', icon: CheckSquare, color: 'text-green-400' },
   { href: '/prizm/deliverables', label: 'Deliverables', icon: FileBox, color: 'text-amber-400' },
@@ -41,7 +42,15 @@ const moreItems = [
 export default function BottomNav() {
   const pathname = usePathname();
   const [showMore, setShowMore] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const { getTodayClipCount } = useAppStore();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const todayClipCount = mounted ? getTodayClipCount() : 0;
 
   const isActive = (href: string) => {
     if (href === '/prizm') {
@@ -132,22 +141,30 @@ export default function BottomNav() {
           {navItems.map((item) => {
             const active = isActive(item.href);
             const Icon = item.icon;
+            const showBadge = 'showBadge' in item && item.showBadge && todayClipCount > 0;
 
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex flex-col items-center justify-center w-full h-full px-2 transition-colors ${
+                className={`relative flex flex-col items-center justify-center w-full h-full px-2 transition-colors ${
                   active
                     ? 'text-[#FFD100]'
                     : 'text-[#9CA3AF] hover:text-white'
                 }`}
               >
-                <Icon
-                  size={24}
-                  strokeWidth={active ? 2.5 : 2}
-                  className={active ? 'drop-shadow-[0_0_8px_rgba(255,209,0,0.5)]' : ''}
-                />
+                <div className="relative">
+                  <Icon
+                    size={24}
+                    strokeWidth={active ? 2.5 : 2}
+                    className={active ? 'drop-shadow-[0_0_8px_rgba(255,209,0,0.5)]' : ''}
+                  />
+                  {showBadge && (
+                    <div className="absolute -top-1 -right-2 bg-[#3B82F6] text-white text-[9px] font-bold min-w-[16px] h-[16px] rounded-full flex items-center justify-center px-1">
+                      {todayClipCount > 99 ? '99+' : todayClipCount}
+                    </div>
+                  )}
+                </div>
                 <span className={`text-xs mt-1 font-medium ${active ? 'text-[#FFD100]' : ''}`}>
                   {item.label}
                 </span>

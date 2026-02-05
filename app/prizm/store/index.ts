@@ -16,6 +16,10 @@ import {
   Deliverable,
   DeliverableStatus,
   DeliverableType,
+  ClipMarker,
+  ClipCategory,
+  ClipStatus,
+  MediaType,
 } from '../types';
 import { defaultSchedule } from '../data/schedule';
 import { defaultChecklist } from '../data/checklist';
@@ -91,6 +95,19 @@ interface AppState {
   setSelectedStation: (id: StationId) => void;
   selectedDay: DayDate;
   setSelectedDay: (date: DayDate) => void;
+
+  // Clips (global state for quick access)
+  clips: ClipMarker[];
+  clipModalOpen: boolean;
+  quickMarkCategory: ClipCategory;
+  setClips: (clips: ClipMarker[]) => void;
+  addClip: (clip: Partial<ClipMarker>) => ClipMarker;
+  updateClip: (id: string, updates: Partial<ClipMarker>) => void;
+  deleteClip: (id: string) => void;
+  setClipModalOpen: (open: boolean) => void;
+  setQuickMarkCategory: (category: ClipCategory) => void;
+  getTodayClipCount: () => number;
+  getHighlightCount: () => number;
 }
 
 export const useAppStore = create<AppState>()(
@@ -356,6 +373,63 @@ export const useAppStore = create<AppState>()(
       setSelectedStation: (id) => set({ selectedStation: id }),
       selectedDay: '2026-02-06',
       setSelectedDay: (date) => set({ selectedDay: date }),
+
+      // Clips
+      clips: [],
+      clipModalOpen: false,
+      quickMarkCategory: 'highlight',
+      setClips: (clips) => set({ clips }),
+      addClip: (clipData) => {
+        const now = new Date().toISOString();
+        const newClip: ClipMarker = {
+          id: `clip-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          timestamp: now,
+          timecode: clipData.timecode || null,
+          player_id: clipData.player_id || null,
+          station_id: clipData.station_id || null,
+          category: clipData.category || 'general',
+          tags: clipData.tags || [],
+          notes: clipData.notes || null,
+          rating: clipData.rating || null,
+          media_type: clipData.media_type || 'video',
+          camera: clipData.camera || null,
+          crew_member: clipData.crew_member || null,
+          status: 'marked',
+          created_at: now,
+          updated_at: now,
+        };
+        set((state) => ({
+          clips: [newClip, ...state.clips],
+        }));
+        return newClip;
+      },
+      updateClip: (id, updates) => {
+        set((state) => ({
+          clips: state.clips.map((clip) =>
+            clip.id === id
+              ? { ...clip, ...updates, updated_at: new Date().toISOString() }
+              : clip
+          ),
+        }));
+      },
+      deleteClip: (id) => {
+        set((state) => ({
+          clips: state.clips.filter((clip) => clip.id !== id),
+        }));
+      },
+      setClipModalOpen: (open) => set({ clipModalOpen: open }),
+      setQuickMarkCategory: (category) => set({ quickMarkCategory: category }),
+      getTodayClipCount: () => {
+        const state = get();
+        const today = new Date().toDateString();
+        return state.clips.filter(
+          (c) => new Date(c.timestamp).toDateString() === today
+        ).length;
+      },
+      getHighlightCount: () => {
+        const state = get();
+        return state.clips.filter((c) => c.category === 'highlight').length;
+      },
     }),
     {
       name: 'prizm-lounge-storage',
@@ -372,6 +446,8 @@ export const useAppStore = create<AppState>()(
         deliverables: state.deliverables,
         selectedStation: state.selectedStation,
         selectedDay: state.selectedDay,
+        clips: state.clips,
+        quickMarkCategory: state.quickMarkCategory,
       }),
     }
   )

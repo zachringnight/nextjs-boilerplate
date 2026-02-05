@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Header from '../components/Header';
 import { useAppStore } from '../store';
 import { getSupabase, isSupabaseConfigured } from '../lib/supabase';
-import { ClipMarker, ClipMarkerInsert, ClipCategory, ClipStatus, MediaType } from '../types/database';
+import { ClipMarker, ClipCategory, ClipStatus, MediaType } from '../types/database';
 import { StationId } from '../types';
 import { getPlayerById, players } from '../data/players';
 import { stations } from '../data/stations';
@@ -22,7 +22,6 @@ import {
   Filter,
   Clock,
   User,
-  MapPin,
   Film,
   RefreshCw,
   Wifi,
@@ -38,9 +37,9 @@ import {
   Archive,
   Eye,
   Download,
+  Keyboard,
 } from 'lucide-react';
 import { cn } from '../lib/utils';
-import { generateId } from '../lib/utils';
 
 // Category configuration with icons and colors
 const CATEGORY_CONFIG: Record<ClipCategory, { label: string; icon: typeof Video; color: string }> = {
@@ -68,19 +67,26 @@ const MEDIA_CONFIG: Record<MediaType, { label: string; icon: typeof Video }> = {
   audio: { label: 'Audio', icon: Mic },
 };
 
-// Local storage key for offline clips
-const LOCAL_STORAGE_KEY = 'prizm-clip-markers';
-
 export default function ClipsPage() {
-  const { largeText } = useAppStore();
+  const {
+    largeText,
+    clips,
+    setClips,
+    addClip,
+    updateClip,
+    deleteClip,
+    quickMarkCategory,
+    setQuickMarkCategory,
+    setClipModalOpen,
+  } = useAppStore();
   const [mounted, setMounted] = useState(false);
-  const [clips, setClips] = useState<ClipMarker[]>([]);
   const [isOnline, setIsOnline] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [expandedClip, setExpandedClip] = useState<string | null>(null);
   const [filterCategory, setFilterCategory] = useState<ClipCategory | 'all'>('all');
   const [filterStatus, setFilterStatus] = useState<ClipStatus | 'all'>('all');
+  const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
 
   // Form state
   const [category, setCategory] = useState<ClipCategory>('general');
@@ -95,10 +101,7 @@ export default function ClipsPage() {
   const [tagInput, setTagInput] = useState('');
   const [rating, setRating] = useState<number>(0);
 
-  // Quick mark mode - minimizes friction
-  const [quickMarkCategory, setQuickMarkCategory] = useState<ClipCategory>('highlight');
-
-  // Load clips from Supabase or localStorage
+  // Load clips from Supabase
   const loadClips = useCallback(async () => {
     const supabase = getSupabase();
 
@@ -115,152 +118,94 @@ export default function ClipsPage() {
 
         if (data) {
           setClips(data as ClipMarker[]);
-          // Cache to localStorage for offline use
-          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
         }
       } catch (err) {
         console.error('Error loading clips from Supabase:', err);
-        // Fall back to localStorage
-        loadFromLocalStorage();
       }
-    } else {
-      loadFromLocalStorage();
     }
-  }, [isOnline]);
+  }, [isOnline, setClips]);
 
-  const loadFromLocalStorage = () => {
-    try {
-      const cached = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (cached) {
-        setClips(JSON.parse(cached));
-      }
-    } catch (err) {
-      console.error('Error loading from localStorage:', err);
-    }
-  };
-
-  // Add a new clip marker
-  const addClip = async (clipData: Partial<ClipMarker>) => {
-    const now = new Date().toISOString();
-    const newClip: ClipMarker = {
-      id: generateId(),
-      timestamp: now,
-      timecode: clipData.timecode || null,
-      player_id: clipData.player_id || null,
-      station_id: clipData.station_id || null,
-      category: clipData.category || 'general',
-      tags: clipData.tags || [],
-      notes: clipData.notes || null,
-      rating: clipData.rating || null,
-      media_type: clipData.media_type || 'video',
-      camera: clipData.camera || null,
-      crew_member: clipData.crew_member || null,
-      status: 'marked',
-      created_at: now,
-      updated_at: now,
-    };
-
-    // Optimistically update UI
-    setClips((prev) => [newClip, ...prev]);
-
+  // Sync to Supabase when adding locally
+  const syncAddToSupabase = useCallback(async (clipData: Partial<ClipMarker>) => {
     const supabase = getSupabase();
     if (supabase && isOnline) {
       try {
-        // Prepare insert data (omit the local id - Supabase generates UUID)
-        const insertData: ClipMarkerInsert = {
-          timestamp: newClip.timestamp,
-          timecode: newClip.timecode,
-          player_id: newClip.player_id,
-          station_id: newClip.station_id,
-          category: newClip.category,
-          tags: newClip.tags,
-          notes: newClip.notes,
-          rating: newClip.rating,
-          media_type: newClip.media_type,
-          camera: newClip.camera,
-          crew_member: newClip.crew_member,
-          status: newClip.status,
-        };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error } = await (supabase as any).from('clip_markers').insert(insertData);
-
-        if (error) throw error;
-
-        // Reload to get the server-generated ID
+        await (supabase as any).from('clip_markers').insert({
+          timestamp: new Date().toISOString(),
+          category: clipData.category || 'general',
+          media_type: clipData.media_type || 'video',
+          status: 'marked',
+          tags: clipData.tags || [],
+          notes: clipData.notes || null,
+          player_id: clipData.player_id || null,
+          station_id: clipData.station_id || null,
+          timecode: clipData.timecode || null,
+          camera: clipData.camera || null,
+          crew_member: clipData.crew_member || null,
+          rating: clipData.rating || null,
+        });
+        // Reload to get server ID
         await loadClips();
       } catch (err) {
-        console.error('Error saving clip to Supabase:', err);
-        // Keep the local version and save to localStorage
-        saveToLocalStorage([newClip, ...clips]);
+        console.error('Error syncing add to Supabase:', err);
       }
-    } else {
-      saveToLocalStorage([newClip, ...clips]);
     }
-  };
+  }, [isOnline, loadClips]);
 
-  // Update clip
-  const updateClip = async (id: string, updates: Partial<ClipMarker>) => {
-    const updatedClips = clips.map((clip) =>
-      clip.id === id ? { ...clip, ...updates, updated_at: new Date().toISOString() } : clip
-    );
-    setClips(updatedClips);
-
+  // Sync update to Supabase
+  const syncUpdateToSupabase = useCallback(async (id: string, updates: Partial<ClipMarker>) => {
     const supabase = getSupabase();
     if (supabase && isOnline) {
       try {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error } = await (supabase as any)
+        await (supabase as any)
           .from('clip_markers')
           .update({ ...updates, updated_at: new Date().toISOString() })
           .eq('id', id);
-
-        if (error) throw error;
       } catch (err) {
-        console.error('Error updating clip:', err);
+        console.error('Error syncing update to Supabase:', err);
       }
     }
+  }, [isOnline]);
 
-    saveToLocalStorage(updatedClips);
-  };
-
-  // Delete clip
-  const deleteClip = async (id: string) => {
-    const updatedClips = clips.filter((clip) => clip.id !== id);
-    setClips(updatedClips);
-
+  // Sync delete to Supabase
+  const syncDeleteToSupabase = useCallback(async (id: string) => {
     const supabase = getSupabase();
     if (supabase && isOnline) {
       try {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error } = await (supabase as any).from('clip_markers').delete().eq('id', id);
-        if (error) throw error;
+        await (supabase as any).from('clip_markers').delete().eq('id', id);
       } catch (err) {
-        console.error('Error deleting clip:', err);
+        console.error('Error syncing delete to Supabase:', err);
       }
     }
+  }, [isOnline]);
 
-    saveToLocalStorage(updatedClips);
+  // Wrapper for updateClip that syncs to Supabase
+  const handleUpdateClip = (id: string, updates: Partial<ClipMarker>) => {
+    updateClip(id, updates);
+    syncUpdateToSupabase(id, updates);
   };
 
-  // Save to localStorage
-  const saveToLocalStorage = (data: ClipMarker[]) => {
-    try {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
-    } catch (err) {
-      console.error('Error saving to localStorage:', err);
-    }
+  // Wrapper for deleteClip that syncs to Supabase
+  const handleDeleteClip = (id: string) => {
+    deleteClip(id);
+    syncDeleteToSupabase(id);
   };
 
   // Quick mark - one tap to mark a clip
   const quickMark = () => {
-    addClip({ category: quickMarkCategory });
+    const clipData = { category: quickMarkCategory };
+    addClip(clipData);
+    syncAddToSupabase(clipData);
   };
 
   // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    addClip({
+    const clipData = {
       category,
       media_type: mediaType,
       player_id: playerId || null,
@@ -271,7 +216,10 @@ export default function ClipsPage() {
       crew_member: crewMember || null,
       tags,
       rating: rating || null,
-    });
+    };
+
+    addClip(clipData);
+    syncAddToSupabase(clipData);
 
     // Reset form
     setNotes('');
@@ -281,6 +229,8 @@ export default function ClipsPage() {
     setTags([]);
     setTagInput('');
     setRating(0);
+    setPlayerId('');
+    setStationId('');
     setShowAddForm(false);
   };
 
@@ -409,13 +359,22 @@ export default function ClipsPage() {
             </span>
           </div>
         </div>
-        <button
-          onClick={syncClips}
-          disabled={isSyncing || !isOnline}
-          className="p-2 text-[#9CA3AF] hover:text-white disabled:opacity-50"
-        >
-          <RefreshCw className={cn('w-4 h-4', isSyncing && 'animate-spin')} />
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setShowKeyboardHelp(true)}
+            className="p-2 text-[#9CA3AF] hover:text-white"
+            title="Keyboard shortcuts"
+          >
+            <Keyboard className="w-4 h-4" />
+          </button>
+          <button
+            onClick={syncClips}
+            disabled={isSyncing || !isOnline}
+            className="p-2 text-[#9CA3AF] hover:text-white disabled:opacity-50"
+          >
+            <RefreshCw className={cn('w-4 h-4', isSyncing && 'animate-spin')} />
+          </button>
+        </div>
       </div>
 
       {/* Quick Mark Section */}
@@ -612,7 +571,7 @@ export default function ClipsPage() {
                       {[1, 2, 3, 4, 5].map((star) => (
                         <button
                           key={star}
-                          onClick={() => updateClip(clip.id, { rating: star })}
+                          onClick={() => handleUpdateClip(clip.id, { rating: star })}
                           className="p-1"
                         >
                           {clip.rating && star <= clip.rating ? (
@@ -628,7 +587,7 @@ export default function ClipsPage() {
                     <div className="flex items-center gap-2 flex-wrap">
                       {clip.status !== 'reviewed' && (
                         <button
-                          onClick={() => updateClip(clip.id, { status: 'reviewed' })}
+                          onClick={() => handleUpdateClip(clip.id, { status: 'reviewed' })}
                           className="flex items-center gap-1 px-3 py-1.5 bg-yellow-500/20 text-yellow-400 rounded-lg text-sm hover:bg-yellow-500/30"
                         >
                           <Eye className="w-4 h-4" />
@@ -637,7 +596,7 @@ export default function ClipsPage() {
                       )}
                       {clip.status !== 'exported' && (
                         <button
-                          onClick={() => updateClip(clip.id, { status: 'exported' })}
+                          onClick={() => handleUpdateClip(clip.id, { status: 'exported' })}
                           className="flex items-center gap-1 px-3 py-1.5 bg-green-500/20 text-green-400 rounded-lg text-sm hover:bg-green-500/30"
                         >
                           <Download className="w-4 h-4" />
@@ -646,7 +605,7 @@ export default function ClipsPage() {
                       )}
                       {clip.status !== 'archived' && (
                         <button
-                          onClick={() => updateClip(clip.id, { status: 'archived' })}
+                          onClick={() => handleUpdateClip(clip.id, { status: 'archived' })}
                           className="flex items-center gap-1 px-3 py-1.5 bg-gray-500/20 text-gray-400 rounded-lg text-sm hover:bg-gray-500/30"
                         >
                           <Archive className="w-4 h-4" />
@@ -654,7 +613,7 @@ export default function ClipsPage() {
                         </button>
                       )}
                       <button
-                        onClick={() => deleteClip(clip.id)}
+                        onClick={() => handleDeleteClip(clip.id)}
                         className="flex items-center gap-1 px-3 py-1.5 bg-red-500/20 text-red-400 rounded-lg text-sm hover:bg-red-500/30 ml-auto"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -676,6 +635,62 @@ export default function ClipsPage() {
       >
         <Plus className="w-6 h-6 text-white" />
       </button>
+
+      {/* Keyboard Shortcuts Help Modal */}
+      {showKeyboardHelp && (
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+          <div className="bg-[#1A1A1A] rounded-xl max-w-md w-full overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-[#2A2A2A]">
+              <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+                <Keyboard className="w-5 h-5" />
+                Keyboard Shortcuts
+              </h2>
+              <button
+                onClick={() => setShowKeyboardHelp(false)}
+                className="p-2 text-[#9CA3AF] hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-4 space-y-3">
+              <p className="text-xs text-[#6B7280] mb-4">
+                Use these shortcuts from any page to quickly mark clips
+              </p>
+              <div className="flex items-center justify-between py-2 border-b border-[#2A2A2A]">
+                <span className="text-white text-sm">Quick mark clip</span>
+                <div className="flex items-center gap-1">
+                  <kbd className="bg-[#2A2A2A] px-2 py-1 rounded text-xs text-[#9CA3AF]">Ctrl</kbd>
+                  <span className="text-[#6B7280]">+</span>
+                  <kbd className="bg-[#2A2A2A] px-2 py-1 rounded text-xs text-[#9CA3AF]">M</kbd>
+                </div>
+              </div>
+              <div className="flex items-center justify-between py-2 border-b border-[#2A2A2A]">
+                <span className="text-white text-sm">Open detailed form</span>
+                <div className="flex items-center gap-1">
+                  <kbd className="bg-[#2A2A2A] px-2 py-1 rounded text-xs text-[#9CA3AF]">Ctrl</kbd>
+                  <span className="text-[#6B7280]">+</span>
+                  <kbd className="bg-[#2A2A2A] px-2 py-1 rounded text-xs text-[#9CA3AF]">Shift</kbd>
+                  <span className="text-[#6B7280]">+</span>
+                  <kbd className="bg-[#2A2A2A] px-2 py-1 rounded text-xs text-[#9CA3AF]">M</kbd>
+                </div>
+              </div>
+              <div className="flex items-center justify-between py-2">
+                <span className="text-white text-sm">Select category (when picker open)</span>
+                <div className="flex items-center gap-1">
+                  <kbd className="bg-[#2A2A2A] px-2 py-1 rounded text-xs text-[#9CA3AF]">1</kbd>
+                  <span className="text-[#6B7280]">-</span>
+                  <kbd className="bg-[#2A2A2A] px-2 py-1 rounded text-xs text-[#9CA3AF]">9</kbd>
+                </div>
+              </div>
+              <div className="mt-4 p-3 bg-[#FFD100]/10 rounded-lg border border-[#FFD100]/30">
+                <p className="text-[#FFD100] text-xs">
+                  The floating clip button is available on every page. Click it to mark clips instantly!
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Add Clip Modal */}
       {showAddForm && (
