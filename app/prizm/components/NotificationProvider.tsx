@@ -76,7 +76,7 @@ export default function NotificationProvider() {
     const today = formatDate(now);
 
     // Only check on event days
-    if (!EVENT_DATES.includes(today as '2026-02-06' | '2026-02-07' | '2026-02-08')) {
+    if (!(EVENT_DATES as readonly string[]).includes(today)) {
       return;
     }
 

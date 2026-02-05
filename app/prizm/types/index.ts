@@ -55,7 +55,7 @@ export interface ScheduleSlot {
   notes?: string; // Additional notes for the slot
 }
 
-export type DayDate = '2026-02-06' | '2026-02-07' | '2026-02-08';
+export type DayDate = '2026-02-05' | '2026-02-06' | '2026-02-07';
 
 // Quick Notes / Issue Logger
 export type NoteCategory = 'general' | 'technical' | 'scheduling' | 'vip' | 'media' | 'urgent';
@@ -77,46 +77,6 @@ export interface Note {
 }
 
 // =====================
-// CONTENT TRACKING
-// =====================
-
-export const CONTENT_MODES = [
-  'Player Spotlight',
-  'Pack Reveal/Hit',
-  'Signing Session',
-  'Legend Tribute',
-  'Event Promo',
-  'Behind the Scenes',
-  'Day Recap',
-  'Media Moment',
-  'Product Drop',
-  'Card Break Hype',
-] as const;
-
-export type ContentMode = typeof CONTENT_MODES[number];
-
-export const CONTENT_PLATFORMS = [
-  'Instagram',
-  'TikTok',
-  'Twitter/X',
-  'YouTube',
-  'Facebook',
-  'Internal',
-] as const;
-
-export type ContentPlatform = typeof CONTENT_PLATFORMS[number];
-
-export interface ContentTracking {
-  id: string;
-  playerId: string;
-  mode: ContentMode;
-  platform: ContentPlatform;
-  usedAt: string; // ISO timestamp
-  notes?: string;
-  createdBy?: string;
-}
-
-// =====================
 // EVENT DAYS
 // =====================
 
@@ -127,7 +87,7 @@ export type EventDay = typeof EVENT_DAYS[number];
 // DELIVERABLES TRACKER
 // =====================
 
-export const DELIVERABLE_TYPES = ['photo', 'video', 'social', 'document', 'other'] as const;
+export const DELIVERABLE_TYPES = ['photo', 'video'] as const;
 export type DeliverableType = typeof DELIVERABLE_TYPES[number];
 
 export const DELIVERABLE_STATUSES = ['pending', 'in-progress', 'completed', 'delivered'] as const;

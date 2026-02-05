@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "NWSL Media Day 2026 | Panini Shoot Packet",
-  description: "Panini × NWSL Media Day Production Packet | January 28 & 29, 2026 | MG Studio, Los Angeles",
+  title: "Prizm Lounge Production Hub | Super Bowl LX",
+  description: "Production coordination for Panini America Prizm Lounge at Super Bowl LX | Feb 5-7, 2026",
 };
 
 export default function RootLayout({
