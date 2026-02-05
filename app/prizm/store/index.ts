@@ -383,7 +383,7 @@ export const useAppStore = create<AppState>()(
       // UI
       selectedStation: 'signing',
       setSelectedStation: (id) => set({ selectedStation: id }),
-      selectedDay: '2026-02-06',
+      selectedDay: '2026-02-05',
       setSelectedDay: (date) => set({ selectedDay: date }),
 
       // Clips

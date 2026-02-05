@@ -9,7 +9,7 @@ import { z } from 'zod';
 export const StationIdSchema = z.enum(['ledWall', 'signing', 'packRip', 'prCall', 'free']);
 
 // Day date enum (event dates)
-export const DayDateSchema = z.enum(['2026-02-06', '2026-02-07', '2026-02-08']);
+export const DayDateSchema = z.enum(['2026-02-05', '2026-02-06', '2026-02-07']);
 
 // Time string validation (HH:MM format)
 export const TimeStringSchema = z.string().regex(

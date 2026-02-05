@@ -55,7 +55,7 @@ export interface ScheduleSlot {
   notes?: string; // Additional notes for the slot
 }
 
-export type DayDate = '2026-02-06' | '2026-02-07' | '2026-02-08';
+export type DayDate = '2026-02-05' | '2026-02-06' | '2026-02-07';
 
 // Quick Notes / Issue Logger
 export type NoteCategory = 'general' | 'technical' | 'scheduling' | 'vip' | 'media' | 'urgent';

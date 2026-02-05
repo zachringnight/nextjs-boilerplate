@@ -8,9 +8,10 @@ import { StationId } from '../types';
 
 interface PlayerStationChecklistProps {
   filterSigningOnly?: boolean;
+  dayPlayerIds?: Set<string> | null;
 }
 
-export default function PlayerStationChecklist({ filterSigningOnly = false }: PlayerStationChecklistProps) {
+export default function PlayerStationChecklist({ filterSigningOnly = false, dayPlayerIds = null }: PlayerStationChecklistProps) {
   const {
     largeText,
     togglePlayerStation,
@@ -21,10 +22,11 @@ export default function PlayerStationChecklist({ filterSigningOnly = false }: Pl
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedPlayers, setExpandedPlayers] = useState<Set<string>>(new Set());
 
-  // Filter players based on search and signingOnly preference
+  // Filter players based on search, signingOnly preference, and day filter
   const filteredPlayers = players.filter((player) => {
     if (filterSigningOnly && !player.signingOnly) return false;
     if (!filterSigningOnly && player.signingOnly) return false;
+    if (dayPlayerIds && !dayPlayerIds.has(player.id)) return false;
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       return (

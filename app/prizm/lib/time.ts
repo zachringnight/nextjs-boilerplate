@@ -98,9 +98,9 @@ export const isUpcomingSlot = (dateStr: string, startTime: string): boolean => {
 // Get day number (1, 2, or 3) for a date
 export const getDayNumber = (dateStr: string): number => {
   const dayMap: Record<string, number> = {
-    '2026-02-06': 1,
-    '2026-02-07': 2,
-    '2026-02-08': 3
+    '2026-02-05': 1,
+    '2026-02-06': 2,
+    '2026-02-07': 3
   };
   return dayMap[dateStr] || 1;
 };
@@ -118,7 +118,7 @@ export const isEventHours = (): boolean => {
   const currentTime = formatTime(now);
 
   // Check if it's an event day
-  if (!['2026-02-06', '2026-02-07', '2026-02-08'].includes(today)) {
+  if (!['2026-02-05', '2026-02-06', '2026-02-07'].includes(today)) {
     return false;
   }
 
@@ -140,7 +140,7 @@ export const getEventStatus = (): 'pre-show' | 'active' | 'lunch' | 'wrapped' | 
   const currentTime = formatTime(now);
 
   // Check if it's an event day
-  if (!['2026-02-06', '2026-02-07', '2026-02-08'].includes(today)) {
+  if (!['2026-02-05', '2026-02-06', '2026-02-07'].includes(today)) {
     return 'off-day';
   }
 

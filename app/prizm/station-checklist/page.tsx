@@ -1,16 +1,20 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { ClipboardCheck, RotateCcw, Users, ChevronDown } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { ClipboardCheck, RotateCcw, Users, Calendar } from 'lucide-react';
 import { useAppStore } from '../store';
 import { players } from '../data/players';
 import { stations, checklistStations } from '../data/stations';
+import { EVENT_DATES, DAY_LABELS, getPlayersForDay } from '../data/schedule';
+import { formatDate } from '../lib/time';
 import PlayerStationChecklist from '../components/PlayerStationChecklist';
 
 type ViewMode = 'players' | 'summary';
+type DayFilter = 'all' | typeof EVENT_DATES[number];
 
 export default function StationChecklistPage() {
   const {
+    schedule,
     largeText,
     playerStationCompletions,
     resetPlayerStationChecklist,
@@ -20,11 +24,39 @@ export default function StationChecklistPage() {
 
   const [viewMode, setViewMode] = useState<ViewMode>('players');
   const [showSigningOnly, setShowSigningOnly] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  // Calculate overall stats
+  // Auto-detect current day for default filter
+  const [selectedDay, setSelectedDay] = useState<DayFilter>('all');
+
+  useEffect(() => {
+    setMounted(true);
+    const today = formatDate(new Date());
+    if ((EVENT_DATES as readonly string[]).includes(today)) {
+      setSelectedDay(today as typeof EVENT_DATES[number]);
+    }
+  }, []);
+
+  // Get player IDs scheduled for the selected day
+  const dayPlayerIds = useMemo(() => {
+    if (selectedDay === 'all') return null; // null means show all
+    return new Set(getPlayersForDay(schedule, selectedDay));
+  }, [schedule, selectedDay]);
+
+  // Filter players by day and signing type
+  const filteredPlayers = useMemo(() => {
+    return players.filter((p) => {
+      if (showSigningOnly && !p.signingOnly) return false;
+      if (!showSigningOnly && p.signingOnly) return false;
+      if (dayPlayerIds && !dayPlayerIds.has(p.id)) return false;
+      return true;
+    });
+  }, [showSigningOnly, dayPlayerIds]);
+
+  // Calculate stats for currently filtered players
   const stats = useMemo(() => {
-    const rotationPlayers = players.filter((p) => !p.signingOnly);
-    const signingOnlyPlayers = players.filter((p) => p.signingOnly);
+    const rotationPlayers = filteredPlayers.filter((p) => !p.signingOnly);
+    const signingOnlyPlayers = filteredPlayers.filter((p) => p.signingOnly);
 
     const rotationCompleted = rotationPlayers.filter((p) => {
       const progress = getPlayerProgress(p.id);
@@ -43,16 +75,17 @@ export default function StationChecklistPage() {
       signingCompleted,
       totalCompletions: playerStationCompletions.filter((c) => c.completed).length,
     };
-  }, [playerStationCompletions, getPlayerProgress]);
+  }, [playerStationCompletions, getPlayerProgress, filteredPlayers]);
 
   // Station summary data
   const stationSummary = useMemo(() => {
+    const relevantPlayerIds = new Set(filteredPlayers.map((p) => p.id));
     return checklistStations.map((stationId) => {
       const station = stations.find((s) => s.id === stationId);
-      const count = getStationCompletionCount(stationId);
-      const totalPlayers = showSigningOnly
-        ? players.filter((p) => p.signingOnly).length
-        : players.filter((p) => !p.signingOnly).length;
+      const count = playerStationCompletions.filter(
+        (c) => c.stationId === stationId && c.completed && relevantPlayerIds.has(c.playerId)
+      ).length;
+      const totalPlayers = filteredPlayers.length;
       return {
         id: stationId,
         name: station?.name || stationId,
@@ -63,7 +96,23 @@ export default function StationChecklistPage() {
         percentage: totalPlayers > 0 ? Math.round((count / totalPlayers) * 100) : 0,
       };
     });
-  }, [playerStationCompletions, showSigningOnly, getStationCompletionCount]);
+  }, [playerStationCompletions, filteredPlayers]);
+
+  // Day tab colors
+  const dayColors: Record<string, string> = {
+    'all': 'bg-zinc-600',
+    [EVENT_DATES[0]]: 'bg-blue-600',
+    [EVENT_DATES[1]]: 'bg-purple-600',
+    [EVENT_DATES[2]]: 'bg-amber-600',
+  };
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+        <div className="text-zinc-400">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-zinc-950 pb-24">
@@ -90,6 +139,45 @@ export default function StationChecklistPage() {
           >
             <RotateCcw className="w-5 h-5" />
           </button>
+        </div>
+      </div>
+
+      {/* Day Filter Tabs */}
+      <div className="px-4 pt-4 pb-2">
+        <div className="flex items-center gap-2 mb-2">
+          <Calendar className="w-4 h-4 text-zinc-400" />
+          <span className={`text-zinc-400 ${largeText ? 'text-base' : 'text-sm'}`}>Filter by Day</span>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setSelectedDay('all')}
+            className={`py-2 px-4 rounded-lg text-sm font-medium transition-colors ${
+              selectedDay === 'all'
+                ? 'bg-zinc-600 text-white'
+                : 'bg-zinc-900 text-zinc-400 hover:bg-zinc-800'
+            }`}
+          >
+            All Days
+          </button>
+          {EVENT_DATES.map((date) => {
+            const isToday = formatDate(new Date()) === date;
+            return (
+              <button
+                key={date}
+                onClick={() => setSelectedDay(date)}
+                className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+                  selectedDay === date
+                    ? `${dayColors[date]} text-white`
+                    : 'bg-zinc-900 text-zinc-400 hover:bg-zinc-800'
+                }`}
+              >
+                <div>{DAY_LABELS[date]}</div>
+                {isToday && (
+                  <div className="text-[10px] opacity-80 font-normal">Today</div>
+                )}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -200,7 +288,7 @@ export default function StationChecklistPage() {
       {/* Content */}
       <div className="px-4">
         {viewMode === 'players' ? (
-          <PlayerStationChecklist filterSigningOnly={showSigningOnly} />
+          <PlayerStationChecklist filterSigningOnly={showSigningOnly} dayPlayerIds={dayPlayerIds} />
         ) : (
           /* Station Summary View */
           <div className="space-y-3">

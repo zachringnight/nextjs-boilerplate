@@ -1,14 +1,14 @@
 import { ScheduleSlot, StationId } from '../types';
 
-// Event dates
-export const EVENT_DATES = ['2026-02-06', '2026-02-07', '2026-02-08'] as const;
+// Event dates (Feb 5-7, 2026 — Thursday through Saturday)
+export const EVENT_DATES = ['2026-02-05', '2026-02-06', '2026-02-07'] as const;
 export const EVENT_TIMEZONE = 'America/Los_Angeles';
 
 // Day labels
 export const DAY_LABELS: Record<string, string> = {
-  '2026-02-06': 'Thursday',
-  '2026-02-07': 'Friday',
-  '2026-02-08': 'Saturday'
+  '2026-02-05': 'Thursday',
+  '2026-02-06': 'Friday',
+  '2026-02-07': 'Saturday'
 };
 
 // Event hours (PST)
@@ -18,7 +18,7 @@ export const EVENT_END_TIME = '18:00';
 // Generate the complete schedule based on provided itinerary
 export const defaultSchedule: ScheduleSlot[] = [
   // =====================================================
-  // THURSDAY FEB 6 - Day 1
+  // THURSDAY FEB 5 - Day 1
   // =====================================================
 
   // ---------------
@@ -29,7 +29,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'thu-gibbs-1',
     playerId: 'jahmyr-gibbs',
-    date: '2026-02-06',
+    date: '2026-02-05',
     startTime: '11:00',
     endTime: '11:15',
     station: 'ledWall',
@@ -38,7 +38,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'thu-gibbs-2',
     playerId: 'jahmyr-gibbs',
-    date: '2026-02-06',
+    date: '2026-02-05',
     startTime: '11:15',
     endTime: '12:25',
     station: 'signing',
@@ -47,7 +47,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'thu-gibbs-3',
     playerId: 'jahmyr-gibbs',
-    date: '2026-02-06',
+    date: '2026-02-05',
     startTime: '12:25',
     endTime: '12:35',
     station: 'packRip',
@@ -56,7 +56,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'thu-gibbs-4',
     playerId: 'jahmyr-gibbs',
-    date: '2026-02-06',
+    date: '2026-02-05',
     startTime: '12:35',
     endTime: '12:45',
     station: 'free',
@@ -65,7 +65,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'thu-gibbs-5',
     playerId: 'jahmyr-gibbs',
-    date: '2026-02-06',
+    date: '2026-02-05',
     startTime: '12:45',
     endTime: '13:00',
     station: 'prCall',
@@ -81,7 +81,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'thu-sewell-1',
     playerId: 'penei-sewell',
-    date: '2026-02-06',
+    date: '2026-02-05',
     startTime: '11:00',
     endTime: '13:00',
     station: 'signing',
@@ -93,7 +93,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'thu-hamilton-1',
     playerId: 'kyle-hamilton',
-    date: '2026-02-06',
+    date: '2026-02-05',
     startTime: '11:00',
     endTime: '13:00',
     station: 'signing',
@@ -109,7 +109,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'thu-ewers-1',
     playerId: 'quinn-ewers',
-    date: '2026-02-06',
+    date: '2026-02-05',
     startTime: '14:30',
     endTime: '14:45',
     station: 'ledWall',
@@ -118,7 +118,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'thu-ewers-2',
     playerId: 'quinn-ewers',
-    date: '2026-02-06',
+    date: '2026-02-05',
     startTime: '14:45',
     endTime: '16:05',
     station: 'free',
@@ -128,7 +128,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'thu-ewers-3',
     playerId: 'quinn-ewers',
-    date: '2026-02-06',
+    date: '2026-02-05',
     startTime: '16:05',
     endTime: '16:15',
     station: 'packRip',
@@ -137,7 +137,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'thu-ewers-4',
     playerId: 'quinn-ewers',
-    date: '2026-02-06',
+    date: '2026-02-05',
     startTime: '16:15',
     endTime: '16:30',
     station: 'prCall',
@@ -152,7 +152,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'thu-kmet-1',
     playerId: 'cole-kmet',
-    date: '2026-02-06',
+    date: '2026-02-05',
     startTime: '14:30',
     endTime: '16:30',
     station: 'signing',
@@ -168,7 +168,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'thu-leinart-1',
     playerId: 'matt-leinart',
-    date: '2026-02-06',
+    date: '2026-02-05',
     startTime: '15:30',
     endTime: '15:45',
     station: 'ledWall',
@@ -177,7 +177,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'thu-leinart-2',
     playerId: 'matt-leinart',
-    date: '2026-02-06',
+    date: '2026-02-05',
     startTime: '15:45',
     endTime: '16:00',
     station: 'prCall',
@@ -191,7 +191,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'thu-leinart-3',
     playerId: 'matt-leinart',
-    date: '2026-02-06',
+    date: '2026-02-05',
     startTime: '16:00',
     endTime: '16:10',
     station: 'packRip',
@@ -200,7 +200,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'thu-leinart-4',
     playerId: 'matt-leinart',
-    date: '2026-02-06',
+    date: '2026-02-05',
     startTime: '16:10',
     endTime: '16:30',
     station: 'free',
@@ -216,7 +216,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'thu-penix-tbd',
     playerId: 'michael-penix-jr',
-    date: '2026-02-06',
+    date: '2026-02-05',
     startTime: '00:00',
     endTime: '00:00',
     station: 'free',
@@ -225,7 +225,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   },
 
   // =====================================================
-  // FRIDAY FEB 7 - Day 2
+  // FRIDAY FEB 6 - Day 2
   // =====================================================
 
   // ---------------
@@ -236,7 +236,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-lawrence-1',
     playerId: 'trevor-lawrence',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '10:00',
     endTime: '10:15',
     station: 'ledWall',
@@ -245,7 +245,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-lawrence-2',
     playerId: 'trevor-lawrence',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '10:15',
     endTime: '10:25',
     station: 'signing',
@@ -254,7 +254,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-lawrence-2b',
     playerId: 'trevor-lawrence',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '10:25',
     endTime: '10:55',
     station: 'free',
@@ -264,7 +264,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-lawrence-3',
     playerId: 'trevor-lawrence',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '10:55',
     endTime: '11:05',
     station: 'packRip',
@@ -273,7 +273,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-lawrence-4',
     playerId: 'trevor-lawrence',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '11:05',
     endTime: '11:15',
     station: 'free',
@@ -283,7 +283,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-lawrence-5',
     playerId: 'trevor-lawrence',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '11:15',
     endTime: '11:30',
     station: 'prCall',
@@ -299,7 +299,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-shough-1',
     playerId: 'tyler-shough',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '10:15',
     endTime: '10:30',
     station: 'ledWall',
@@ -308,7 +308,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-shough-2',
     playerId: 'tyler-shough',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '10:30',
     endTime: '10:40',
     station: 'signing',
@@ -317,7 +317,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-shough-2b',
     playerId: 'tyler-shough',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '10:40',
     endTime: '11:05',
     station: 'free',
@@ -327,7 +327,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-shough-3',
     playerId: 'tyler-shough',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '11:05',
     endTime: '11:15',
     station: 'packRip',
@@ -336,7 +336,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-shough-4',
     playerId: 'tyler-shough',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '11:15',
     endTime: '11:30',
     station: 'prCall',
@@ -356,7 +356,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-odunze-1',
     playerId: 'rome-odunze',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '11:00',
     endTime: '11:15',
     station: 'ledWall',
@@ -365,7 +365,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-odunze-2',
     playerId: 'rome-odunze',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '11:15',
     endTime: '11:25',
     station: 'signing',
@@ -374,7 +374,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-odunze-2b',
     playerId: 'rome-odunze',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '11:25',
     endTime: '12:25',
     station: 'free',
@@ -384,7 +384,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-odunze-3',
     playerId: 'rome-odunze',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '12:25',
     endTime: '12:35',
     station: 'packRip',
@@ -393,7 +393,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-odunze-4',
     playerId: 'rome-odunze',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '12:35',
     endTime: '12:45',
     station: 'free',
@@ -402,7 +402,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-odunze-5',
     playerId: 'rome-odunze',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '12:45',
     endTime: '13:00',
     station: 'prCall',
@@ -422,7 +422,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-bailey-1',
     playerId: 'champ-bailey',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '12:00',
     endTime: '12:15',
     station: 'ledWall',
@@ -431,7 +431,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-bailey-2',
     playerId: 'champ-bailey',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '12:15',
     endTime: '12:25',
     station: 'packRip',
@@ -440,7 +440,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-bailey-3',
     playerId: 'champ-bailey',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '12:25',
     endTime: '14:00',
     station: 'free',
@@ -452,7 +452,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-law-1',
     playerId: 'ty-law',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '12:00',
     endTime: '12:15',
     station: 'ledWall',
@@ -461,7 +461,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-law-2',
     playerId: 'ty-law',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '12:15',
     endTime: '13:35',
     station: 'free',
@@ -471,7 +471,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-law-3',
     playerId: 'ty-law',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '13:35',
     endTime: '13:45',
     station: 'packRip',
@@ -480,7 +480,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-law-4',
     playerId: 'ty-law',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '13:45',
     endTime: '14:00',
     station: 'prCall',
@@ -500,7 +500,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-anderson-1',
     playerId: 'will-anderson-jr',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '12:30',
     endTime: '12:45',
     station: 'ledWall',
@@ -509,7 +509,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-anderson-2',
     playerId: 'will-anderson-jr',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '12:45',
     endTime: '14:05',
     station: 'free',
@@ -519,7 +519,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-anderson-3',
     playerId: 'will-anderson-jr',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '14:05',
     endTime: '14:15',
     station: 'packRip',
@@ -528,7 +528,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-anderson-4',
     playerId: 'will-anderson-jr',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '14:15',
     endTime: '14:30',
     station: 'prCall',
@@ -548,7 +548,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-williams-1',
     playerId: 'ricky-williams',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '13:00',
     endTime: '13:15',
     station: 'ledWall',
@@ -557,7 +557,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-williams-2',
     playerId: 'ricky-williams',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '13:15',
     endTime: '14:35',
     station: 'free',
@@ -567,7 +567,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-williams-3',
     playerId: 'ricky-williams',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '14:35',
     endTime: '14:45',
     station: 'packRip',
@@ -576,7 +576,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-williams-4',
     playerId: 'ricky-williams',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '14:45',
     endTime: '15:00',
     station: 'free',
@@ -592,7 +592,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-hutchinson-1',
     playerId: 'aidan-hutchinson',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '14:00',
     endTime: '14:15',
     station: 'ledWall',
@@ -601,7 +601,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-hutchinson-2',
     playerId: 'aidan-hutchinson',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '14:15',
     endTime: '14:25',
     station: 'signing',
@@ -610,7 +610,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-hutchinson-2b',
     playerId: 'aidan-hutchinson',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '14:25',
     endTime: '15:05',
     station: 'free',
@@ -620,7 +620,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-hutchinson-3',
     playerId: 'aidan-hutchinson',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '15:05',
     endTime: '15:15',
     station: 'packRip',
@@ -629,7 +629,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-hutchinson-4',
     playerId: 'aidan-hutchinson',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '15:15',
     endTime: '15:30',
     station: 'prCall',
@@ -649,7 +649,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-reed-1',
     playerId: 'andre-reed',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '14:30',
     endTime: '14:45',
     station: 'ledWall',
@@ -658,7 +658,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-reed-2',
     playerId: 'andre-reed',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '14:45',
     endTime: '15:05',
     station: 'signing',
@@ -667,7 +667,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-reed-2b',
     playerId: 'andre-reed',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '15:05',
     endTime: '16:05',
     station: 'free',
@@ -677,7 +677,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-reed-3',
     playerId: 'andre-reed',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '16:05',
     endTime: '16:15',
     station: 'packRip',
@@ -686,7 +686,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-reed-4',
     playerId: 'andre-reed',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '16:15',
     endTime: '16:30',
     station: 'prCall',
@@ -706,7 +706,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-moore-1',
     playerId: 'dante-moore',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '16:30',
     endTime: '16:45',
     station: 'ledWall',
@@ -715,7 +715,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-moore-2',
     playerId: 'dante-moore',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '16:45',
     endTime: '17:05',
     station: 'signing',
@@ -724,7 +724,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-moore-2b',
     playerId: 'dante-moore',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '17:05',
     endTime: '17:35',
     station: 'free',
@@ -734,7 +734,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-moore-3',
     playerId: 'dante-moore',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '17:35',
     endTime: '17:45',
     station: 'packRip',
@@ -743,7 +743,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'fri-moore-4',
     playerId: 'dante-moore',
-    date: '2026-02-07',
+    date: '2026-02-06',
     startTime: '17:45',
     endTime: '18:00',
     station: 'prCall',
@@ -756,7 +756,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   },
 
   // =====================================================
-  // SATURDAY FEB 8 - Day 3
+  // SATURDAY FEB 7 - Day 3
   // =====================================================
 
   // ---------------
@@ -767,7 +767,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'sat-henderson-1',
     playerId: 'keisean-henderson',
-    date: '2026-02-08',
+    date: '2026-02-07',
     startTime: '11:00',
     endTime: '11:15',
     station: 'ledWall',
@@ -776,7 +776,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'sat-henderson-2',
     playerId: 'keisean-henderson',
-    date: '2026-02-08',
+    date: '2026-02-07',
     startTime: '11:15',
     endTime: '12:45',
     station: 'free',
@@ -786,7 +786,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'sat-henderson-3',
     playerId: 'keisean-henderson',
-    date: '2026-02-08',
+    date: '2026-02-07',
     startTime: '12:45',
     endTime: '12:55',
     station: 'packRip',
@@ -795,7 +795,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'sat-henderson-4',
     playerId: 'keisean-henderson',
-    date: '2026-02-08',
+    date: '2026-02-07',
     startTime: '12:55',
     endTime: '13:00',
     station: 'free',
@@ -811,7 +811,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'sat-edelman-1',
     playerId: 'julian-edelman',
-    date: '2026-02-08',
+    date: '2026-02-07',
     startTime: '14:00',
     endTime: '16:00',
     station: 'signing',
@@ -827,7 +827,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'tbd-kupp-1',
     playerId: 'cooper-kupp',
-    date: '2026-02-06',
+    date: '2026-02-05',
     startTime: '00:00',
     endTime: '00:00',
     station: 'signing',
@@ -839,7 +839,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'tbd-gibson-1',
     playerId: 'antonio-gibson',
-    date: '2026-02-06',
+    date: '2026-02-05',
     startTime: '00:00',
     endTime: '00:00',
     station: 'signing',
@@ -851,7 +851,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'tbd-robinson-1',
     playerId: 'brian-robinson-jr',
-    date: '2026-02-06',
+    date: '2026-02-05',
     startTime: '00:00',
     endTime: '00:00',
     station: 'signing',
@@ -863,7 +863,7 @@ export const defaultSchedule: ScheduleSlot[] = [
   {
     id: 'tbd-mcbride-1',
     playerId: 'trey-mcbride',
-    date: '2026-02-06',
+    date: '2026-02-05',
     startTime: '00:00',
     endTime: '00:00',
     station: 'signing',

@@ -12,7 +12,6 @@ import {
   MoreHorizontal,
   Clapperboard,
   Video,
-  CheckSquare,
   ClipboardCheck,
   FileBox,
   StickyNote,
@@ -31,9 +30,8 @@ const navItems = [
 
 const moreItems = [
   { href: '/prizm/players', label: 'Players', icon: Users, color: 'text-blue-400' },
-  { href: '/prizm/station-checklist', label: 'Station Check', icon: ClipboardCheck, color: 'text-yellow-400' },
+  { href: '/prizm/station-checklist', label: 'Checklist', icon: ClipboardCheck, color: 'text-yellow-400' },
   { href: '/prizm/content', label: 'Content Tracking', icon: Video, color: 'text-purple-400' },
-  { href: '/prizm/checklist', label: 'Checklist', icon: CheckSquare, color: 'text-green-400' },
   { href: '/prizm/deliverables', label: 'Deliverables', icon: FileBox, color: 'text-amber-400' },
   { href: '/prizm/notes', label: 'Notes', icon: StickyNote, color: 'text-cyan-400' },
   { href: '/prizm/timer', label: 'Timer', icon: Timer, color: 'text-red-400' },
