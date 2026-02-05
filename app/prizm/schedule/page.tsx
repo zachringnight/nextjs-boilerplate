@@ -1,39 +1,59 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import Link from 'next/link';
 import Header from '../components/Header';
-import ScheduleSlotRow from '../components/ScheduleSlotRow';
 import { useAppStore } from '../store';
-import { getScheduleForDay, DAY_LABELS, EVENT_DATES } from '../data/schedule';
-import { formatDate, isCurrentSlot } from '../lib/time';
-import { ChevronDown } from 'lucide-react';
+import { getPlayerById } from '../data/players';
+import {
+  EVENT_DATES,
+  DAY_LABELS,
+  getPlayerArrivalsForDay,
+  getPRCallsForDay,
+  PlayerArrival,
+} from '../data/schedule';
+import { formatDate } from '../lib/time';
+import {
+  Clock,
+  Phone,
+  Users,
+  ChevronDown,
+  Calendar,
+} from 'lucide-react';
+import { cn } from '../lib/utils';
+
+// Format 24h time to 12h AM/PM
+const to12h = (time: string) => {
+  const [h, m] = time.split(':').map(Number);
+  const suffix = h >= 12 ? 'PM' : 'AM';
+  const hour = h % 12 || 12;
+  return `${hour}:${String(m).padStart(2, '0')} ${suffix}`;
+};
 
 export default function SchedulePage() {
-  const { schedule, selectedDay, setSelectedDay, largeText } = useAppStore();
+  const { schedule, largeText } = useAppStore();
+  const [selectedDate, setSelectedDate] = useState(EVENT_DATES[0] as string);
   const [mounted, setMounted] = useState(false);
-  const currentSlotRef = useRef<HTMLDivElement>(null);
+  const [showPROnly, setShowPROnly] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const daySchedule = getScheduleForDay(schedule, selectedDay);
-
-  // Find the current slot index
-  const currentSlotIndex = daySchedule.findIndex(slot =>
-    isCurrentSlot(slot.date, slot.startTime, slot.endTime)
-  );
-
-  // Find the next slot (first future slot)
   const now = new Date();
-  const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-  const nextSlotIndex = daySchedule.findIndex(slot =>
-    slot.date === formatDate(now) && slot.startTime > currentTime
+  const today = formatDate(now);
+
+  const arrivals = useMemo(
+    () => getPlayerArrivalsForDay(schedule, selectedDate),
+    [schedule, selectedDate]
   );
 
-  const scrollToNow = () => {
-    currentSlotRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  };
+  const prCalls = useMemo(
+    () => arrivals.filter((a) => a.prCall !== null),
+    [arrivals]
+  );
+
+  const displayList = showPROnly ? prCalls : arrivals;
 
   if (!mounted) {
     return (
@@ -44,7 +64,7 @@ export default function SchedulePage() {
   }
 
   return (
-    <div>
+    <div className="pb-24">
       <Header title="Schedule" />
 
       {/* Day Tabs */}
@@ -53,15 +73,17 @@ export default function SchedulePage() {
           {EVENT_DATES.map((date, index) => (
             <button
               key={date}
-              onClick={() => setSelectedDay(date as typeof selectedDay)}
-              className={`flex-1 py-3 px-4 text-center transition-colors ${
-                selectedDay === date
+              onClick={() => setSelectedDate(date)}
+              className={cn(
+                'flex-1 py-3 px-4 text-center transition-colors',
+                selectedDate === date
                   ? 'text-[#FFD100] border-b-2 border-[#FFD100] bg-[#FFD100]/5'
-                  : 'text-[#9CA3AF] hover:text-white'
-              } ${largeText ? 'text-lg' : 'text-base'}`}
+                  : 'text-[#9CA3AF] hover:text-white',
+                largeText ? 'text-lg' : 'text-base'
+              )}
             >
               <div className="font-semibold">Day {index + 1}</div>
-              <div className={`${largeText ? 'text-sm' : 'text-xs'} opacity-75`}>
+              <div className={cn('opacity-75', largeText ? 'text-sm' : 'text-xs')}>
                 {DAY_LABELS[date]}
               </div>
             </button>
@@ -69,44 +91,165 @@ export default function SchedulePage() {
         </div>
       </div>
 
-      {/* Schedule List */}
+      {/* Filter Toggle */}
+      <div className="px-4 py-3 bg-[#1A1A1A] border-b border-[#2A2A2A] flex items-center gap-2">
+        <button
+          onClick={() => setShowPROnly(false)}
+          className={cn(
+            'flex-1 py-2 rounded-lg text-sm font-medium transition-colors',
+            !showPROnly ? 'bg-[#FFD100] text-black' : 'bg-[#2A2A2A] text-[#9CA3AF] hover:bg-[#3A3A3A]'
+          )}
+        >
+          <Users className="w-4 h-4 inline mr-1.5" />
+          All Players ({arrivals.length})
+        </button>
+        <button
+          onClick={() => setShowPROnly(true)}
+          className={cn(
+            'flex-1 py-2 rounded-lg text-sm font-medium transition-colors',
+            showPROnly ? 'bg-[#8B5CF6] text-white' : 'bg-[#2A2A2A] text-[#9CA3AF] hover:bg-[#3A3A3A]'
+          )}
+        >
+          <Phone className="w-4 h-4 inline mr-1.5" />
+          PR Interviews ({prCalls.length})
+        </button>
+      </div>
+
+      {/* Player List */}
       <div className="p-4 space-y-2">
-        {daySchedule.length === 0 ? (
+        {displayList.length === 0 ? (
           <div className="text-center py-12">
-            <p className={`text-[#9CA3AF] ${largeText ? 'text-lg' : 'text-base'}`}>
-              No scheduled slots for this day
+            <Calendar className="w-12 h-12 mx-auto mb-3 text-[#6B7280] opacity-50" />
+            <p className={cn('text-[#9CA3AF]', largeText ? 'text-lg' : 'text-base')}>
+              {showPROnly ? 'No PR interviews scheduled' : 'No players scheduled'}
             </p>
           </div>
         ) : (
-          daySchedule.map((slot, index) => (
-            <div
-              key={slot.id}
-              ref={index === currentSlotIndex ? currentSlotRef : undefined}
-            >
-              {/* NEXT badge for upcoming slot */}
-              {index === nextSlotIndex && currentSlotIndex === -1 && (
-                <div className="flex items-center gap-2 mb-1 ml-2">
-                  <span className="px-2 py-0.5 rounded-full bg-[#F59E0B] text-black text-xs font-bold">
-                    NEXT
-                  </span>
+          displayList.map((arrival) => {
+            const player = getPlayerById(arrival.playerId);
+            if (!player) return null;
+
+            const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            const isHere =
+              selectedDate === today &&
+              arrival.status === 'scheduled' &&
+              arrival.arrivalTime <= currentTime &&
+              arrival.departureTime > currentTime;
+            const isDone =
+              selectedDate === today &&
+              arrival.status === 'scheduled' &&
+              arrival.departureTime <= currentTime;
+
+            return (
+              <div
+                key={arrival.playerId}
+                className={cn(
+                  'bg-[#1A1A1A] rounded-xl border overflow-hidden',
+                  isHere ? 'border-[#22c55e]' : isDone ? 'border-[#2A2A2A] opacity-60' : 'border-[#2A2A2A]'
+                )}
+              >
+                <div className="p-4 flex items-center gap-3">
+                  {/* Player Photo */}
+                  <div className="w-10 h-10 rounded-full bg-[#2A2A2A] flex items-center justify-center text-sm font-bold text-white overflow-hidden flex-shrink-0">
+                    {player.photo ? (
+                      <img
+                        src={player.photo}
+                        alt={player.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          target.parentElement!.innerHTML = player.name.charAt(0);
+                        }}
+                      />
+                    ) : (
+                      player.name.charAt(0)
+                    )}
+                  </div>
+
+                  {/* Player Info */}
+                  <div className="flex-1 min-w-0">
+                    <Link
+                      href={`/prizm/players/${player.id}`}
+                      className={cn(
+                        'font-semibold text-white hover:text-[#FFD100] transition-colors truncate block',
+                        largeText ? 'text-base' : 'text-sm'
+                      )}
+                    >
+                      {player.name}
+                    </Link>
+                    <div className={cn('text-[#9CA3AF] flex items-center gap-2', largeText ? 'text-sm' : 'text-xs')}>
+                      <span>{player.team} — {player.position}</span>
+                      {arrival.signingOnly && (
+                        <span className="px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-400 text-[10px] font-medium">
+                          SIGNING ONLY
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Time */}
+                  <div className="text-right flex-shrink-0">
+                    {arrival.status === 'tbd' ? (
+                      <span className="px-2 py-1 rounded bg-[#F59E0B]/20 text-[#F59E0B] text-xs font-medium">
+                        TBD
+                      </span>
+                    ) : (
+                      <>
+                        <div className={cn('text-white font-medium', largeText ? 'text-base' : 'text-sm')}>
+                          {to12h(arrival.arrivalTime)}
+                        </div>
+                        <div className={cn('text-[#6B7280]', largeText ? 'text-sm' : 'text-xs')}>
+                          to {to12h(arrival.departureTime)}
+                        </div>
+                      </>
+                    )}
+                    {isHere && (
+                      <span className="mt-1 inline-block px-2 py-0.5 rounded-full bg-[#22c55e] text-black text-[10px] font-bold animate-pulse">
+                        HERE
+                      </span>
+                    )}
+                    {isDone && <span className="text-[#22c55e] text-xs">Done</span>}
+                  </div>
                 </div>
-              )}
-              <ScheduleSlotRow slot={slot} />
-            </div>
-          ))
+
+                {/* PR Call Info */}
+                {arrival.prCall && (
+                  <div className="px-4 pb-3 pt-0">
+                    <div className="flex items-center gap-2 bg-[#8B5CF6]/10 border border-[#8B5CF6]/30 rounded-lg px-3 py-2">
+                      <Phone className="w-3.5 h-3.5 text-[#8B5CF6] flex-shrink-0" />
+                      <div className={cn('flex-1 min-w-0', largeText ? 'text-sm' : 'text-xs')}>
+                        <span className="text-[#8B5CF6] font-medium">
+                          {to12h(arrival.prCall.time)}
+                        </span>
+                        <span className="text-[#9CA3AF]"> — {arrival.prCall.outlet}</span>
+                        {arrival.prCall.contact && (
+                          <span className="text-[#6B7280]"> ({arrival.prCall.contact})</span>
+                        )}
+                      </div>
+                      {arrival.prCall.callIn && arrival.prCall.callIn !== 'TBD' && (
+                        <a
+                          href={`tel:${arrival.prCall.callIn}`}
+                          className="text-[#8B5CF6] text-xs font-mono hover:underline flex-shrink-0"
+                        >
+                          {arrival.prCall.callIn}
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Notes */}
+                {arrival.notes && !arrival.signingOnly && (
+                  <div className="px-4 pb-3 pt-0">
+                    <p className="text-[#6B7280] text-xs italic">{arrival.notes}</p>
+                  </div>
+                )}
+              </div>
+            );
+          })
         )}
       </div>
-
-      {/* Jump to Now Button */}
-      {currentSlotIndex !== -1 && selectedDay === formatDate(new Date()) && (
-        <button
-          onClick={scrollToNow}
-          className="jump-to-now flex items-center gap-2 px-4 py-2 bg-[#22c55e] text-black rounded-full font-semibold shadow-lg hover:bg-[#16a34a] transition-colors"
-        >
-          <ChevronDown size={20} />
-          Jump to Now
-        </button>
-      )}
     </div>
   );
 }

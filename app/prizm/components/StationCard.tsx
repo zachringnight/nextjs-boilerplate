@@ -55,9 +55,13 @@ export default function StationCard({ station, currentSlot, nextSlot }: StationC
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className={`font-medium text-white truncate ${largeText ? 'text-lg' : 'text-base'}`}>
+                <Link
+                  href={`/prizm/players/${currentSlot!.playerId}`}
+                  onClick={(e) => e.stopPropagation()}
+                  className={`font-medium text-white hover:text-[#FFD100] transition-colors truncate block ${largeText ? 'text-lg' : 'text-base'}`}
+                >
                   {currentPlayer.name}
-                </p>
+                </Link>
                 <p className={`text-[#9CA3AF] truncate ${largeText ? 'text-base' : 'text-sm'}`}>
                   {currentPlayer.team.split(' ').pop()}
                 </p>
