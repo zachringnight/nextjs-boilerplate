@@ -117,26 +117,11 @@ export interface ContentTracking {
 }
 
 // =====================
-// PRODUCTION CHECKLIST
+// EVENT DAYS
 // =====================
-
-export const CHECKLIST_CATEGORIES = ['setup', 'player', 'content', 'teardown'] as const;
-export type ChecklistCategory = typeof CHECKLIST_CATEGORIES[number];
 
 export const EVENT_DAYS = ['Thursday', 'Friday', 'Saturday'] as const;
 export type EventDay = typeof EVENT_DAYS[number];
-
-export interface ChecklistItem {
-  id: string;
-  category: ChecklistCategory;
-  title: string;
-  description?: string;
-  completed: boolean;
-  completedAt?: string; // ISO timestamp
-  assignee?: string;
-  dueDay: EventDay;
-  priority?: 'low' | 'medium' | 'high';
-}
 
 // =====================
 // DELIVERABLES TRACKER

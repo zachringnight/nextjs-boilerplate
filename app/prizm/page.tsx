@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Header from './components/Header';
 import { useAppStore } from './store';
-import { getPlayerById, players } from './data/players';
+import { getPlayerById } from './data/players';
 import {
   EVENT_DATES,
   DAY_LABELS,
@@ -12,53 +12,12 @@ import {
   getPlayersForDay,
   getCompletedPlayerCount,
 } from './data/schedule';
-import {
-  ChecklistCategory,
-  EventDay,
-  CHECKLIST_CATEGORIES,
-  EVENT_DAYS,
-} from './types';
 import { formatDate, getEventStatus, getDayNumber } from './lib/time';
 import {
-  Clock,
   Phone,
   Users,
-  CheckSquare,
-  Square,
-  ChevronDown,
-  ChevronRight,
-  Settings,
-  Video,
-  Package,
-  Trash2,
-  Plus,
-  ExternalLink,
 } from 'lucide-react';
 import { cn } from './lib/utils';
-
-// Checklist category config (matches checklist page)
-const categoryConfig: Record<
-  ChecklistCategory,
-  { icon: typeof Settings; color: string; label: string }
-> = {
-  setup: { icon: Settings, color: 'bg-blue-500', label: 'Setup' },
-  player: { icon: Users, color: 'bg-purple-500', label: 'Player' },
-  content: { icon: Video, color: 'bg-green-500', label: 'Content' },
-  teardown: { icon: Package, color: 'bg-amber-500', label: 'Teardown' },
-};
-
-const dayColors: Record<EventDay, string> = {
-  Thursday: 'bg-blue-600',
-  Friday: 'bg-purple-600',
-  Saturday: 'bg-amber-600',
-};
-
-// Map date strings to EventDay labels for checklist lookup
-const dateToEventDay: Record<string, EventDay> = {
-  '2026-02-06': 'Thursday',
-  '2026-02-07': 'Friday',
-  '2026-02-08': 'Saturday',
-};
 
 // Format 24h time to 12h AM/PM
 const to12h = (time: string) => {
@@ -72,18 +31,10 @@ export default function DailyOverviewPage() {
   const {
     schedule,
     largeText,
-    checklist,
-    toggleChecklistItem,
-    removeChecklistItem,
-    getChecklistByDay,
-    getChecklistProgress,
   } = useAppStore();
 
   const [selectedDate, setSelectedDate] = useState(EVENT_DATES[0] as string);
   const [mounted, setMounted] = useState(false);
-  const [expandedCategories, setExpandedCategories] = useState<Set<ChecklistCategory>>(
-    new Set(['setup', 'player', 'content', 'teardown'])
-  );
   const [now, setNow] = useState(new Date());
 
   useEffect(() => {
@@ -104,31 +55,6 @@ export default function DailyOverviewPage() {
     [schedule, selectedDate]
   );
 
-  // Checklist items for the selected day
-  const eventDay = dateToEventDay[selectedDate] || 'Thursday';
-  const dayItems = useMemo(() => {
-    const items = getChecklistByDay(eventDay);
-    const grouped: Record<ChecklistCategory, typeof items> = {
-      setup: [],
-      player: [],
-      content: [],
-      teardown: [],
-    };
-    items.forEach((item) => grouped[item.category].push(item));
-    return grouped;
-  }, [checklist, eventDay, getChecklistByDay]);
-
-  const checklistProgress = getChecklistProgress(eventDay);
-
-  const toggleCategory = (category: ChecklistCategory) => {
-    setExpandedCategories((prev) => {
-      const next = new Set(prev);
-      if (next.has(category)) next.delete(category);
-      else next.add(category);
-      return next;
-    });
-  };
-
   const getStatusBanner = () => {
     switch (status) {
       case 'pre-show':
@@ -145,15 +71,6 @@ export default function DailyOverviewPage() {
   };
 
   const statusBanner = getStatusBanner();
-
-  const getPriorityColor = (priority?: 'low' | 'medium' | 'high') => {
-    switch (priority) {
-      case 'high': return 'text-red-400';
-      case 'medium': return 'text-amber-400';
-      case 'low': return 'text-green-400';
-      default: return 'text-zinc-400';
-    }
-  };
 
   if (!mounted) {
     return (
@@ -354,123 +271,6 @@ export default function DailyOverviewPage() {
         )}
       </div>
 
-      {/* ======================== */}
-      {/* PRODUCTION CHECKLIST     */}
-      {/* ======================== */}
-      <div className="px-4 pb-4">
-        <h2 className={cn('font-semibold text-white mb-3 flex items-center gap-2', largeText ? 'text-xl' : 'text-lg')}>
-          <CheckSquare className="w-5 h-5 text-green-500" />
-          Production Checklist
-          <span className={cn('ml-auto font-normal text-[#9CA3AF]', largeText ? 'text-sm' : 'text-xs')}>
-            {checklistProgress.completed}/{checklistProgress.total}
-          </span>
-        </h2>
-
-        {/* Checklist progress bar */}
-        <div className="bg-[#1A1A1A] rounded-lg p-3 mb-3 border border-[#2A2A2A]">
-          <div className="h-2 bg-[#2A2A2A] rounded-full overflow-hidden">
-            <div
-              className={cn('h-full transition-all duration-300', dayColors[eventDay])}
-              style={{ width: `${checklistProgress.percentage}%` }}
-            />
-          </div>
-        </div>
-
-        {/* Checklist Categories */}
-        <div className="space-y-3">
-          {CHECKLIST_CATEGORIES.map((category) => {
-            const config = categoryConfig[category];
-            const Icon = config.icon;
-            const items = dayItems[category];
-            const isExpanded = expandedCategories.has(category);
-            const completedCat = items.filter((i) => i.completed).length;
-
-            // Hide empty teardown on non-Saturday
-            if (items.length === 0 && category === 'teardown' && eventDay !== 'Saturday') {
-              return null;
-            }
-
-            return (
-              <div key={category} className="bg-[#1A1A1A] rounded-lg border border-[#2A2A2A] overflow-hidden">
-                {/* Category Header */}
-                <button
-                  onClick={() => toggleCategory(category)}
-                  className="w-full flex items-center justify-between p-4 hover:bg-[#2A2A2A]/50 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={cn(config.color, 'p-2 rounded-lg')}>
-                      <Icon className="w-4 h-4 text-white" />
-                    </div>
-                    <div className="text-left">
-                      <div className="font-medium text-white">{config.label}</div>
-                      <div className="text-xs text-[#6B7280]">
-                        {completedCat}/{items.length} completed
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {items.length > 0 && (
-                      <div className="h-2 w-16 bg-[#2A2A2A] rounded-full overflow-hidden">
-                        <div
-                          className={cn('h-full transition-all duration-300', config.color)}
-                          style={{ width: items.length > 0 ? `${(completedCat / items.length) * 100}%` : '0%' }}
-                        />
-                      </div>
-                    )}
-                    {isExpanded ? (
-                      <ChevronDown className="w-5 h-5 text-[#6B7280]" />
-                    ) : (
-                      <ChevronRight className="w-5 h-5 text-[#6B7280]" />
-                    )}
-                  </div>
-                </button>
-
-                {/* Category Items */}
-                {isExpanded && items.length > 0 && (
-                  <div className="border-t border-[#2A2A2A]">
-                    {items.map((item) => (
-                      <div
-                        key={item.id}
-                        className="flex items-start gap-3 p-4 border-b border-[#2A2A2A] last:border-b-0"
-                      >
-                        <button
-                          onClick={() => toggleChecklistItem(item.id)}
-                          className="mt-0.5 flex-shrink-0"
-                        >
-                          {item.completed ? (
-                            <CheckSquare className="w-5 h-5 text-green-500" />
-                          ) : (
-                            <Square className="w-5 h-5 text-[#6B7280] hover:text-[#9CA3AF]" />
-                          )}
-                        </button>
-                        <div className="flex-1 min-w-0">
-                          <div className={cn('font-medium', item.completed ? 'text-[#6B7280] line-through' : 'text-white')}>
-                            {item.title}
-                          </div>
-                          {item.description && (
-                            <div className="text-sm text-[#6B7280] mt-0.5">{item.description}</div>
-                          )}
-                          {item.priority && (
-                            <span className={cn('text-xs', getPriorityColor(item.priority))}>
-                              {item.priority}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {isExpanded && items.length === 0 && (
-                  <div className="p-4 text-center text-[#6B7280] text-sm border-t border-[#2A2A2A]">
-                    No {config.label.toLowerCase()} tasks for {eventDay}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
     </div>
   );
 }

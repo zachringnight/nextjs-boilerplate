@@ -10,8 +10,6 @@ import {
   ContentMode,
   ContentPlatform,
   CONTENT_MODES,
-  ChecklistItem,
-  ChecklistCategory,
   EventDay,
   Deliverable,
   DeliverableStatus,
@@ -24,7 +22,6 @@ import {
 } from '../types';
 import { checklistStations } from '../data/stations';
 import { defaultSchedule } from '../data/schedule';
-import { defaultChecklist } from '../data/checklist';
 import { defaultDeliverables } from '../data/deliverables';
 
 interface AppState {
@@ -68,17 +65,6 @@ interface AppState {
   getUnusedModes: (playerId: string) => ContentMode[];
   getContentForPlayer: (playerId: string) => ContentTracking[];
   clearContentTracking: () => void;
-
-  // Checklist
-  checklist: ChecklistItem[];
-  toggleChecklistItem: (itemId: string) => void;
-  updateChecklistItem: (itemId: string, updates: Partial<ChecklistItem>) => void;
-  addChecklistItem: (item: Omit<ChecklistItem, 'id'>) => string;
-  removeChecklistItem: (itemId: string) => void;
-  resetChecklist: () => void;
-  getChecklistByDay: (day: EventDay) => ChecklistItem[];
-  getChecklistByCategory: (category: ChecklistCategory) => ChecklistItem[];
-  getChecklistProgress: (day?: EventDay) => { completed: number; total: number; percentage: number };
 
   // Deliverables
   deliverables: Deliverable[];
@@ -257,65 +243,6 @@ export const useAppStore = create<AppState>()(
         return state.contentTracking.filter((t) => t.playerId === playerId);
       },
       clearContentTracking: () => set({ contentTracking: [] }),
-
-      // Checklist
-      checklist: defaultChecklist,
-      toggleChecklistItem: (itemId) => {
-        const now = new Date().toISOString();
-        set((state) => ({
-          checklist: state.checklist.map((item) =>
-            item.id === itemId
-              ? {
-                  ...item,
-                  completed: !item.completed,
-                  completedAt: !item.completed ? now : undefined,
-                }
-              : item
-          ),
-        }));
-      },
-      updateChecklistItem: (itemId, updates) => {
-        set((state) => ({
-          checklist: state.checklist.map((item) =>
-            item.id === itemId ? { ...item, ...updates } : item
-          ),
-        }));
-      },
-      addChecklistItem: (itemData) => {
-        const id = `checklist-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-        const item: ChecklistItem = {
-          ...itemData,
-          id,
-        };
-        set((state) => ({
-          checklist: [...state.checklist, item],
-        }));
-        return id;
-      },
-      removeChecklistItem: (itemId) => {
-        set((state) => ({
-          checklist: state.checklist.filter((item) => item.id !== itemId),
-        }));
-      },
-      resetChecklist: () => set({ checklist: defaultChecklist }),
-      getChecklistByDay: (day) => {
-        const state = get();
-        return state.checklist.filter((item) => item.dueDay === day);
-      },
-      getChecklistByCategory: (category) => {
-        const state = get();
-        return state.checklist.filter((item) => item.category === category);
-      },
-      getChecklistProgress: (day) => {
-        const state = get();
-        const items = day
-          ? state.checklist.filter((item) => item.dueDay === day)
-          : state.checklist;
-        const completed = items.filter((item) => item.completed).length;
-        const total = items.length;
-        const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
-        return { completed, total, percentage };
-      },
 
       // Deliverables
       deliverables: defaultDeliverables,
@@ -536,7 +463,6 @@ export const useAppStore = create<AppState>()(
         schedule: state.schedule,
         notes: state.notes,
         contentTracking: state.contentTracking,
-        checklist: state.checklist,
         deliverables: state.deliverables,
         selectedStation: state.selectedStation,
         selectedDay: state.selectedDay,
