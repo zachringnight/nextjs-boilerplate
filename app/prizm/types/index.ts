@@ -1,5 +1,8 @@
 // Prizm Lounge Production Hub - TypeScript Types
 
+// Re-export database types
+export * from './database';
+
 export interface Player {
   id: string;
   name: string;
