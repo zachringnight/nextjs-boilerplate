@@ -1,7 +1,25 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { ScheduleSlot, StationId, DayDate, Note, NoteStatus } from '../types';
+import {
+  ScheduleSlot,
+  StationId,
+  DayDate,
+  Note,
+  NoteStatus,
+  ContentTracking,
+  ContentMode,
+  ContentPlatform,
+  CONTENT_MODES,
+  ChecklistItem,
+  ChecklistCategory,
+  EventDay,
+  Deliverable,
+  DeliverableStatus,
+  DeliverableType,
+} from '../types';
 import { defaultSchedule } from '../data/schedule';
+import { defaultChecklist } from '../data/checklist';
+import { defaultDeliverables } from '../data/deliverables';
 
 interface AppState {
   // Preferences
@@ -36,6 +54,38 @@ interface AppState {
   resolveNote: (id: string) => void;
   clearResolvedNotes: () => void;
 
+  // Content Tracking
+  contentTracking: ContentTracking[];
+  trackContent: (playerId: string, mode: ContentMode, platform: ContentPlatform, notes?: string) => string;
+  removeContentTracking: (id: string) => void;
+  hasUsedMode: (playerId: string, mode: ContentMode) => boolean;
+  getUnusedModes: (playerId: string) => ContentMode[];
+  getContentForPlayer: (playerId: string) => ContentTracking[];
+  clearContentTracking: () => void;
+
+  // Checklist
+  checklist: ChecklistItem[];
+  toggleChecklistItem: (itemId: string) => void;
+  updateChecklistItem: (itemId: string, updates: Partial<ChecklistItem>) => void;
+  addChecklistItem: (item: Omit<ChecklistItem, 'id'>) => string;
+  removeChecklistItem: (itemId: string) => void;
+  resetChecklist: () => void;
+  getChecklistByDay: (day: EventDay) => ChecklistItem[];
+  getChecklistByCategory: (category: ChecklistCategory) => ChecklistItem[];
+  getChecklistProgress: (day?: EventDay) => { completed: number; total: number; percentage: number };
+
+  // Deliverables
+  deliverables: Deliverable[];
+  updateDeliverableStatus: (id: string, status: DeliverableStatus) => void;
+  updateDeliverable: (id: string, updates: Partial<Deliverable>) => void;
+  addDeliverable: (deliverable: Omit<Deliverable, 'id'>) => string;
+  removeDeliverable: (id: string) => void;
+  resetDeliverables: () => void;
+  getDeliverablesByDay: (day: EventDay) => Deliverable[];
+  getDeliverablesByType: (type: DeliverableType) => Deliverable[];
+  getDeliverablesByStatus: (status: DeliverableStatus) => Deliverable[];
+  getDeliverablesProgress: () => { pending: number; inProgress: number; completed: number; delivered: number };
+
   // UI
   selectedStation: StationId;
   setSelectedStation: (id: StationId) => void;
@@ -45,7 +95,7 @@ interface AppState {
 
 export const useAppStore = create<AppState>()(
   persist(
-    (set, _get) => ({
+    (set, get) => ({
       // Preferences
       largeText: false,
       toggleLargeText: () => set((state) => ({ largeText: !state.largeText })),
@@ -137,6 +187,170 @@ export const useAppStore = create<AppState>()(
         }));
       },
 
+      // Content Tracking
+      contentTracking: [],
+      trackContent: (playerId, mode, platform, notes) => {
+        const id = `content-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        const now = new Date().toISOString();
+        const tracking: ContentTracking = {
+          id,
+          playerId,
+          mode,
+          platform,
+          usedAt: now,
+          notes,
+        };
+        set((state) => ({
+          contentTracking: [tracking, ...state.contentTracking],
+        }));
+        return id;
+      },
+      removeContentTracking: (id) => {
+        set((state) => ({
+          contentTracking: state.contentTracking.filter((t) => t.id !== id),
+        }));
+      },
+      hasUsedMode: (playerId, mode) => {
+        const state = get();
+        return state.contentTracking.some(
+          (t) => t.playerId === playerId && t.mode === mode
+        );
+      },
+      getUnusedModes: (playerId) => {
+        const state = get();
+        const usedModes = state.contentTracking
+          .filter((t) => t.playerId === playerId)
+          .map((t) => t.mode);
+        return CONTENT_MODES.filter((mode) => !usedModes.includes(mode));
+      },
+      getContentForPlayer: (playerId) => {
+        const state = get();
+        return state.contentTracking.filter((t) => t.playerId === playerId);
+      },
+      clearContentTracking: () => set({ contentTracking: [] }),
+
+      // Checklist
+      checklist: defaultChecklist,
+      toggleChecklistItem: (itemId) => {
+        const now = new Date().toISOString();
+        set((state) => ({
+          checklist: state.checklist.map((item) =>
+            item.id === itemId
+              ? {
+                  ...item,
+                  completed: !item.completed,
+                  completedAt: !item.completed ? now : undefined,
+                }
+              : item
+          ),
+        }));
+      },
+      updateChecklistItem: (itemId, updates) => {
+        set((state) => ({
+          checklist: state.checklist.map((item) =>
+            item.id === itemId ? { ...item, ...updates } : item
+          ),
+        }));
+      },
+      addChecklistItem: (itemData) => {
+        const id = `checklist-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        const item: ChecklistItem = {
+          ...itemData,
+          id,
+        };
+        set((state) => ({
+          checklist: [...state.checklist, item],
+        }));
+        return id;
+      },
+      removeChecklistItem: (itemId) => {
+        set((state) => ({
+          checklist: state.checklist.filter((item) => item.id !== itemId),
+        }));
+      },
+      resetChecklist: () => set({ checklist: defaultChecklist }),
+      getChecklistByDay: (day) => {
+        const state = get();
+        return state.checklist.filter((item) => item.dueDay === day);
+      },
+      getChecklistByCategory: (category) => {
+        const state = get();
+        return state.checklist.filter((item) => item.category === category);
+      },
+      getChecklistProgress: (day) => {
+        const state = get();
+        const items = day
+          ? state.checklist.filter((item) => item.dueDay === day)
+          : state.checklist;
+        const completed = items.filter((item) => item.completed).length;
+        const total = items.length;
+        const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+        return { completed, total, percentage };
+      },
+
+      // Deliverables
+      deliverables: defaultDeliverables,
+      updateDeliverableStatus: (id, status) => {
+        const now = new Date().toISOString();
+        set((state) => ({
+          deliverables: state.deliverables.map((d) =>
+            d.id === id
+              ? {
+                  ...d,
+                  status,
+                  completedAt: status === 'completed' || status === 'delivered' ? now : d.completedAt,
+                  deliveredAt: status === 'delivered' ? now : d.deliveredAt,
+                }
+              : d
+          ),
+        }));
+      },
+      updateDeliverable: (id, updates) => {
+        set((state) => ({
+          deliverables: state.deliverables.map((d) =>
+            d.id === id ? { ...d, ...updates } : d
+          ),
+        }));
+      },
+      addDeliverable: (deliverableData) => {
+        const id = `deliverable-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        const deliverable: Deliverable = {
+          ...deliverableData,
+          id,
+        };
+        set((state) => ({
+          deliverables: [...state.deliverables, deliverable],
+        }));
+        return id;
+      },
+      removeDeliverable: (id) => {
+        set((state) => ({
+          deliverables: state.deliverables.filter((d) => d.id !== id),
+        }));
+      },
+      resetDeliverables: () => set({ deliverables: defaultDeliverables }),
+      getDeliverablesByDay: (day) => {
+        const state = get();
+        return state.deliverables.filter((d) => d.dueDay === day);
+      },
+      getDeliverablesByType: (type) => {
+        const state = get();
+        return state.deliverables.filter((d) => d.type === type);
+      },
+      getDeliverablesByStatus: (status) => {
+        const state = get();
+        return state.deliverables.filter((d) => d.status === status);
+      },
+      getDeliverablesProgress: () => {
+        const state = get();
+        return {
+          pending: state.deliverables.filter((d) => d.status === 'pending').length,
+          inProgress: state.deliverables.filter((d) => d.status === 'in-progress').length,
+          completed: state.deliverables.filter((d) => d.status === 'completed').length,
+          delivered: state.deliverables.filter((d) => d.status === 'delivered').length,
+        };
+      },
+
       // UI
       selectedStation: 'signing',
       setSelectedStation: (id) => set({ selectedStation: id }),
@@ -153,6 +367,9 @@ export const useAppStore = create<AppState>()(
         recentSearches: state.recentSearches,
         schedule: state.schedule,
         notes: state.notes,
+        contentTracking: state.contentTracking,
+        checklist: state.checklist,
+        deliverables: state.deliverables,
         selectedStation: state.selectedStation,
         selectedDay: state.selectedDay,
       }),
