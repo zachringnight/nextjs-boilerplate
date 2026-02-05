@@ -7,14 +7,12 @@ import { ClipMarker } from '../types/database';
 import QuickClipButton from './QuickClipButton';
 import QuickClipModal from './QuickClipModal';
 
-const LOCAL_STORAGE_KEY = 'prizm-clip-markers';
-
 export default function ClipProvider() {
-  const { setClips, clips } = useAppStore();
+  const { setClips } = useAppStore();
   const isInitialLoad = useRef(true);
   const isOnline = useRef(true);
 
-  // Load clips from Supabase or localStorage
+  // Load clips from Supabase (Zustand persist handles offline fallback)
   const loadClips = useCallback(async () => {
     const supabase = getSupabase();
 
@@ -24,39 +22,19 @@ export default function ClipProvider() {
         const { data, error } = await (supabase as any)
           .from('clip_markers')
           .select('*')
-          .order('timestamp', { ascending: false })
-          .limit(100);
+          .order('timestamp', { ascending: false });
 
         if (error) throw error;
 
         if (data) {
           setClips(data as ClipMarker[]);
-          // Cache to localStorage for offline use
-          try {
-            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
-          } catch (e) {
-            console.error('Error caching clips to localStorage:', e);
-          }
         }
       } catch (err) {
         console.error('Error loading clips from Supabase:', err);
-        loadFromLocalStorage();
+        // Zustand persist already has clips cached in localStorage — no extra fallback needed
       }
-    } else {
-      loadFromLocalStorage();
     }
-  }, [setClips]);
-
-  const loadFromLocalStorage = useCallback(() => {
-    try {
-      const cached = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (cached) {
-        const parsedClips = JSON.parse(cached);
-        setClips(parsedClips);
-      }
-    } catch (err) {
-      console.error('Error loading from localStorage:', err);
-    }
+    // When offline, Zustand's persisted state already has the clips
   }, [setClips]);
 
   // Initial load and online status
@@ -106,17 +84,6 @@ export default function ClipProvider() {
       supabase.removeChannel(channel);
     };
   }, [loadClips]);
-
-  // Keep localStorage in sync with store changes
-  useEffect(() => {
-    if (clips.length > 0) {
-      try {
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(clips));
-      } catch (e) {
-        console.error('Error saving clips to localStorage:', e);
-      }
-    }
-  }, [clips]);
 
   return (
     <>

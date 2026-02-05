@@ -410,9 +410,11 @@ export const useAppStore = create<AppState>()(
           created_at: now,
           updated_at: now,
         };
-        set((state) => ({
-          clips: [newClip, ...state.clips],
-        }));
+        set((state) => {
+          const updated = [newClip, ...state.clips];
+          // Cap at 500 to prevent localStorage overflow
+          return { clips: updated.length > 500 ? updated.slice(0, 500) : updated };
+        });
         return newClip;
       },
       updateClip: (id, updates) => {
