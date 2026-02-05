@@ -111,8 +111,7 @@ export default function ClipsPage() {
         const { data, error } = await (supabase as any)
           .from('clip_markers')
           .select('*')
-          .order('timestamp', { ascending: false })
-          .limit(100);
+          .order('timestamp', { ascending: false });
 
         if (error) throw error;
 
