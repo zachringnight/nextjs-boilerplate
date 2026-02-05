@@ -145,7 +145,7 @@ export default function PrintPage() {
           {printType === 'full' && (
             <>
               <h1>Prizm Lounge - Complete Event Schedule</h1>
-              <h2>Super Bowl LX • February 6-8, 2026</h2>
+              <h2>Super Bowl LX • February 5-7, 2026</h2>
               {EVENT_DATES.map((date) => (
                 <div key={date} style={{ marginBottom: '2rem' }}>
                   <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.5rem', borderBottom: '1px solid #ddd', paddingBottom: '0.25rem' }}>
