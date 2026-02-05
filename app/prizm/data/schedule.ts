@@ -1031,6 +1031,13 @@ export const getPlayerArrivalsForDay = (
     const departureTime = scheduled.length > 0 ? scheduled[scheduled.length - 1].endTime : '00:00';
     const isTbd = sorted.every((s) => s.status === 'tbd') || arrivalTime === '00:00';
 
+    // Skip players whose date AND time are completely TBD (not assigned to this day)
+    // These are players with notes containing "Date/Time TBD" who shouldn't appear in daily schedules
+    const hasDateTimeTBD = sorted.some((s) => s.notes?.includes('Date/Time TBD'));
+    if (arrivalTime === '00:00' && scheduled.length === 0 && hasDateTimeTBD) {
+      return;
+    }
+
     // Signing only = every non-free station is 'signing'
     const nonFreeStations = sorted.filter((s) => s.station !== 'free').map((s) => s.station);
     const signingOnly = nonFreeStations.length > 0 && nonFreeStations.every((s) => s === 'signing');
