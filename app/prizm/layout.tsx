@@ -4,6 +4,7 @@ import GlobalSearch from './components/GlobalSearch';
 import ServiceWorkerRegistration from './components/ServiceWorkerRegistration';
 import NotificationProvider from './components/NotificationProvider';
 import AppErrorBoundary from './components/AppErrorBoundary';
+import ClipProvider from './components/ClipProvider';
 import './prizm.css';
 
 export const metadata: Metadata = {
@@ -39,6 +40,7 @@ export default function PrizmLayout({
       <ServiceWorkerRegistration />
       <NotificationProvider />
       <GlobalSearch />
+      <ClipProvider />
       <AppErrorBoundary>
         <main className="pb-20">
           {children}
