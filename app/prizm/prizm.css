@@ -286,3 +286,100 @@ html {
 .print-preview tr:nth-child(even) {
   background: #f9f9f9;
 }
+
+/* ===================== */
+/* Quick Clip Button     */
+/* ===================== */
+
+/* Pulse ring around FAB when stations are live */
+@keyframes quick-clip-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  70% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+.quick-clip-pulse-ring {
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 2px solid #FFD100;
+  animation: quick-clip-pulse 2s ease-out infinite;
+  pointer-events: none;
+}
+
+/* Live dot blink */
+@keyframes quick-clip-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.quick-clip-live-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #22C55E;
+  animation: quick-clip-blink 1.5s ease-in-out infinite;
+}
+
+/* Toast enter/exit */
+@keyframes quick-clip-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes quick-clip-toast-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.95);
+  }
+}
+
+.quick-clip-toast-enter {
+  animation: quick-clip-toast-in 0.25s ease-out forwards;
+}
+
+.quick-clip-toast-exit {
+  animation: quick-clip-toast-out 0.4s ease-in forwards;
+}
+
+/* Panel slide-up */
+@keyframes quick-clip-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.quick-clip-panel {
+  animation: quick-clip-panel-in 0.2s ease-out;
+  transform-origin: bottom right;
+}
+
+/* FAB glow when live */
+.quick-clip-fab-live {
+  box-shadow: 0 0 0 0 rgba(255, 209, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.3);
+}
