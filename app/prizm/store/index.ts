@@ -6,18 +6,12 @@ import {
   DayDate,
   Note,
   NoteStatus,
-  ContentTracking,
-  ContentMode,
-  ContentPlatform,
-  CONTENT_MODES,
   EventDay,
   Deliverable,
   DeliverableStatus,
   DeliverableType,
   ClipMarker,
   ClipCategory,
-  ClipStatus,
-  MediaType,
   PlayerStationCompletion,
 } from '../types';
 import { checklistStations } from '../data/stations';
@@ -56,15 +50,6 @@ interface AppState {
   deleteNote: (id: string) => void;
   resolveNote: (id: string) => void;
   clearResolvedNotes: () => void;
-
-  // Content Tracking
-  contentTracking: ContentTracking[];
-  trackContent: (playerId: string, mode: ContentMode, platform: ContentPlatform, notes?: string) => string;
-  removeContentTracking: (id: string) => void;
-  hasUsedMode: (playerId: string, mode: ContentMode) => boolean;
-  getUnusedModes: (playerId: string) => ContentMode[];
-  getContentForPlayer: (playerId: string) => ContentTracking[];
-  clearContentTracking: () => void;
 
   // Deliverables
   deliverables: Deliverable[];
@@ -202,48 +187,6 @@ export const useAppStore = create<AppState>()(
         }));
       },
 
-      // Content Tracking
-      contentTracking: [],
-      trackContent: (playerId, mode, platform, notes) => {
-        const id = `content-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-        const now = new Date().toISOString();
-        const tracking: ContentTracking = {
-          id,
-          playerId,
-          mode,
-          platform,
-          usedAt: now,
-          notes,
-        };
-        set((state) => ({
-          contentTracking: [tracking, ...state.contentTracking],
-        }));
-        return id;
-      },
-      removeContentTracking: (id) => {
-        set((state) => ({
-          contentTracking: state.contentTracking.filter((t) => t.id !== id),
-        }));
-      },
-      hasUsedMode: (playerId, mode) => {
-        const state = get();
-        return state.contentTracking.some(
-          (t) => t.playerId === playerId && t.mode === mode
-        );
-      },
-      getUnusedModes: (playerId) => {
-        const state = get();
-        const usedModes = state.contentTracking
-          .filter((t) => t.playerId === playerId)
-          .map((t) => t.mode);
-        return CONTENT_MODES.filter((mode) => !usedModes.includes(mode));
-      },
-      getContentForPlayer: (playerId) => {
-        const state = get();
-        return state.contentTracking.filter((t) => t.playerId === playerId);
-      },
-      clearContentTracking: () => set({ contentTracking: [] }),
-
       // Deliverables
       deliverables: defaultDeliverables,
       updateDeliverableStatus: (id, status) => {
@@ -310,7 +253,7 @@ export const useAppStore = create<AppState>()(
       // UI
       selectedStation: 'signing',
       setSelectedStation: (id) => set({ selectedStation: id }),
-      selectedDay: '2026-02-06',
+      selectedDay: '2026-02-05',
       setSelectedDay: (date) => set({ selectedDay: date }),
 
       // Clips
@@ -462,7 +405,6 @@ export const useAppStore = create<AppState>()(
         recentSearches: state.recentSearches,
         schedule: state.schedule,
         notes: state.notes,
-        contentTracking: state.contentTracking,
         deliverables: state.deliverables,
         selectedStation: state.selectedStation,
         selectedDay: state.selectedDay,

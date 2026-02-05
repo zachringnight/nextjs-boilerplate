@@ -5,9 +5,6 @@ import {
   FileBox,
   Camera,
   Video,
-  Share2,
-  FileText,
-  MoreHorizontal,
   Plus,
   Trash2,
   Filter,
@@ -28,13 +25,10 @@ import {
 } from '../types';
 import { players } from '../data/players';
 
-// Type config
+// Type config (photo & video only)
 const typeConfig: Record<DeliverableType, { icon: typeof Camera; color: string; label: string }> = {
   photo: { icon: Camera, color: 'bg-blue-500', label: 'Photo' },
   video: { icon: Video, color: 'bg-red-500', label: 'Video' },
-  social: { icon: Share2, color: 'bg-purple-500', label: 'Social' },
-  document: { icon: FileText, color: 'bg-amber-500', label: 'Document' },
-  other: { icon: MoreHorizontal, color: 'bg-zinc-500', label: 'Other' },
 };
 
 // Status config
@@ -56,13 +50,9 @@ export default function DeliverablesPage() {
   const {
     deliverables,
     updateDeliverableStatus,
-    updateDeliverable,
     addDeliverable,
     removeDeliverable,
     resetDeliverables,
-    getDeliverablesByDay,
-    getDeliverablesByType,
-    getDeliverablesByStatus,
     getDeliverablesProgress,
   } = useAppStore();
 
@@ -73,9 +63,9 @@ export default function DeliverablesPage() {
   const [newDeliverable, setNewDeliverable] = useState({
     title: '',
     description: '',
-    type: 'photo' as DeliverableType,
+    type: 'video' as DeliverableType,
     dueDay: 'Thursday' as EventDay,
-    priority: 'medium' as 'low' | 'medium' | 'high',
+    priority: 'high' as 'low' | 'medium' | 'high',
     playerId: '',
   });
 
@@ -110,9 +100,9 @@ export default function DeliverablesPage() {
     setNewDeliverable({
       title: '',
       description: '',
-      type: 'photo',
+      type: 'video',
       dueDay: 'Thursday',
-      priority: 'medium',
+      priority: 'high',
       playerId: '',
     });
     setShowAddForm(false);
@@ -130,19 +120,6 @@ export default function DeliverablesPage() {
     return players.find((p) => p.id === playerId)?.name || null;
   };
 
-  const getPriorityColor = (priority?: 'low' | 'medium' | 'high') => {
-    switch (priority) {
-      case 'high':
-        return 'text-red-400 border-red-800';
-      case 'medium':
-        return 'text-amber-400 border-amber-800';
-      case 'low':
-        return 'text-green-400 border-green-800';
-      default:
-        return 'text-zinc-400 border-zinc-700';
-    }
-  };
-
   return (
     <div className="min-h-screen bg-zinc-950 pb-24">
       {/* Header */}
@@ -153,7 +130,7 @@ export default function DeliverablesPage() {
               <FileBox className="w-6 h-6 text-amber-500" />
               Deliverables
             </h1>
-            <p className="text-sm text-zinc-400 mt-1">Track photos, videos, and content deliverables</p>
+            <p className="text-sm text-zinc-400 mt-1">Video &amp; photos per player + daily recaps</p>
           </div>
           <button
             onClick={resetDeliverables}
@@ -319,42 +296,22 @@ export default function DeliverablesPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm text-zinc-400 block mb-1">Priority</label>
-              <select
-                value={newDeliverable.priority}
-                onChange={(e) =>
-                  setNewDeliverable({
-                    ...newDeliverable,
-                    priority: e.target.value as 'low' | 'medium' | 'high',
-                  })
-                }
-                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white"
-              >
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="text-sm text-zinc-400 block mb-1">Player (optional)</label>
-              <select
-                value={newDeliverable.playerId}
-                onChange={(e) =>
-                  setNewDeliverable({ ...newDeliverable, playerId: e.target.value })
-                }
-                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white"
-              >
-                <option value="">No player</option>
-                {players.map((player) => (
-                  <option key={player.id} value={player.id}>
-                    {player.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+          <div>
+            <label className="text-sm text-zinc-400 block mb-1">Player (optional)</label>
+            <select
+              value={newDeliverable.playerId}
+              onChange={(e) =>
+                setNewDeliverable({ ...newDeliverable, playerId: e.target.value })
+              }
+              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white"
+            >
+              <option value="">No player</option>
+              {players.map((player) => (
+                <option key={player.id} value={player.id}>
+                  {player.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="flex gap-2">
@@ -383,7 +340,7 @@ export default function DeliverablesPage() {
           </div>
         ) : (
           filteredDeliverables.map((deliverable) => {
-            const typeConf = typeConfig[deliverable.type];
+            const typeConf = typeConfig[deliverable.type] || typeConfig.video;
             const statusConf = statusConfig[deliverable.status];
             const TypeIcon = typeConf.icon;
             const StatusIcon = statusConf.icon;
@@ -392,7 +349,7 @@ export default function DeliverablesPage() {
             return (
               <div
                 key={deliverable.id}
-                className={`bg-zinc-900 border rounded-lg p-4 ${getPriorityColor(deliverable.priority).split(' ')[1]}`}
+                className="bg-zinc-900 border border-zinc-800 rounded-lg p-4"
               >
                 <div className="flex items-start gap-3">
                   {/* Type Icon */}
@@ -444,13 +401,6 @@ export default function DeliverablesPage() {
                       {playerName && (
                         <span className="text-xs bg-purple-900/50 text-purple-400 px-2 py-1 rounded">
                           {playerName}
-                        </span>
-                      )}
-
-                      {/* Priority */}
-                      {deliverable.priority && (
-                        <span className={`text-xs ${getPriorityColor(deliverable.priority).split(' ')[0]}`}>
-                          {deliverable.priority}
                         </span>
                       )}
                     </div>
