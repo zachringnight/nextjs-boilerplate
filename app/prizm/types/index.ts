@@ -24,7 +24,7 @@ export interface Station {
   questions: string[];
 }
 
-export type StationId = 'ledWall' | 'signing' | 'packRip' | 'prCall' | 'free';
+export type StationId = 'ledWall' | 'signing' | 'packRip' | 'prCall' | 'free' | 'kidReporter' | 'deacon';
 
 // PR Call information for media interviews
 export interface PRCallInfo {
@@ -152,6 +152,28 @@ export interface Deliverable {
   notes?: string;
   assignee?: string;
   priority?: 'low' | 'medium' | 'high';
+}
+
+// =====================
+// PLAYER STATION CHECKLIST
+// =====================
+
+// Tracks which stations each player has completed
+export interface PlayerStationCompletion {
+  playerId: string;
+  stationId: StationId;
+  completed: boolean;
+  completedAt?: string; // ISO timestamp
+  completedBy?: string; // Crew member who marked it
+  notes?: string;
+}
+
+// Summary of a player's station progress
+export interface PlayerStationProgress {
+  playerId: string;
+  completedStations: StationId[];
+  remainingStations: StationId[];
+  completionPercentage: number;
 }
 
 // =====================

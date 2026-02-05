@@ -64,6 +64,32 @@ export const stations: Station[] = [
       'Touch-up and refreshments',
       'Review upcoming activities'
     ]
+  },
+  {
+    id: 'kidReporter',
+    name: 'Kid Reporter',
+    icon: '🎤',
+    color: '#06b6d4',
+    questions: [
+      'What was your favorite subject in school?',
+      'If you could have any superpower, what would it be?',
+      'What advice would you give to kids who want to play sports?',
+      'Who was your hero growing up?',
+      'What is your favorite snack before a game?'
+    ]
+  },
+  {
+    id: 'deacon',
+    name: 'Deacon',
+    icon: '🙏',
+    color: '#a855f7',
+    questions: [
+      'How does faith play a role in your career?',
+      'What motivates you off the field?',
+      'Message of inspiration for fans?',
+      'How do you stay grounded?',
+      'What are you most grateful for?'
+    ]
   }
 ];
 
@@ -78,4 +104,7 @@ export const stationMap = new Map<StationId, Station>(
 );
 
 // Station order for typical rotation
-export const stationOrder: StationId[] = ['ledWall', 'signing', 'packRip', 'prCall'];
+export const stationOrder: StationId[] = ['ledWall', 'signing', 'packRip', 'prCall', 'kidReporter', 'deacon'];
+
+// Stations used for player completion checklist (excludes free/buffer)
+export const checklistStations: StationId[] = ['ledWall', 'signing', 'packRip', 'prCall', 'kidReporter', 'deacon'];
