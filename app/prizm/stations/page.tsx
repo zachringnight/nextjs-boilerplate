@@ -28,6 +28,19 @@ function StationsContent() {
 
   const station = getStationById(selectedStation);
   const stationSchedule = getScheduleForStation(schedule, selectedStation, selectedDay);
+  const isQuestionStation = selectedStation === 'signing' || selectedStation === 'packRip';
+
+  const getPlayerQuestions = (stationId: StationId, playerId: string) => {
+    const player = getPlayerById(playerId);
+    if (!player) return [];
+    if (stationId === 'signing') {
+      return player.questions?.signing ?? [];
+    }
+    if (stationId === 'packRip') {
+      return player.questions?.packRip ?? [];
+    }
+    return [];
+  };
 
   const toggleSlot = (slotId: string) => {
     setExpandedSlots(prev => {
@@ -126,6 +139,9 @@ function StationsContent() {
             const isCurrent = isCurrentSlot(slot.date, slot.startTime, slot.endTime);
             const isPast = isPastSlot(slot.date, slot.endTime);
             const isExpanded = expandedSlots.has(slot.id);
+            const playerQuestions = isQuestionStation
+              ? getPlayerQuestions(selectedStation, player.id)
+              : [];
 
             return (
               <div
@@ -240,13 +256,16 @@ function StationsContent() {
                     </div>
 
                     {/* Station Questions */}
-                    {station && (
+                    {station && isQuestionStation && (
                       <div>
                         <h4 className={`font-semibold mb-2 ${largeText ? 'text-base' : 'text-sm'}`} style={{ color: station.color }}>
                           {station.icon} Talking Points
                         </h4>
                         <ul className={`space-y-2 ${largeText ? 'text-base' : 'text-sm'}`}>
-                          {station.questions.map((q, i) => (
+                          {(playerQuestions.length > 0
+                            ? playerQuestions.map(q => q.text)
+                            : station.questions
+                          ).map((q, i) => (
                             <li key={i} className="flex items-start gap-2 text-white">
                               <span className="text-[#FFD100]">•</span>
                               {q}

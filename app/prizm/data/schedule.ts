@@ -121,8 +121,9 @@ export const defaultSchedule: ScheduleSlot[] = [
     date: '2026-02-06',
     startTime: '14:45',
     endTime: '16:05',
-    station: 'signing',
-    status: 'scheduled'
+    station: 'free',
+    status: 'scheduled',
+    notes: 'Signing omitted per plan (free time buffer)'
   },
   {
     id: 'thu-ewers-3',
@@ -202,8 +203,9 @@ export const defaultSchedule: ScheduleSlot[] = [
     date: '2026-02-06',
     startTime: '16:10',
     endTime: '16:30',
-    station: 'signing',
-    status: 'scheduled'
+    station: 'free',
+    status: 'scheduled',
+    notes: 'Signing omitted per plan (free time buffer)'
   },
 
   // ---------------
@@ -217,9 +219,9 @@ export const defaultSchedule: ScheduleSlot[] = [
     date: '2026-02-06',
     startTime: '00:00',
     endTime: '00:00',
-    station: 'signing',
+    station: 'free',
     status: 'tbd',
-    notes: 'Schedule TBD - add when times + PR info land'
+    notes: 'Schedule TBD - build LED/Pack/optional signing when times land'
   },
 
   // =====================================================
@@ -245,9 +247,19 @@ export const defaultSchedule: ScheduleSlot[] = [
     playerId: 'trevor-lawrence',
     date: '2026-02-07',
     startTime: '10:15',
-    endTime: '10:55',
+    endTime: '10:25',
     station: 'signing',
     status: 'scheduled'
+  },
+  {
+    id: 'fri-lawrence-2b',
+    playerId: 'trevor-lawrence',
+    date: '2026-02-07',
+    startTime: '10:25',
+    endTime: '10:55',
+    station: 'free',
+    status: 'scheduled',
+    notes: 'Free / Buffer'
   },
   {
     id: 'fri-lawrence-3',
@@ -298,9 +310,19 @@ export const defaultSchedule: ScheduleSlot[] = [
     playerId: 'tyler-shough',
     date: '2026-02-07',
     startTime: '10:30',
-    endTime: '11:05',
+    endTime: '10:40',
     station: 'signing',
     status: 'scheduled'
+  },
+  {
+    id: 'fri-shough-2b',
+    playerId: 'tyler-shough',
+    date: '2026-02-07',
+    startTime: '10:40',
+    endTime: '11:05',
+    station: 'free',
+    status: 'scheduled',
+    notes: 'Free / Buffer'
   },
   {
     id: 'fri-shough-3',
@@ -345,9 +367,19 @@ export const defaultSchedule: ScheduleSlot[] = [
     playerId: 'rome-odunze',
     date: '2026-02-07',
     startTime: '11:15',
-    endTime: '12:25',
+    endTime: '11:25',
     station: 'signing',
     status: 'scheduled'
+  },
+  {
+    id: 'fri-odunze-2b',
+    playerId: 'rome-odunze',
+    date: '2026-02-07',
+    startTime: '11:25',
+    endTime: '12:25',
+    station: 'free',
+    status: 'scheduled',
+    notes: 'Free / Buffer'
   },
   {
     id: 'fri-odunze-3',
@@ -386,16 +418,34 @@ export const defaultSchedule: ScheduleSlot[] = [
   // 12:00 PM – 2:00 PM Session
   // ---------------
 
-  // Champ Bailey — CB | Retired | Fri 12:00–2:00 (Signing only, no PR)
+  // Champ Bailey — CB | Retired | Fri 12:00–2:00 (No signing, no PR)
   {
     id: 'fri-bailey-1',
     playerId: 'champ-bailey',
     date: '2026-02-07',
     startTime: '12:00',
+    endTime: '12:15',
+    station: 'ledWall',
+    status: 'scheduled'
+  },
+  {
+    id: 'fri-bailey-2',
+    playerId: 'champ-bailey',
+    date: '2026-02-07',
+    startTime: '12:15',
+    endTime: '12:25',
+    station: 'packRip',
+    status: 'scheduled'
+  },
+  {
+    id: 'fri-bailey-3',
+    playerId: 'champ-bailey',
+    date: '2026-02-07',
+    startTime: '12:25',
     endTime: '14:00',
-    station: 'signing',
+    station: 'free',
     status: 'scheduled',
-    notes: 'No PR listed; LED/Pack omitted to preserve single-station rules'
+    notes: 'No PR listed; free/buffer time'
   },
 
   // Ty Law — CB | Retired | Fri 12:00–2:00
@@ -414,8 +464,9 @@ export const defaultSchedule: ScheduleSlot[] = [
     date: '2026-02-07',
     startTime: '12:15',
     endTime: '13:35',
-    station: 'signing',
-    status: 'scheduled'
+    station: 'free',
+    status: 'scheduled',
+    notes: 'Signing omitted per plan (free time buffer)'
   },
   {
     id: 'fri-law-3',
@@ -461,8 +512,9 @@ export const defaultSchedule: ScheduleSlot[] = [
     date: '2026-02-07',
     startTime: '12:45',
     endTime: '14:05',
-    station: 'signing',
-    status: 'scheduled'
+    station: 'free',
+    status: 'scheduled',
+    notes: 'Signing omitted per plan (free time buffer)'
   },
   {
     id: 'fri-anderson-3',
@@ -508,8 +560,9 @@ export const defaultSchedule: ScheduleSlot[] = [
     date: '2026-02-07',
     startTime: '13:15',
     endTime: '14:35',
-    station: 'signing',
-    status: 'scheduled'
+    station: 'free',
+    status: 'scheduled',
+    notes: 'Signing omitted per plan (free time buffer)'
   },
   {
     id: 'fri-williams-3',
@@ -550,9 +603,19 @@ export const defaultSchedule: ScheduleSlot[] = [
     playerId: 'aidan-hutchinson',
     date: '2026-02-07',
     startTime: '14:15',
-    endTime: '15:05',
+    endTime: '14:25',
     station: 'signing',
     status: 'scheduled'
+  },
+  {
+    id: 'fri-hutchinson-2b',
+    playerId: 'aidan-hutchinson',
+    date: '2026-02-07',
+    startTime: '14:25',
+    endTime: '15:05',
+    station: 'free',
+    status: 'scheduled',
+    notes: 'Free / Buffer'
   },
   {
     id: 'fri-hutchinson-3',
@@ -597,9 +660,19 @@ export const defaultSchedule: ScheduleSlot[] = [
     playerId: 'andre-reed',
     date: '2026-02-07',
     startTime: '14:45',
-    endTime: '16:05',
+    endTime: '15:05',
     station: 'signing',
     status: 'scheduled'
+  },
+  {
+    id: 'fri-reed-2b',
+    playerId: 'andre-reed',
+    date: '2026-02-07',
+    startTime: '15:05',
+    endTime: '16:05',
+    station: 'free',
+    status: 'scheduled',
+    notes: 'Free / Buffer'
   },
   {
     id: 'fri-reed-3',
@@ -644,9 +717,19 @@ export const defaultSchedule: ScheduleSlot[] = [
     playerId: 'dante-moore',
     date: '2026-02-07',
     startTime: '16:45',
-    endTime: '17:35',
+    endTime: '17:05',
     station: 'signing',
     status: 'scheduled'
+  },
+  {
+    id: 'fri-moore-2b',
+    playerId: 'dante-moore',
+    date: '2026-02-07',
+    startTime: '17:05',
+    endTime: '17:35',
+    station: 'free',
+    status: 'scheduled',
+    notes: 'Free / Buffer'
   },
   {
     id: 'fri-moore-3',
@@ -696,8 +779,9 @@ export const defaultSchedule: ScheduleSlot[] = [
     date: '2026-02-08',
     startTime: '11:15',
     endTime: '12:45',
-    station: 'signing',
-    status: 'scheduled'
+    station: 'free',
+    status: 'scheduled',
+    notes: 'Optional stickers only if ahead (free time buffer)'
   },
   {
     id: 'sat-henderson-3',
