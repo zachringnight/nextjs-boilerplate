@@ -1,13 +1,15 @@
 'use client';
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import dynamic from 'next/dynamic';
 import { players, playerCounts, getPlayerByFirstName } from '../data/players';
 import PlayerCard from './components/PlayerCard';
-import PlayerModal from './components/PlayerModal';
-import ScheduleView from './components/ScheduleView';
-import StationToolView from './components/StationToolView';
-import NowDashboard from './components/NowDashboard';
 import type { Player } from '../data/players';
+
+const PlayerModal = dynamic(() => import('./components/PlayerModal'), { ssr: false });
+const ScheduleView = dynamic(() => import('./components/ScheduleView'));
+const StationToolView = dynamic(() => import('./components/StationToolView'));
+const NowDashboard = dynamic(() => import('./components/NowDashboard'));
 import { Search, Users, Filter, Calendar, User, Radio, Zap, X, Type, AlertTriangle } from 'lucide-react';
 import { ViewMode, EVENT_INFO } from '../lib/constants';
 

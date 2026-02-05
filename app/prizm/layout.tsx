@@ -1,11 +1,13 @@
 import type { Metadata, Viewport } from 'next';
+import dynamic from 'next/dynamic';
 import BottomNav from './components/BottomNav';
 import GlobalSearch from './components/GlobalSearch';
-import ServiceWorkerRegistration from './components/ServiceWorkerRegistration';
-import NotificationProvider from './components/NotificationProvider';
 import AppErrorBoundary from './components/AppErrorBoundary';
-import ClipProvider from './components/ClipProvider';
 import './prizm.css';
+
+const ClipProvider = dynamic(() => import('./components/ClipProvider'));
+const NotificationProvider = dynamic(() => import('./components/NotificationProvider'));
+const ServiceWorkerRegistration = dynamic(() => import('./components/ServiceWorkerRegistration'));
 
 export const metadata: Metadata = {
   title: 'Prizm Lounge Production Hub',

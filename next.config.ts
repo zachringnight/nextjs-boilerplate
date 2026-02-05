@@ -37,7 +37,7 @@ const nextConfig: NextConfig = {
   // Enable experimental features for better performance
   experimental: {
     // Optimize package imports for smaller bundles
-    optimizePackageImports: ['lucide-react'],
+    optimizePackageImports: ['lucide-react', 'zod', '@supabase/supabase-js'],
   },
 
   // Customize headers for better caching
