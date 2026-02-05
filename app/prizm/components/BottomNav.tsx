@@ -2,14 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Radio, Calendar, Layers, Users, MessageSquare } from 'lucide-react';
+import { Radio, Calendar, Layers, Users, MessageSquare, Clapperboard } from 'lucide-react';
 
 const navItems = [
   { href: '/prizm', label: 'Now', icon: Radio },
   { href: '/prizm/schedule', label: 'Schedule', icon: Calendar },
   { href: '/prizm/stations', label: 'Stations', icon: Layers },
   { href: '/prizm/players', label: 'Players', icon: Users },
-  { href: '/prizm/notes', label: 'Notes', icon: MessageSquare },
+  { href: '/prizm/clips', label: 'Clips', icon: Clapperboard },
 ];
 
 export default function BottomNav() {
