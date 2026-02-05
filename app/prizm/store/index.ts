@@ -20,7 +20,9 @@ import {
   ClipCategory,
   ClipStatus,
   MediaType,
+  PlayerStationCompletion,
 } from '../types';
+import { checklistStations } from '../data/stations';
 import { defaultSchedule } from '../data/schedule';
 import { defaultChecklist } from '../data/checklist';
 import { defaultDeliverables } from '../data/deliverables';
@@ -108,6 +110,16 @@ interface AppState {
   setQuickMarkCategory: (category: ClipCategory) => void;
   getTodayClipCount: () => number;
   getHighlightCount: () => number;
+
+  // Player Station Checklist
+  playerStationCompletions: PlayerStationCompletion[];
+  togglePlayerStation: (playerId: string, stationId: StationId, completedBy?: string) => void;
+  isStationCompleted: (playerId: string, stationId: StationId) => boolean;
+  getPlayerProgress: (playerId: string) => { completed: number; total: number; percentage: number };
+  getCompletedStationsForPlayer: (playerId: string) => StationId[];
+  getRemainingStationsForPlayer: (playerId: string) => StationId[];
+  resetPlayerStationChecklist: () => void;
+  getStationCompletionCount: (stationId: StationId) => number;
 }
 
 export const useAppStore = create<AppState>()(
@@ -430,6 +442,86 @@ export const useAppStore = create<AppState>()(
         const state = get();
         return state.clips.filter((c) => c.category === 'highlight').length;
       },
+
+      // Player Station Checklist
+      playerStationCompletions: [],
+      togglePlayerStation: (playerId, stationId, completedBy) => {
+        const state = get();
+        const existingIndex = state.playerStationCompletions.findIndex(
+          (c) => c.playerId === playerId && c.stationId === stationId
+        );
+
+        if (existingIndex >= 0) {
+          // Toggle existing - remove if completed, or update
+          const existing = state.playerStationCompletions[existingIndex];
+          if (existing.completed) {
+            // Remove completion
+            set({
+              playerStationCompletions: state.playerStationCompletions.filter(
+                (_, i) => i !== existingIndex
+              ),
+            });
+          } else {
+            // Mark as completed
+            const now = new Date().toISOString();
+            set({
+              playerStationCompletions: state.playerStationCompletions.map((c, i) =>
+                i === existingIndex
+                  ? { ...c, completed: true, completedAt: now, completedBy }
+                  : c
+              ),
+            });
+          }
+        } else {
+          // Add new completion
+          const now = new Date().toISOString();
+          const newCompletion: PlayerStationCompletion = {
+            playerId,
+            stationId,
+            completed: true,
+            completedAt: now,
+            completedBy,
+          };
+          set({
+            playerStationCompletions: [...state.playerStationCompletions, newCompletion],
+          });
+        }
+      },
+      isStationCompleted: (playerId, stationId) => {
+        const state = get();
+        return state.playerStationCompletions.some(
+          (c) => c.playerId === playerId && c.stationId === stationId && c.completed
+        );
+      },
+      getPlayerProgress: (playerId) => {
+        const state = get();
+        const completed = state.playerStationCompletions.filter(
+          (c) => c.playerId === playerId && c.completed
+        ).length;
+        const total = checklistStations.length;
+        const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+        return { completed, total, percentage };
+      },
+      getCompletedStationsForPlayer: (playerId) => {
+        const state = get();
+        return state.playerStationCompletions
+          .filter((c) => c.playerId === playerId && c.completed)
+          .map((c) => c.stationId);
+      },
+      getRemainingStationsForPlayer: (playerId) => {
+        const state = get();
+        const completed = state.playerStationCompletions
+          .filter((c) => c.playerId === playerId && c.completed)
+          .map((c) => c.stationId);
+        return checklistStations.filter((s) => !completed.includes(s));
+      },
+      resetPlayerStationChecklist: () => set({ playerStationCompletions: [] }),
+      getStationCompletionCount: (stationId) => {
+        const state = get();
+        return state.playerStationCompletions.filter(
+          (c) => c.stationId === stationId && c.completed
+        ).length;
+      },
     }),
     {
       name: 'prizm-lounge-storage',
@@ -448,6 +540,7 @@ export const useAppStore = create<AppState>()(
         selectedDay: state.selectedDay,
         clips: state.clips,
         quickMarkCategory: state.quickMarkCategory,
+        playerStationCompletions: state.playerStationCompletions,
       }),
     }
   )
