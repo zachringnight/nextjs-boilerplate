@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useAppStore } from '../store';
 import { players } from '../data/players';
 import { stations, checklistStations } from '../data/stations';
@@ -142,9 +143,13 @@ export default function PlayerStationChecklist({ filterSigningOnly = false }: Pl
 
                   {/* Player Info */}
                   <div className="flex-1 min-w-0 text-left">
-                    <p className={`font-semibold text-white truncate ${largeText ? 'text-lg' : 'text-base'}`}>
+                    <Link
+                      href={`/prizm/players/${player.id}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className={`font-semibold text-white hover:text-[#FFD100] transition-colors truncate block ${largeText ? 'text-lg' : 'text-base'}`}
+                    >
                       {player.name}
-                    </p>
+                    </Link>
                     <p className={`text-[#9CA3AF] ${largeText ? 'text-base' : 'text-sm'}`}>
                       {player.team} - {player.position}
                     </p>

@@ -979,3 +979,95 @@ export const getPRCallsForDay = (schedule: ScheduleSlot[], date: string): Schedu
     )
     .sort((a, b) => a.startTime.localeCompare(b.startTime));
 };
+
+// ---------- Player Arrival Summaries ----------
+
+export interface PlayerArrival {
+  playerId: string;
+  date: string;
+  arrivalTime: string;       // earliest startTime for this player on this day
+  departureTime: string;     // latest endTime for this player on this day
+  status: 'scheduled' | 'tbd';
+  signingOnly: boolean;      // true when their only station is signing
+  prCall: {
+    time: string;
+    outlet: string;
+    contact?: string;
+    callIn?: string;
+    notes?: string;
+  } | null;
+  notes: string | null;      // first non-empty note on their slots
+}
+
+/**
+ * Summarise every player's appearance on a given day into a single row:
+ * arrival time, departure time, whether signing-only, and PR-call info.
+ */
+export const getPlayerArrivalsForDay = (
+  schedule: ScheduleSlot[],
+  date: string
+): PlayerArrival[] => {
+  const daySlots = schedule.filter(
+    (slot) => slot.date === date && slot.status !== 'cancelled'
+  );
+
+  // Group by player
+  const byPlayer = new Map<string, ScheduleSlot[]>();
+  daySlots.forEach((slot) => {
+    const list = byPlayer.get(slot.playerId) || [];
+    list.push(slot);
+    byPlayer.set(slot.playerId, list);
+  });
+
+  const arrivals: PlayerArrival[] = [];
+
+  byPlayer.forEach((slots, playerId) => {
+    // Sort slots by start time
+    const sorted = [...slots].sort((a, b) => a.startTime.localeCompare(b.startTime));
+
+    // Arrival = earliest start that isn't 00:00 (TBD sentinel)
+    const scheduled = sorted.filter((s) => s.startTime !== '00:00');
+    const arrivalTime = scheduled.length > 0 ? scheduled[0].startTime : '00:00';
+    const departureTime = scheduled.length > 0 ? scheduled[scheduled.length - 1].endTime : '00:00';
+    const isTbd = sorted.every((s) => s.status === 'tbd') || arrivalTime === '00:00';
+
+    // Signing only = every non-free station is 'signing'
+    const nonFreeStations = sorted.filter((s) => s.station !== 'free').map((s) => s.station);
+    const signingOnly = nonFreeStations.length > 0 && nonFreeStations.every((s) => s === 'signing');
+
+    // PR call info
+    const prSlot = sorted.find((s) => s.station === 'prCall' && s.prCallInfo);
+    const prCall = prSlot?.prCallInfo
+      ? {
+          time: prSlot.startTime,
+          outlet: prSlot.prCallInfo.outlet,
+          contact: prSlot.prCallInfo.contact,
+          callIn: prSlot.prCallInfo.callIn,
+          notes: prSlot.prCallInfo.notes,
+        }
+      : null;
+
+    // Grab first meaningful note
+    const note = sorted.find((s) => s.notes)?.notes || null;
+
+    arrivals.push({
+      playerId,
+      date,
+      arrivalTime,
+      departureTime,
+      status: isTbd ? 'tbd' : 'scheduled',
+      signingOnly,
+      prCall,
+      notes: note,
+    });
+  });
+
+  // Sort: TBD at bottom, then by arrival time
+  arrivals.sort((a, b) => {
+    if (a.status === 'tbd' && b.status !== 'tbd') return 1;
+    if (a.status !== 'tbd' && b.status === 'tbd') return -1;
+    return a.arrivalTime.localeCompare(b.arrivalTime);
+  });
+
+  return arrivals;
+};

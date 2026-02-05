@@ -1,28 +1,20 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Header from '../components/Header';
 import { useAppStore } from '../store';
 import { getSupabase, isSupabaseConfigured } from '../lib/supabase';
-import { ClipMarker, ClipCategory, ClipStatus, MediaType } from '../types/database';
-import { StationId } from '../types';
-import { getPlayerById, players } from '../data/players';
+import { ClipMarker, ClipCategory, ClipStatus } from '../types/database';
+import { getPlayerById } from '../data/players';
 import { stations } from '../data/stations';
 import {
-  Video,
-  Camera,
-  Mic,
   Star,
   StarOff,
-  Tag,
   X,
   Plus,
-  Check,
   Trash2,
   Filter,
   Clock,
-  User,
-  Film,
   RefreshCw,
   Wifi,
   WifiOff,
@@ -30,42 +22,16 @@ import {
   ChevronUp,
   Clapperboard,
   Sparkles,
-  MessageSquare,
-  Laugh,
-  Share2,
-  Play,
   Archive,
   Eye,
   Download,
   Keyboard,
+  Search,
+  AlertTriangle,
 } from 'lucide-react';
 import { cn } from '../lib/utils';
-
-// Category configuration with icons and colors
-const CATEGORY_CONFIG: Record<ClipCategory, { label: string; icon: typeof Video; color: string }> = {
-  highlight: { label: 'Highlight', icon: Sparkles, color: '#FFD100' },
-  interview: { label: 'Interview', icon: MessageSquare, color: '#3B82F6' },
-  broll: { label: 'B-Roll', icon: Film, color: '#8B5CF6' },
-  reaction: { label: 'Reaction', icon: Laugh, color: '#F59E0B' },
-  signing: { label: 'Signing', icon: User, color: '#22C55E' },
-  pack_rip: { label: 'Pack Rip', icon: Play, color: '#EF4444' },
-  general: { label: 'General', icon: Video, color: '#9CA3AF' },
-  blooper: { label: 'Blooper', icon: Laugh, color: '#EC4899' },
-  social: { label: 'Social', icon: Share2, color: '#06B6D4' },
-};
-
-const STATUS_CONFIG: Record<ClipStatus, { label: string; color: string; icon: typeof Eye }> = {
-  marked: { label: 'Marked', color: '#3B82F6', icon: Clapperboard },
-  reviewed: { label: 'Reviewed', color: '#F59E0B', icon: Eye },
-  exported: { label: 'Exported', color: '#22C55E', icon: Download },
-  archived: { label: 'Archived', color: '#6B7280', icon: Archive },
-};
-
-const MEDIA_CONFIG: Record<MediaType, { label: string; icon: typeof Video }> = {
-  video: { label: 'Video', icon: Video },
-  photo: { label: 'Photo', icon: Camera },
-  audio: { label: 'Audio', icon: Mic },
-};
+import { CATEGORY_CONFIG, STATUS_CONFIG, MEDIA_CONFIG } from '../lib/clip-constants';
+import { syncClipInsert, syncClipUpdate, syncClipDelete } from '../lib/clip-sync';
 
 export default function ClipsPage() {
   const {
@@ -82,24 +48,12 @@ export default function ClipsPage() {
   const [mounted, setMounted] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
-  const [showAddForm, setShowAddForm] = useState(false);
   const [expandedClip, setExpandedClip] = useState<string | null>(null);
   const [filterCategory, setFilterCategory] = useState<ClipCategory | 'all'>('all');
   const [filterStatus, setFilterStatus] = useState<ClipStatus | 'all'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
   const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
-
-  // Form state
-  const [category, setCategory] = useState<ClipCategory>('general');
-  const [mediaType, setMediaType] = useState<MediaType>('video');
-  const [playerId, setPlayerId] = useState('');
-  const [stationId, setStationId] = useState<StationId | ''>('');
-  const [notes, setNotes] = useState('');
-  const [timecode, setTimecode] = useState('');
-  const [camera, setCamera] = useState('');
-  const [crewMember, setCrewMember] = useState('');
-  const [tags, setTags] = useState<string[]>([]);
-  const [tagInput, setTagInput] = useState('');
-  const [rating, setRating] = useState<number>(0);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   // Load clips from Supabase
   const loadClips = useCallback(async () => {
@@ -124,122 +78,25 @@ export default function ClipsPage() {
     }
   }, [isOnline, setClips]);
 
-  // Sync to Supabase when adding locally
-  const syncAddToSupabase = useCallback(async (clipData: Partial<ClipMarker>) => {
-    const supabase = getSupabase();
-    if (supabase && isOnline) {
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await (supabase as any).from('clip_markers').insert({
-          timestamp: new Date().toISOString(),
-          category: clipData.category || 'general',
-          media_type: clipData.media_type || 'video',
-          status: 'marked',
-          tags: clipData.tags || [],
-          notes: clipData.notes || null,
-          player_id: clipData.player_id || null,
-          station_id: clipData.station_id || null,
-          timecode: clipData.timecode || null,
-          camera: clipData.camera || null,
-          crew_member: clipData.crew_member || null,
-          rating: clipData.rating || null,
-        });
-        // Reload to get server ID
-        await loadClips();
-      } catch (err) {
-        console.error('Error syncing add to Supabase:', err);
-      }
-    }
-  }, [isOnline, loadClips]);
-
-  // Sync update to Supabase
-  const syncUpdateToSupabase = useCallback(async (id: string, updates: Partial<ClipMarker>) => {
-    const supabase = getSupabase();
-    if (supabase && isOnline) {
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await (supabase as any)
-          .from('clip_markers')
-          .update({ ...updates, updated_at: new Date().toISOString() })
-          .eq('id', id);
-      } catch (err) {
-        console.error('Error syncing update to Supabase:', err);
-      }
-    }
-  }, [isOnline]);
-
-  // Sync delete to Supabase
-  const syncDeleteToSupabase = useCallback(async (id: string) => {
-    const supabase = getSupabase();
-    if (supabase && isOnline) {
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await (supabase as any).from('clip_markers').delete().eq('id', id);
-      } catch (err) {
-        console.error('Error syncing delete to Supabase:', err);
-      }
-    }
-  }, [isOnline]);
-
   // Wrapper for updateClip that syncs to Supabase
   const handleUpdateClip = (id: string, updates: Partial<ClipMarker>) => {
     updateClip(id, updates);
-    syncUpdateToSupabase(id, updates);
+    syncClipUpdate(id, updates);
   };
 
-  // Wrapper for deleteClip that syncs to Supabase
+  // Wrapper for deleteClip that syncs to Supabase (with confirmation)
   const handleDeleteClip = (id: string) => {
     deleteClip(id);
-    syncDeleteToSupabase(id);
+    syncClipDelete(id);
+    setDeleteConfirmId(null);
+    setExpandedClip(null);
   };
 
   // Quick mark - one tap to mark a clip
   const quickMark = () => {
     const clipData = { category: quickMarkCategory };
     addClip(clipData);
-    syncAddToSupabase(clipData);
-  };
-
-  // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const clipData = {
-      category,
-      media_type: mediaType,
-      player_id: playerId || null,
-      station_id: stationId || null,
-      notes: notes || null,
-      timecode: timecode || null,
-      camera: camera || null,
-      crew_member: crewMember || null,
-      tags,
-      rating: rating || null,
-    };
-
-    addClip(clipData);
-    syncAddToSupabase(clipData);
-
-    // Reset form
-    setNotes('');
-    setTimecode('');
-    setCamera('');
-    setCrewMember('');
-    setTags([]);
-    setTagInput('');
-    setRating(0);
-    setPlayerId('');
-    setStationId('');
-    setShowAddForm(false);
-  };
-
-  // Add tag
-  const addTag = () => {
-    const trimmed = tagInput.trim();
-    if (trimmed && !tags.includes(trimmed)) {
-      setTags([...tags, trimmed]);
-      setTagInput('');
-    }
+    syncClipInsert(clipData);
   };
 
   // Manual sync
@@ -293,12 +150,41 @@ export default function ClipsPage() {
     loadClips();
   }, [loadClips]);
 
-  // Filter clips
-  const filteredClips = clips.filter((clip) => {
-    if (filterCategory !== 'all' && clip.category !== filterCategory) return false;
-    if (filterStatus !== 'all' && clip.status !== filterStatus) return false;
-    return true;
-  });
+  // Filter + search clips
+  const filteredClips = useMemo(() => {
+    const query = searchQuery.toLowerCase().trim();
+
+    return clips.filter((clip) => {
+      if (filterCategory !== 'all' && clip.category !== filterCategory) return false;
+      if (filterStatus !== 'all' && clip.status !== filterStatus) return false;
+
+      if (query) {
+        const player = clip.player_id ? getPlayerById(clip.player_id) : null;
+        const station = clip.station_id
+          ? stations.find((s) => s.id === clip.station_id)
+          : null;
+        const categoryLabel = CATEGORY_CONFIG[clip.category]?.label || '';
+
+        const searchable = [
+          clip.notes,
+          player?.name,
+          station?.name,
+          categoryLabel,
+          clip.crew_member,
+          clip.timecode,
+          clip.camera,
+          ...clip.tags,
+        ]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase();
+
+        if (!searchable.includes(query)) return false;
+      }
+
+      return true;
+    });
+  }, [clips, filterCategory, filterStatus, searchQuery]);
 
   // Stats
   const todayCount = clips.filter((c) => {
@@ -403,6 +289,28 @@ export default function ClipsPage() {
         </p>
       </div>
 
+      {/* Search Bar */}
+      <div className="px-4 py-2 bg-[#0D0D0D] border-b border-[#2A2A2A]">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280]" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search clips by player, notes, tags..."
+            className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg pl-9 pr-8 py-2 text-white text-sm placeholder-[#6B7280] focus:border-[#FFD100] focus:outline-none"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-[#6B7280] hover:text-white"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* Filters */}
       <div className="px-4 py-3 bg-[#0D0D0D] border-b border-[#2A2A2A] flex items-center gap-2 overflow-x-auto">
         <Filter className="w-4 h-4 text-[#9CA3AF] flex-shrink-0" />
@@ -431,7 +339,7 @@ export default function ClipsPage() {
           ))}
         </select>
         <span className="ml-auto text-[#6B7280] text-xs whitespace-nowrap">
-          {filteredClips.length} clips
+          {filteredClips.length} clip{filteredClips.length !== 1 ? 's' : ''}
         </span>
       </div>
 
@@ -440,10 +348,37 @@ export default function ClipsPage() {
         {filteredClips.length === 0 ? (
           <div className="text-center py-12 text-[#9CA3AF]">
             <Clapperboard className="w-12 h-12 mx-auto mb-3 opacity-50" />
-            <p className={largeText ? 'text-base' : 'text-sm'}>
-              {clips.length === 0 ? 'No clips marked yet' : 'No clips match filters'}
-            </p>
-            <p className="text-xs text-[#6B7280] mt-1">Tap MARK CLIP to get started</p>
+            {clips.length === 0 ? (
+              <>
+                <p className={cn('font-medium text-white', largeText ? 'text-lg' : 'text-base')}>
+                  No clips marked yet
+                </p>
+                <p className="text-sm text-[#6B7280] mt-2 max-w-xs mx-auto">
+                  Tap <strong className="text-[#FFD100]">MARK CLIP</strong> above for a quick mark, or use the <strong className="text-[#3B82F6]">+</strong> button for a detailed clip with notes, tags, and ratings.
+                </p>
+                <div className="mt-4 p-3 bg-[#1A1A1A] rounded-lg border border-[#2A2A2A] inline-block">
+                  <p className="text-xs text-[#9CA3AF]">
+                    <kbd className="bg-[#2A2A2A] px-1.5 py-0.5 rounded text-[10px]">Ctrl</kbd>+<kbd className="bg-[#2A2A2A] px-1.5 py-0.5 rounded text-[10px]">M</kbd> quick mark from any page
+                  </p>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className={largeText ? 'text-base' : 'text-sm'}>
+                  No clips match your filters
+                </p>
+                <button
+                  onClick={() => {
+                    setFilterCategory('all');
+                    setFilterStatus('all');
+                    setSearchQuery('');
+                  }}
+                  className="mt-3 text-sm text-[#FFD100] hover:text-[#FFD100]/80"
+                >
+                  Clear all filters
+                </button>
+              </>
+            )}
           </div>
         ) : (
           filteredClips.map((clip) => {
@@ -529,7 +464,7 @@ export default function ClipsPage() {
                           </span>
                         )}
                         {player && (
-                          <span className="text-[#9CA3AF] text-xs">• {player.name}</span>
+                          <span className="text-[#9CA3AF] text-xs">{player.name}</span>
                         )}
                       </div>
                       {clip.tags.length > 0 && (
@@ -611,13 +546,32 @@ export default function ClipsPage() {
                           Archive
                         </button>
                       )}
-                      <button
-                        onClick={() => handleDeleteClip(clip.id)}
-                        className="flex items-center gap-1 px-3 py-1.5 bg-red-500/20 text-red-400 rounded-lg text-sm hover:bg-red-500/30 ml-auto"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                        Delete
-                      </button>
+                      {deleteConfirmId === clip.id ? (
+                        <div className="flex items-center gap-2 ml-auto bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-1.5">
+                          <AlertTriangle className="w-4 h-4 text-red-400" />
+                          <span className="text-red-400 text-sm">Delete?</span>
+                          <button
+                            onClick={() => handleDeleteClip(clip.id)}
+                            className="px-2 py-0.5 bg-red-500 text-white rounded text-xs font-medium hover:bg-red-600"
+                          >
+                            Yes
+                          </button>
+                          <button
+                            onClick={() => setDeleteConfirmId(null)}
+                            className="px-2 py-0.5 bg-[#2A2A2A] text-[#9CA3AF] rounded text-xs hover:bg-[#3A3A3A]"
+                          >
+                            No
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setDeleteConfirmId(clip.id)}
+                          className="flex items-center gap-1 px-3 py-1.5 bg-red-500/20 text-red-400 rounded-lg text-sm hover:bg-red-500/30 ml-auto"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          Delete
+                        </button>
+                      )}
                     </div>
                   </div>
                 )}
@@ -627,9 +581,9 @@ export default function ClipsPage() {
         )}
       </div>
 
-      {/* Add Clip FAB */}
+      {/* Add Clip FAB — opens the shared QuickClipModal */}
       <button
-        onClick={() => setShowAddForm(true)}
+        onClick={() => setClipModalOpen(true)}
         className="fixed bottom-24 right-4 w-14 h-14 bg-[#3B82F6] rounded-full flex items-center justify-center shadow-lg hover:bg-[#3B82F6]/90 transition-colors z-30"
       >
         <Plus className="w-6 h-6 text-white" />
@@ -691,231 +645,12 @@ export default function ClipsPage() {
         </div>
       )}
 
-      {/* Add Clip Modal */}
-      {showAddForm && (
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-end sm:items-center justify-center">
-          <div className="bg-[#1A1A1A] w-full sm:max-w-lg sm:rounded-xl rounded-t-xl max-h-[90vh] overflow-auto">
-            <div className="sticky top-0 bg-[#1A1A1A] border-b border-[#2A2A2A] p-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-white">Add Detailed Clip</h2>
-              <button
-                onClick={() => setShowAddForm(false)}
-                className="p-2 text-[#9CA3AF] hover:text-white"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit} className="p-4 space-y-4">
-              {/* Category */}
-              <div>
-                <label className="block text-sm text-[#9CA3AF] mb-2">Category</label>
-                <div className="grid grid-cols-3 gap-2">
-                  {Object.entries(CATEGORY_CONFIG).map(([key, config]) => {
-                    const Icon = config.icon;
-                    return (
-                      <button
-                        key={key}
-                        type="button"
-                        onClick={() => setCategory(key as ClipCategory)}
-                        className={cn(
-                          'p-2 rounded-lg border text-sm flex flex-col items-center gap-1 transition-all',
-                          category === key
-                            ? 'border-[#FFD100] bg-[#FFD100]/10'
-                            : 'border-[#2A2A2A] hover:border-[#3A3A3A]'
-                        )}
-                      >
-                        <Icon className="w-4 h-4" style={{ color: config.color }} />
-                        <span className="text-white text-xs">{config.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Media Type */}
-              <div>
-                <label className="block text-sm text-[#9CA3AF] mb-2">Media Type</label>
-                <div className="flex gap-2">
-                  {Object.entries(MEDIA_CONFIG).map(([key, config]) => {
-                    const Icon = config.icon;
-                    return (
-                      <button
-                        key={key}
-                        type="button"
-                        onClick={() => setMediaType(key as MediaType)}
-                        className={cn(
-                          'flex-1 py-2 rounded-lg border text-sm font-medium transition-all flex items-center justify-center gap-2',
-                          mediaType === key
-                            ? 'border-[#FFD100] bg-[#FFD100]/10 text-white'
-                            : 'border-[#2A2A2A] text-[#9CA3AF] hover:border-[#3A3A3A]'
-                        )}
-                      >
-                        <Icon className="w-4 h-4" />
-                        {config.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Notes */}
-              <div>
-                <label className="block text-sm text-[#9CA3AF] mb-1">Notes (optional)</label>
-                <textarea
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Describe the clip..."
-                  rows={2}
-                  className="w-full bg-[#0D0D0D] border border-[#2A2A2A] rounded-lg px-3 py-2 text-white placeholder-[#6B7280] focus:border-[#FFD100] focus:outline-none"
-                />
-              </div>
-
-              {/* Timecode & Camera */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-sm text-[#9CA3AF] mb-1">Timecode</label>
-                  <input
-                    type="text"
-                    value={timecode}
-                    onChange={(e) => setTimecode(e.target.value)}
-                    placeholder="01:23:45:12"
-                    className="w-full bg-[#0D0D0D] border border-[#2A2A2A] rounded-lg px-3 py-2 text-white placeholder-[#6B7280] focus:border-[#FFD100] focus:outline-none font-mono"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm text-[#9CA3AF] mb-1">Camera</label>
-                  <input
-                    type="text"
-                    value={camera}
-                    onChange={(e) => setCamera(e.target.value)}
-                    placeholder="Camera A"
-                    className="w-full bg-[#0D0D0D] border border-[#2A2A2A] rounded-lg px-3 py-2 text-white placeholder-[#6B7280] focus:border-[#FFD100] focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              {/* Station & Player */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-sm text-[#9CA3AF] mb-1">Station</label>
-                  <select
-                    value={stationId}
-                    onChange={(e) => setStationId(e.target.value as StationId | '')}
-                    className="w-full bg-[#0D0D0D] border border-[#2A2A2A] rounded-lg px-3 py-2 text-white text-sm"
-                  >
-                    <option value="">None</option>
-                    {stations.map((s) => (
-                      <option key={s.id} value={s.id}>
-                        {s.icon} {s.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm text-[#9CA3AF] mb-1">Player</label>
-                  <select
-                    value={playerId}
-                    onChange={(e) => setPlayerId(e.target.value)}
-                    className="w-full bg-[#0D0D0D] border border-[#2A2A2A] rounded-lg px-3 py-2 text-white text-sm"
-                  >
-                    <option value="">None</option>
-                    {players.map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* Crew Member */}
-              <div>
-                <label className="block text-sm text-[#9CA3AF] mb-1">Crew Member</label>
-                <input
-                  type="text"
-                  value={crewMember}
-                  onChange={(e) => setCrewMember(e.target.value)}
-                  placeholder="Your name"
-                  className="w-full bg-[#0D0D0D] border border-[#2A2A2A] rounded-lg px-3 py-2 text-white placeholder-[#6B7280] focus:border-[#FFD100] focus:outline-none"
-                />
-              </div>
-
-              {/* Tags */}
-              <div>
-                <label className="block text-sm text-[#9CA3AF] mb-1">Tags</label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={tagInput}
-                    onChange={(e) => setTagInput(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
-                    placeholder="Add tag..."
-                    className="flex-1 bg-[#0D0D0D] border border-[#2A2A2A] rounded-lg px-3 py-2 text-white placeholder-[#6B7280] focus:border-[#FFD100] focus:outline-none"
-                  />
-                  <button
-                    type="button"
-                    onClick={addTag}
-                    className="px-3 py-2 bg-[#2A2A2A] text-white rounded-lg hover:bg-[#3A3A3A]"
-                  >
-                    <Tag className="w-4 h-4" />
-                  </button>
-                </div>
-                {tags.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="px-2 py-1 bg-[#2A2A2A] rounded text-sm text-white flex items-center gap-1"
-                      >
-                        #{tag}
-                        <button
-                          type="button"
-                          onClick={() => setTags(tags.filter((t) => t !== tag))}
-                          className="text-[#6B7280] hover:text-white"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Rating */}
-              <div>
-                <label className="block text-sm text-[#9CA3AF] mb-2">Rating</label>
-                <div className="flex items-center gap-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => setRating(rating === star ? 0 : star)}
-                      className="p-1"
-                    >
-                      {star <= rating ? (
-                        <Star className="w-6 h-6 fill-[#FFD100] text-[#FFD100]" />
-                      ) : (
-                        <StarOff className="w-6 h-6 text-[#4A4A4A]" />
-                      )}
-                    </button>
-                  ))}
-                  {rating > 0 && (
-                    <span className="text-[#9CA3AF] text-sm ml-2">{rating} star{rating !== 1 ? 's' : ''}</span>
-                  )}
-                </div>
-              </div>
-
-              {/* Submit */}
-              <button
-                type="submit"
-                className="w-full py-3 bg-[#FFD100] text-black font-semibold rounded-lg hover:bg-[#FFD100]/90 transition-colors"
-              >
-                <Check className="w-5 h-5 inline mr-2" />
-                Add Clip Marker
-              </button>
-            </form>
-          </div>
-        </div>
+      {/* Delete Confirmation Overlay - closes on backdrop click */}
+      {deleteConfirmId && (
+        <div
+          className="fixed inset-0 z-20"
+          onClick={() => setDeleteConfirmId(null)}
+        />
       )}
     </div>
   );
