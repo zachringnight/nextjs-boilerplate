@@ -2,42 +2,7 @@
  * Supabase Database Types for Prizm Lounge
  *
  * These types define the structure of our Supabase tables.
- * Run this SQL in Supabase to create the tables:
- *
- * -- Clip markers table
- * CREATE TABLE clip_markers (
- *   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
- *   timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
- *   timecode VARCHAR(20),
- *   player_id VARCHAR(100),
- *   station_id VARCHAR(50),
- *   category VARCHAR(50) NOT NULL DEFAULT 'general',
- *   tags TEXT[],
- *   notes TEXT,
- *   rating INTEGER CHECK (rating >= 1 AND rating <= 5),
- *   media_type VARCHAR(20) DEFAULT 'video',
- *   camera VARCHAR(50),
- *   crew_member VARCHAR(100),
- *   status VARCHAR(20) DEFAULT 'marked',
- *   created_at TIMESTAMPTZ DEFAULT NOW(),
- *   updated_at TIMESTAMPTZ DEFAULT NOW()
- * );
- *
- * -- Enable Row Level Security
- * ALTER TABLE clip_markers ENABLE ROW LEVEL SECURITY;
- *
- * -- Allow anonymous access for production use
- * CREATE POLICY "Allow anonymous access" ON clip_markers
- *   FOR ALL USING (true) WITH CHECK (true);
- *
- * -- Create index for faster queries
- * CREATE INDEX idx_clip_markers_timestamp ON clip_markers(timestamp DESC);
- * CREATE INDEX idx_clip_markers_player_id ON clip_markers(player_id);
- * CREATE INDEX idx_clip_markers_station_id ON clip_markers(station_id);
- * CREATE INDEX idx_clip_markers_category ON clip_markers(category);
- *
- * -- Enable realtime
- * ALTER PUBLICATION supabase_realtime ADD TABLE clip_markers;
+ * Run supabase/migration.sql in the Supabase SQL Editor to create all tables.
  */
 
 export type ClipCategory =
@@ -127,6 +92,167 @@ export interface ClipDefaults {
   media_type: MediaType;
 }
 
+// =============================================
+// Notes table types
+// =============================================
+
+export interface NoteRow {
+  id: string;
+  content: string;
+  category: string;
+  priority: string;
+  status: string;
+  station_id: string | null;
+  player_id: string | null;
+  created_at: string;
+  updated_at: string;
+  resolved_at: string | null;
+  created_by: string | null;
+}
+
+export interface NoteInsert {
+  id: string;
+  content: string;
+  category?: string;
+  priority?: string;
+  status?: string;
+  station_id?: string | null;
+  player_id?: string | null;
+  created_at?: string;
+  updated_at?: string;
+  resolved_at?: string | null;
+  created_by?: string | null;
+}
+
+export interface NoteUpdate {
+  content?: string;
+  category?: string;
+  priority?: string;
+  status?: string;
+  station_id?: string | null;
+  player_id?: string | null;
+  updated_at?: string;
+  resolved_at?: string | null;
+  created_by?: string | null;
+}
+
+// =============================================
+// Deliverables table types
+// =============================================
+
+export interface DeliverableRow {
+  id: string;
+  title: string;
+  description: string | null;
+  type: string;
+  status: string;
+  player_id: string | null;
+  due_day: string;
+  completed_at: string | null;
+  delivered_at: string | null;
+  notes: string | null;
+  assignee: string | null;
+  priority: string | null;
+}
+
+export interface DeliverableInsert {
+  id: string;
+  title: string;
+  description?: string | null;
+  type?: string;
+  status?: string;
+  player_id?: string | null;
+  due_day: string;
+  completed_at?: string | null;
+  delivered_at?: string | null;
+  notes?: string | null;
+  assignee?: string | null;
+  priority?: string | null;
+}
+
+export interface DeliverableUpdate {
+  title?: string;
+  description?: string | null;
+  type?: string;
+  status?: string;
+  player_id?: string | null;
+  due_day?: string;
+  completed_at?: string | null;
+  delivered_at?: string | null;
+  notes?: string | null;
+  assignee?: string | null;
+  priority?: string | null;
+}
+
+// =============================================
+// Schedule slots table types
+// =============================================
+
+export interface ScheduleSlotRow {
+  id: string;
+  player_id: string;
+  date: string;
+  start_time: string;
+  end_time: string;
+  station: string;
+  status: string | null;
+  pr_call_info: Record<string, unknown> | null;
+  notes: string | null;
+}
+
+export interface ScheduleSlotInsert {
+  id: string;
+  player_id: string;
+  date: string;
+  start_time: string;
+  end_time: string;
+  station: string;
+  status?: string | null;
+  pr_call_info?: Record<string, unknown> | null;
+  notes?: string | null;
+}
+
+export interface ScheduleSlotUpdate {
+  player_id?: string;
+  date?: string;
+  start_time?: string;
+  end_time?: string;
+  station?: string;
+  status?: string | null;
+  pr_call_info?: Record<string, unknown> | null;
+  notes?: string | null;
+}
+
+// =============================================
+// Player station completions table types
+// =============================================
+
+export interface PlayerStationCompletionRow {
+  id: string;
+  player_id: string;
+  station_id: string;
+  completed: boolean;
+  completed_at: string | null;
+  completed_by: string | null;
+  notes: string | null;
+}
+
+export interface PlayerStationCompletionInsert {
+  player_id: string;
+  station_id: string;
+  completed?: boolean;
+  completed_at?: string | null;
+  completed_by?: string | null;
+  notes?: string | null;
+}
+
+export interface PlayerStationCompletionUpdate {
+  completed?: boolean;
+  completed_at?: string | null;
+  completed_by?: string | null;
+  notes?: string | null;
+}
+
 // Database schema definition for Supabase client
 export interface Database {
   public: {
@@ -135,6 +261,26 @@ export interface Database {
         Row: ClipMarker;
         Insert: ClipMarkerInsert;
         Update: ClipMarkerUpdate;
+      };
+      notes: {
+        Row: NoteRow;
+        Insert: NoteInsert;
+        Update: NoteUpdate;
+      };
+      deliverables: {
+        Row: DeliverableRow;
+        Insert: DeliverableInsert;
+        Update: DeliverableUpdate;
+      };
+      schedule_slots: {
+        Row: ScheduleSlotRow;
+        Insert: ScheduleSlotInsert;
+        Update: ScheduleSlotUpdate;
+      };
+      player_station_completions: {
+        Row: PlayerStationCompletionRow;
+        Insert: PlayerStationCompletionInsert;
+        Update: PlayerStationCompletionUpdate;
       };
     };
     Views: Record<string, never>;

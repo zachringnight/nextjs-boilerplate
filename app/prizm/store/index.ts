@@ -20,6 +20,56 @@ import {
 import { checklistStations } from '../data/stations';
 import { defaultSchedule } from '../data/schedule';
 import { defaultDeliverables } from '../data/deliverables';
+import { syncClipInsert, syncClipUpdate, syncClipDelete, syncBulkClipUpdate, syncBulkClipDelete } from '../lib/clip-sync';
+import {
+  syncNoteInsert,
+  syncNoteUpdate,
+  syncNoteDelete,
+  syncBulkNoteDelete,
+  syncDeliverableUpsert,
+  syncDeliverableUpdate,
+  syncDeliverableDelete,
+  syncBulkDeliverableUpsert,
+  syncScheduleSlotUpsert,
+  syncScheduleSlotDelete,
+  syncBulkScheduleSlotUpsert,
+  syncCompletionUpsert,
+  syncCompletionDelete,
+  syncResetCompletions,
+} from '../lib/db-sync';
+
+// Helper to convert app ScheduleSlot to DB record format
+function slotToRecord(slot: ScheduleSlot) {
+  return {
+    id: slot.id,
+    player_id: slot.playerId,
+    date: slot.date,
+    start_time: slot.startTime,
+    end_time: slot.endTime,
+    station: slot.station,
+    status: slot.status || null,
+    pr_call_info: slot.prCallInfo ? (slot.prCallInfo as unknown as Record<string, unknown>) : null,
+    notes: slot.notes || null,
+  };
+}
+
+// Helper to convert app Deliverable to DB record format
+function deliverableToRecord(d: Deliverable) {
+  return {
+    id: d.id,
+    title: d.title,
+    description: d.description || null,
+    type: d.type,
+    status: d.status,
+    player_id: d.playerId || null,
+    due_day: d.dueDay,
+    completed_at: d.completedAt || null,
+    delivered_at: d.deliveredAt || null,
+    notes: d.notes || null,
+    assignee: d.assignee || null,
+    priority: d.priority || null,
+  };
+}
 
 interface AppState {
   // Preferences
@@ -153,21 +203,31 @@ export const useAppStore = create<AppState>()(
 
       // Schedule
       schedule: defaultSchedule,
-      updateSlot: (id, updates) =>
+      updateSlot: (id, updates) => {
         set((state) => ({
           schedule: state.schedule.map((slot) =>
             slot.id === id ? { ...slot, ...updates } : slot
           ),
-        })),
-      addSlot: (slot) =>
+        }));
+        const updated = get().schedule.find((s) => s.id === id);
+        if (updated) syncScheduleSlotUpsert(slotToRecord(updated));
+      },
+      addSlot: (slot) => {
         set((state) => ({
           schedule: [...state.schedule, slot],
-        })),
-      removeSlot: (id) =>
+        }));
+        syncScheduleSlotUpsert(slotToRecord(slot));
+      },
+      removeSlot: (id) => {
         set((state) => ({
           schedule: state.schedule.filter((slot) => slot.id !== id),
-        })),
-      resetSchedule: () => set({ schedule: defaultSchedule }),
+        }));
+        syncScheduleSlotDelete(id);
+      },
+      resetSchedule: () => {
+        set({ schedule: defaultSchedule });
+        syncBulkScheduleSlotUpsert(defaultSchedule.map(slotToRecord));
+      },
 
       // Notes / Issue Logger
       notes: [],
@@ -182,20 +242,45 @@ export const useAppStore = create<AppState>()(
         set((state) => ({
           notes: [note, ...state.notes],
         }));
+        syncNoteInsert({
+          id: note.id,
+          content: note.content,
+          category: note.category,
+          priority: note.priority,
+          status: note.status,
+          station_id: note.stationId || null,
+          player_id: note.playerId || null,
+          created_at: note.createdAt,
+          updated_at: note.updatedAt,
+          resolved_at: note.resolvedAt || null,
+          created_by: note.createdBy || null,
+        });
       },
       updateNote: (id, updates) => {
+        const now = new Date().toISOString();
         set((state) => ({
           notes: state.notes.map((note) =>
             note.id === id
-              ? { ...note, ...updates, updatedAt: new Date().toISOString() }
+              ? { ...note, ...updates, updatedAt: now }
               : note
           ),
         }));
+        const dbUpdates: Record<string, unknown> = { updated_at: now };
+        if (updates.content !== undefined) dbUpdates.content = updates.content;
+        if (updates.category !== undefined) dbUpdates.category = updates.category;
+        if (updates.priority !== undefined) dbUpdates.priority = updates.priority;
+        if (updates.status !== undefined) dbUpdates.status = updates.status;
+        if (updates.stationId !== undefined) dbUpdates.station_id = updates.stationId;
+        if (updates.playerId !== undefined) dbUpdates.player_id = updates.playerId;
+        if (updates.resolvedAt !== undefined) dbUpdates.resolved_at = updates.resolvedAt;
+        if (updates.createdBy !== undefined) dbUpdates.created_by = updates.createdBy;
+        syncNoteUpdate(id, dbUpdates);
       },
       deleteNote: (id) => {
         set((state) => ({
           notes: state.notes.filter((note) => note.id !== id),
         }));
+        syncNoteDelete(id);
       },
       resolveNote: (id) => {
         const now = new Date().toISOString();
@@ -206,11 +291,16 @@ export const useAppStore = create<AppState>()(
               : note
           ),
         }));
+        syncNoteUpdate(id, { status: 'resolved', resolved_at: now, updated_at: now });
       },
       clearResolvedNotes: () => {
+        const resolvedIds = get().notes
+          .filter((note) => note.status === 'resolved')
+          .map((note) => note.id);
         set((state) => ({
           notes: state.notes.filter((note) => note.status !== 'resolved'),
         }));
+        if (resolvedIds.length > 0) syncBulkNoteDelete(resolvedIds);
       },
 
       // Deliverables
@@ -229,6 +319,12 @@ export const useAppStore = create<AppState>()(
               : d
           ),
         }));
+        const updated = get().deliverables.find((d) => d.id === id);
+        if (updated) syncDeliverableUpdate(id, {
+          status: updated.status,
+          completed_at: updated.completedAt || null,
+          delivered_at: updated.deliveredAt || null,
+        });
       },
       updateDeliverable: (id, updates) => {
         set((state) => ({
@@ -236,6 +332,8 @@ export const useAppStore = create<AppState>()(
             d.id === id ? { ...d, ...updates } : d
           ),
         }));
+        const updated = get().deliverables.find((d) => d.id === id);
+        if (updated) syncDeliverableUpsert(deliverableToRecord(updated));
       },
       addDeliverable: (deliverableData) => {
         const id = `deliverable-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -246,14 +344,19 @@ export const useAppStore = create<AppState>()(
         set((state) => ({
           deliverables: [...state.deliverables, deliverable],
         }));
+        syncDeliverableUpsert(deliverableToRecord(deliverable));
         return id;
       },
       removeDeliverable: (id) => {
         set((state) => ({
           deliverables: state.deliverables.filter((d) => d.id !== id),
         }));
+        syncDeliverableDelete(id);
       },
-      resetDeliverables: () => set({ deliverables: defaultDeliverables }),
+      resetDeliverables: () => {
+        set({ deliverables: defaultDeliverables });
+        syncBulkDeliverableUpsert(defaultDeliverables.map(deliverableToRecord));
+      },
       getDeliverablesByDay: (day) => {
         const state = get();
         return state.deliverables.filter((d) => d.dueDay === day);
@@ -317,9 +420,9 @@ export const useAppStore = create<AppState>()(
         };
         set((state) => {
           const updated = [newClip, ...state.clips];
-          // Cap at 500 to prevent localStorage overflow
           return { clips: updated.length > 500 ? updated.slice(0, 500) : updated };
         });
+        syncClipInsert(newClip);
         return newClip;
       },
       updateClip: (id, updates) => {
@@ -330,12 +433,14 @@ export const useAppStore = create<AppState>()(
               : clip
           ),
         }));
+        syncClipUpdate(id, updates);
       },
       deleteClip: (id) => {
         set((state) => ({
           clips: state.clips.filter((clip) => clip.id !== id),
           selectedClipIds: state.selectedClipIds.filter((sid) => sid !== id),
         }));
+        syncClipDelete(id);
       },
       duplicateClip: (id) => {
         const state = get();
@@ -354,6 +459,7 @@ export const useAppStore = create<AppState>()(
           const updated = [newClip, ...state.clips];
           return { clips: updated.length > 500 ? updated.slice(0, 500) : updated };
         });
+        syncClipInsert(newClip);
         return newClip;
       },
       bulkUpdateClips: (ids, updates) => {
@@ -365,12 +471,14 @@ export const useAppStore = create<AppState>()(
               : clip
           ),
         }));
+        syncBulkClipUpdate(ids, updates);
       },
       bulkDeleteClips: (ids) => {
         set((state) => ({
           clips: state.clips.filter((clip) => !ids.includes(clip.id)),
           selectedClipIds: [],
         }));
+        syncBulkClipDelete(ids);
       },
       toggleClipSelection: (id) => {
         set((state) => ({
@@ -390,13 +498,16 @@ export const useAppStore = create<AppState>()(
       },
       setClipSort: (field, direction) => set({ clipSortField: field, clipSortDirection: direction }),
       toggleClipFlag: (id) => {
+        const clip = get().clips.find((c) => c.id === id);
+        const newFlagged = clip ? !clip.flagged : true;
         set((state) => ({
-          clips: state.clips.map((clip) =>
-            clip.id === id
-              ? { ...clip, flagged: !clip.flagged, updated_at: new Date().toISOString() }
-              : clip
+          clips: state.clips.map((c) =>
+            c.id === id
+              ? { ...c, flagged: newFlagged, updated_at: new Date().toISOString() }
+              : c
           ),
         }));
+        syncClipUpdate(id, { flagged: newFlagged });
       },
       getTodayClipCount: () => {
         const state = get();
@@ -460,7 +571,6 @@ export const useAppStore = create<AppState>()(
         );
 
         if (existingIndex >= 0) {
-          // Toggle existing - remove if completed, or update
           const existing = state.playerStationCompletions[existingIndex];
           if (existing.completed) {
             // Remove completion
@@ -469,6 +579,7 @@ export const useAppStore = create<AppState>()(
                 (_, i) => i !== existingIndex
               ),
             });
+            syncCompletionDelete(playerId, stationId);
           } else {
             // Mark as completed
             const now = new Date().toISOString();
@@ -478,6 +589,13 @@ export const useAppStore = create<AppState>()(
                   ? { ...c, completed: true, completedAt: now, completedBy }
                   : c
               ),
+            });
+            syncCompletionUpsert({
+              player_id: playerId,
+              station_id: stationId,
+              completed: true,
+              completed_at: now,
+              completed_by: completedBy || null,
             });
           }
         } else {
@@ -492,6 +610,13 @@ export const useAppStore = create<AppState>()(
           };
           set({
             playerStationCompletions: [...state.playerStationCompletions, newCompletion],
+          });
+          syncCompletionUpsert({
+            player_id: playerId,
+            station_id: stationId,
+            completed: true,
+            completed_at: now,
+            completed_by: completedBy || null,
           });
         }
       },
@@ -523,7 +648,10 @@ export const useAppStore = create<AppState>()(
           .map((c) => c.stationId);
         return checklistStations.filter((s) => !completed.includes(s));
       },
-      resetPlayerStationChecklist: () => set({ playerStationCompletions: [] }),
+      resetPlayerStationChecklist: () => {
+        set({ playerStationCompletions: [] });
+        syncResetCompletions();
+      },
       getStationCompletionCount: (stationId) => {
         const state = get();
         return state.playerStationCompletions.filter(
