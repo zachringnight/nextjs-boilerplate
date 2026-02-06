@@ -3,8 +3,6 @@
  * Each function gracefully returns false when offline or Supabase is not configured.
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { getSupabase } from './supabase';
 
 function isOnline(): boolean {

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { useMounted } from '../hooks/useMounted';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAppStore } from '../store';
@@ -40,13 +41,9 @@ const moreItems = [
 export default function BottomNav() {
   const pathname = usePathname();
   const [showMore, setShowMore] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useMounted();
   const menuRef = useRef<HTMLDivElement>(null);
   const { getTodayClipCount } = useAppStore();
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const todayClipCount = mounted ? getTodayClipCount() : 0;
 
@@ -78,6 +75,7 @@ export default function BottomNav() {
 
   // Close menu on navigation
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional: close menu when route changes
     setShowMore(false);
   }, [pathname]);
 

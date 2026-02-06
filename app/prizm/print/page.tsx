@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useMounted } from '../hooks/useMounted';
 import Link from 'next/link';
 import { useAppStore } from '../store';
 import { getScheduleForDay, DAY_LABELS, EVENT_DATES } from '../data/schedule';
@@ -15,11 +16,7 @@ export default function PrintPage() {
   const [selectedDay, setSelectedDay] = useState<string>(EVENT_DATES[0]);
   const [printType, setPrintType] = useState<PrintType>('daily');
   const [showPreview, setShowPreview] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useMounted();
 
   const handlePrint = () => {
     window.print();

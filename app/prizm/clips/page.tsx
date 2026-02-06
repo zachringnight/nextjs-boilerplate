@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useMounted } from '../hooks/useMounted';
 import Header from '../components/Header';
 import { useAppStore } from '../store';
 import { getSupabase, isSupabaseConfigured } from '../lib/supabase';
@@ -66,7 +67,7 @@ export default function ClipsPage() {
     toggleClipFlag,
     getClipAnalytics,
   } = useAppStore();
-  const [mounted, setMounted] = useState(false);
+  const mounted = useMounted();
   const [isOnline, setIsOnline] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
   const [expandedClip, setExpandedClip] = useState<string | null>(null);
@@ -89,7 +90,6 @@ export default function ClipsPage() {
 
     if (supabase && isOnline) {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { data, error } = await (supabase as any)
           .from('clip_markers')
           .select('*')
@@ -269,7 +269,6 @@ export default function ClipsPage() {
 
   // Initial load
   useEffect(() => {
-    setMounted(true);
     loadClips();
   }, [loadClips]);
 
@@ -359,7 +358,7 @@ export default function ClipsPage() {
   const flaggedCount = clips.filter((c) => c.flagged).length;
 
   // Analytics
-  const analytics = useMemo(() => getClipAnalytics(), [clips, getClipAnalytics]);
+  const analytics = useMemo(() => getClipAnalytics(), [getClipAnalytics]);
 
   const formatTime = (isoString: string) => {
     const date = new Date(isoString);

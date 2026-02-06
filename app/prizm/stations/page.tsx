@@ -1,6 +1,7 @@
 'use client';
 
 import { Suspense, useState, useEffect } from 'react';
+import { useMounted } from '../hooks/useMounted';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import Header from '../components/Header';
@@ -19,10 +20,9 @@ function StationsContent() {
   const { schedule, selectedStation, setSelectedStation, selectedDay, largeText } = useAppStore();
   const [expandedSlots, setExpandedSlots] = useState<Set<string>>(new Set());
   const [expandAll, setExpandAll] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useMounted();
 
   useEffect(() => {
-    setMounted(true);
     if (initialStation && stations.some(s => s.id === initialStation)) {
       setSelectedStation(initialStation);
     }
@@ -71,6 +71,7 @@ function StationsContent() {
       isCurrentSlot(slot.date, slot.startTime, slot.endTime)
     );
     if (currentSlot) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional: auto-expand current time slot
       setExpandedSlots(prev => new Set([...prev, currentSlot.id]));
     }
   }, [stationSchedule]);

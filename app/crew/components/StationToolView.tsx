@@ -225,6 +225,7 @@ export default function StationToolView({ largeText = false }: StationToolViewPr
   // Auto-expand current player on mount and when player changes
   useEffect(() => {
     if (currentPlayerIndex >= 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional: sync expanded state with current player
       setExpandedPlayers(new Set([filteredPlayers[currentPlayerIndex].id]));
     }
   }, [currentPlayerIndex, filteredPlayers]);

@@ -5,6 +5,7 @@ import { Search, Type, Timer, Bell, BellOff } from 'lucide-react';
 import { useAppStore } from '../store';
 import { formatTime12, getCurrentDayNumber, getEventStatus } from '../lib/time';
 import { useEffect, useState } from 'react';
+import { useMounted } from '../hooks/useMounted';
 
 interface HeaderProps {
   title?: string;
@@ -27,10 +28,9 @@ export default function Header({
     setNotificationsEnabled,
   } = useAppStore();
   const [currentTime, setCurrentTime] = useState<string>('');
-  const [mounted, setMounted] = useState(false);
+  const mounted = useMounted();
 
   useEffect(() => {
-    setMounted(true);
     const updateTime = () => {
       setCurrentTime(formatTime12(new Date()));
     };

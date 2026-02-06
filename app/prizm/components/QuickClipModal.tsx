@@ -56,6 +56,7 @@ export default function QuickClipModal() {
   const [clipName, setClipName] = useState('');
 
   // Auto-generate clip name when player or station changes (only in add mode)
+  /* eslint-disable react-hooks/set-state-in-effect -- intentional: derive clip name and populate form from external data */
   useEffect(() => {
     if (isEditMode) return;
     const player = playerId ? getPlayerById(playerId) : null;
@@ -97,6 +98,7 @@ export default function QuickClipModal() {
       }
     }
   }, [clipModalOpen, editingClip, quickMarkCategory, clipDefaults]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {

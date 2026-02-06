@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useMounted } from '../hooks/useMounted';
 import Header from '../components/Header';
 import { useAppStore } from '../store';
 import { NoteCategory, NotePriority, NoteStatus, StationId } from '../types';
@@ -49,7 +50,7 @@ const STATUS_CONFIG: Record<NoteStatus, { label: string; color: string }> = {
 
 export default function NotesPage() {
   const { notes, addNote, updateNote, deleteNote, resolveNote, clearResolvedNotes, largeText } = useAppStore();
-  const [mounted, setMounted] = useState(false);
+  const mounted = useMounted();
   const [showAddForm, setShowAddForm] = useState(false);
   const [filterStatus, setFilterStatus] = useState<NoteStatus | 'all'>('all');
   const [filterCategory, setFilterCategory] = useState<NoteCategory | 'all'>('all');
@@ -61,10 +62,6 @@ export default function NotesPage() {
   const [priority, setPriority] = useState<NotePriority>('medium');
   const [stationId, setStationId] = useState<StationId | ''>('');
   const [playerId, setPlayerId] = useState('');
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
+import { useMounted } from '../hooks/useMounted';
 import Link from 'next/link';
 import Header from '../components/Header';
 import PlayerPhoto from '../components/PlayerPhoto';
@@ -35,12 +36,8 @@ const to12h = (time: string) => {
 export default function SchedulePage() {
   const { schedule, largeText } = useAppStore();
   const [selectedDate, setSelectedDate] = useState(EVENT_DATES[0] as string);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useMounted();
   const [showPROnly, setShowPROnly] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const now = new Date();
   const today = formatDate(now);

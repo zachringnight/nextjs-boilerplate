@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { useMounted } from './hooks/useMounted';
 import Link from 'next/link';
 import Header from './components/Header';
 import PlayerPhoto from './components/PlayerPhoto';
@@ -36,11 +37,10 @@ export default function DailyOverviewPage() {
   } = useAppStore();
 
   const [selectedDate, setSelectedDate] = useState(EVENT_DATES[0] as string);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useMounted();
   const [now, setNow] = useState(new Date());
 
   useEffect(() => {
-    setMounted(true);
     const id = setInterval(() => setNow(new Date()), 30_000);
     return () => clearInterval(id);
   }, []);
