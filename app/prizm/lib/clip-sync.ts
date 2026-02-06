@@ -19,6 +19,7 @@ export async function syncClipInsert(
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await (supabase as any).from('clip_markers').insert({
+      name: clipData.name || null,
       timestamp: new Date().toISOString(),
       category: clipData.category || 'general',
       media_type: clipData.media_type || 'video',

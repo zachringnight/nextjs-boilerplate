@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useAppStore } from '../store';
 import { ClipCategory, ClipPriority, MediaType } from '../types/database';
-import { players } from '../data/players';
-import { stations } from '../data/stations';
+import { players, getPlayerById } from '../data/players';
+import { stations, getStationById } from '../data/stations';
 import { StationId } from '../types';
 import {
   X,
@@ -46,6 +46,17 @@ export default function QuickClipModal() {
   const [priority, setPriority] = useState<ClipPriority>('normal');
   const [flagged, setFlagged] = useState(false);
   const [showTimecodeRange, setShowTimecodeRange] = useState(false);
+  const [clipName, setClipName] = useState('');
+
+  // Auto-generate clip name when player or station changes
+  useEffect(() => {
+    const player = playerId ? getPlayerById(playerId) : null;
+    const station = stationId ? getStationById(stationId) : null;
+    if (player && station) setClipName(`${player.name} @ ${station.name}`);
+    else if (player) setClipName(player.name);
+    else if (station) setClipName(station.name);
+    else setClipName('');
+  }, [playerId, stationId]);
 
   // Sync category with quickMarkCategory and defaults when modal opens
   useEffect(() => {
@@ -62,6 +73,7 @@ export default function QuickClipModal() {
     e.preventDefault();
 
     const clipData = {
+      name: clipName || null,
       category,
       media_type: mediaType,
       player_id: playerId || null,
@@ -102,6 +114,7 @@ export default function QuickClipModal() {
     setShowTimecodeRange(false);
     setPlayerId('');
     setStationId('');
+    setClipName('');
   };
 
   // Add tag
@@ -357,6 +370,23 @@ export default function QuickClipModal() {
                 ))}
               </select>
             </div>
+          </div>
+
+          {/* Clip Name */}
+          <div>
+            <label className={cn('block text-[#9CA3AF] mb-1', largeText ? 'text-base' : 'text-sm')}>
+              Clip Name
+            </label>
+            <input
+              type="text"
+              value={clipName}
+              onChange={(e) => setClipName(e.target.value)}
+              placeholder="Auto-generated from player & station"
+              className="w-full bg-[#0D0D0D] border border-[#2A2A2A] rounded-lg px-3 py-2 text-white text-sm placeholder-[#6B7280] focus:border-[#FFD100] focus:outline-none"
+            />
+            {clipName && (playerId || stationId) && (
+              <p className="text-[10px] text-[#6B7280] mt-1">Auto-filled from player/station. Edit to customize.</p>
+            )}
           </div>
 
           {/* Crew Member */}

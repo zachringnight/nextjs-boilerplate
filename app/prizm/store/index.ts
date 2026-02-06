@@ -17,7 +17,8 @@ import {
   ClipDefaults,
   PlayerStationCompletion,
 } from '../types';
-import { checklistStations } from '../data/stations';
+import { checklistStations, getStationById } from '../data/stations';
+import { getPlayerById } from '../data/players';
 import { defaultSchedule } from '../data/schedule';
 import { defaultDeliverables } from '../data/deliverables';
 import { syncClipInsert, syncClipUpdate, syncClipDelete, syncBulkClipUpdate, syncBulkClipDelete } from '../lib/clip-sync';
@@ -51,6 +52,16 @@ function slotToRecord(slot: ScheduleSlot) {
     pr_call_info: slot.prCallInfo ? (slot.prCallInfo as unknown as Record<string, unknown>) : null,
     notes: slot.notes || null,
   };
+}
+
+// Helper to generate a clip name from player and station IDs
+function generateClipName(playerId?: string | null, stationId?: string | null): string | null {
+  const player = playerId ? getPlayerById(playerId) : null;
+  const station = stationId ? getStationById(stationId as StationId) : null;
+  if (player && station) return `${player.name} @ ${station.name}`;
+  if (player) return player.name;
+  if (station) return station.name;
+  return null;
 }
 
 // Helper to convert app Deliverable to DB record format
@@ -399,6 +410,7 @@ export const useAppStore = create<AppState>()(
         const defaults = get().clipDefaults;
         const newClip: ClipMarker = {
           id: `clip-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          name: clipData.name || generateClipName(clipData.player_id, clipData.station_id),
           timestamp: now,
           timecode: clipData.timecode || null,
           timecode_in: clipData.timecode_in || null,
@@ -426,14 +438,24 @@ export const useAppStore = create<AppState>()(
         return newClip;
       },
       updateClip: (id, updates) => {
+        // Auto-regenerate name when player or station changes (unless name was explicitly provided)
+        const finalUpdates = { ...updates };
+        if (('player_id' in updates || 'station_id' in updates) && !('name' in updates)) {
+          const clip = get().clips.find((c) => c.id === id);
+          if (clip) {
+            const playerId = 'player_id' in updates ? updates.player_id : clip.player_id;
+            const stationId = 'station_id' in updates ? updates.station_id : clip.station_id;
+            finalUpdates.name = generateClipName(playerId, stationId);
+          }
+        }
         set((state) => ({
           clips: state.clips.map((clip) =>
             clip.id === id
-              ? { ...clip, ...updates, updated_at: new Date().toISOString() }
+              ? { ...clip, ...finalUpdates, updated_at: new Date().toISOString() }
               : clip
           ),
         }));
-        syncClipUpdate(id, updates);
+        syncClipUpdate(id, finalUpdates);
       },
       deleteClip: (id) => {
         set((state) => ({

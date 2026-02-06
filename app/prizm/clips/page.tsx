@@ -186,11 +186,12 @@ export default function ClipsPage() {
 
   // Export to CSV
   const exportCSV = () => {
-    const headers = ['Timestamp', 'Category', 'Priority', 'Status', 'Player', 'Station', 'Notes', 'Rating', 'Tags', 'Timecode', 'Timecode In', 'Timecode Out', 'Camera', 'Crew Member', 'Media Type', 'Flagged'];
+    const headers = ['Name', 'Timestamp', 'Category', 'Priority', 'Status', 'Player', 'Station', 'Notes', 'Rating', 'Tags', 'Timecode', 'Timecode In', 'Timecode Out', 'Camera', 'Crew Member', 'Media Type', 'Flagged'];
     const rows = filteredClips.map(clip => {
       const player = clip.player_id ? getPlayerById(clip.player_id) : null;
       const station = clip.station_id ? stations.find(s => s.id === clip.station_id) : null;
       return [
+        clip.name || '',
         clip.timestamp,
         CATEGORY_CONFIG[clip.category]?.label || clip.category,
         (clip.priority || 'normal'),
@@ -315,6 +316,7 @@ export default function ClipsPage() {
         const categoryLabel = CATEGORY_CONFIG[clip.category]?.label || '';
 
         const searchable = [
+          clip.name,
           clip.notes,
           player?.name,
           station?.name,
@@ -837,6 +839,11 @@ export default function ClipsPage() {
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
+                      {clip.name && (
+                        <p className={cn('font-semibold text-white truncate', largeText ? 'text-base' : 'text-sm')}>
+                          {clip.name}
+                        </p>
+                      )}
                       <div className="flex items-center gap-2">
                         <span
                           className={cn('font-medium', largeText ? 'text-base' : 'text-sm')}
