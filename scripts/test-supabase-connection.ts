@@ -14,6 +14,12 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { Database } from '../app/prizm/types/database';
 
+// Configuration constants
+const REALTIME_CONNECTION_TIMEOUT_MS = 10000;
+
+// Valid table names from the database schema
+type TableName = 'notes' | 'deliverables' | 'schedule_slots' | 'player_station_completions';
+
 // Colors for console output
 const colors = {
   reset: '\x1b[0m',
@@ -103,13 +109,13 @@ async function testConnection(client: SupabaseClient<Database>): Promise<boolean
 async function testDatabaseAccess(client: SupabaseClient<Database>): Promise<boolean> {
   section('TEST 3: Database Access');
   
-  const tables = ['notes', 'deliverables', 'schedule_slots', 'player_station_completions'];
+  const tables: TableName[] = ['notes', 'deliverables', 'schedule_slots', 'player_station_completions'];
   let allPassed = true;
   
   for (const table of tables) {
     try {
       // Try to query the table with a limit of 0 to just check access
-      const { error } = await client.from(table as any).select('*').limit(0);
+      const { error } = await client.from(table).select('*').limit(0);
       
       if (error) {
         if (error.code === '42P01') {
@@ -239,12 +245,12 @@ async function testRealtimeConnection(client: SupabaseClient<Database>): Promise
           }
         });
       
-      // Timeout after 10 seconds
+      // Timeout after configured duration
       setTimeout(() => {
         warning('Realtime connection test timed out');
         channel.unsubscribe();
         resolve(false);
-      }, 10000);
+      }, REALTIME_CONNECTION_TIMEOUT_MS);
     } catch (err) {
       error(`Realtime test error: ${err instanceof Error ? err.message : String(err)}`);
       resolve(false);

@@ -8,6 +8,9 @@
  * Usage: npm run check:env
  */
 
+import * as fs from 'fs';
+import * as path from 'path';
+
 const colors = {
   reset: '\x1b[0m',
   green: '\x1b[32m',
@@ -69,8 +72,6 @@ function main() {
   }
   
   // Check for .env.local
-  const fs = require('fs');
-  const path = require('path');
   const envLocalPath = path.join(process.cwd(), '.env.local');
   
   if (fs.existsSync(envLocalPath)) {
