@@ -151,6 +151,8 @@ interface AppState {
   toggleClipSelection: (id: string) => void;
   selectAllClips: (ids: string[]) => void;
   clearClipSelection: () => void;
+  editingClipId: string | null;
+  setEditingClipId: (id: string | null) => void;
   setClipModalOpen: (open: boolean) => void;
   setQuickMarkCategory: (category: ClipCategory) => void;
   setClipDefaults: (defaults: Partial<ClipDefaults>) => void;
@@ -511,7 +513,12 @@ export const useAppStore = create<AppState>()(
       },
       selectAllClips: (ids) => set({ selectedClipIds: ids }),
       clearClipSelection: () => set({ selectedClipIds: [] }),
-      setClipModalOpen: (open) => set({ clipModalOpen: open }),
+      editingClipId: null,
+      setEditingClipId: (id) => set({ editingClipId: id }),
+      setClipModalOpen: (open) => {
+        if (!open) set({ clipModalOpen: false, editingClipId: null });
+        else set({ clipModalOpen: true });
+      },
       setQuickMarkCategory: (category) => set({ quickMarkCategory: category }),
       setClipDefaults: (defaults) => {
         set((state) => ({
