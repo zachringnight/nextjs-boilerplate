@@ -17,8 +17,12 @@ import {
   Eye,
   Download,
   Archive,
+  AlertTriangle,
+  ArrowUp,
+  Minus,
+  ArrowDown,
 } from 'lucide-react';
-import { ClipCategory, ClipStatus, MediaType } from '../types/database';
+import { ClipCategory, ClipStatus, MediaType, ClipPriority } from '../types/database';
 
 export const CATEGORY_CONFIG: Record<
   ClipCategory,
@@ -49,4 +53,21 @@ export const MEDIA_CONFIG: Record<MediaType, { label: string; icon: typeof Video
   video: { label: 'Video', icon: Video },
   photo: { label: 'Photo', icon: Camera },
   audio: { label: 'Audio', icon: Mic },
+};
+
+export const PRIORITY_CONFIG: Record<
+  ClipPriority,
+  { label: string; icon: typeof AlertTriangle; color: string; sortOrder: number }
+> = {
+  urgent: { label: 'Urgent', icon: AlertTriangle, color: '#EF4444', sortOrder: 0 },
+  high: { label: 'High', icon: ArrowUp, color: '#F59E0B', sortOrder: 1 },
+  normal: { label: 'Normal', icon: Minus, color: '#9CA3AF', sortOrder: 2 },
+  low: { label: 'Low', icon: ArrowDown, color: '#6B7280', sortOrder: 3 },
+};
+
+export const PRIORITY_SORT_ORDER: Record<ClipPriority, number> = {
+  urgent: 0,
+  high: 1,
+  normal: 2,
+  low: 3,
 };
