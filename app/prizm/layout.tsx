@@ -6,6 +6,7 @@ import AppErrorBoundary from './components/AppErrorBoundary';
 import './prizm.css';
 
 const ClipProvider = dynamic(() => import('./components/ClipProvider'));
+const SupabaseProvider = dynamic(() => import('./components/SupabaseProvider'));
 const NotificationProvider = dynamic(() => import('./components/NotificationProvider'));
 const ServiceWorkerRegistration = dynamic(() => import('./components/ServiceWorkerRegistration'));
 
@@ -42,6 +43,7 @@ export default function PrizmLayout({
       <ServiceWorkerRegistration />
       <NotificationProvider />
       <GlobalSearch />
+      <SupabaseProvider />
       <ClipProvider />
       <AppErrorBoundary>
         <main className="pb-20">
