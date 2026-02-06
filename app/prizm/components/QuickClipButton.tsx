@@ -19,10 +19,12 @@ import {
   Eye,
   Flag,
   Settings,
+  Pencil,
+  Trash2,
 } from 'lucide-react';
 import { cn, hapticFeedback } from '../lib/utils';
 import { CATEGORY_CONFIG, PRIORITY_CONFIG } from '../lib/clip-constants';
-import { syncClipInsert } from '../lib/clip-sync';
+import { syncClipInsert, syncClipDelete } from '../lib/clip-sync';
 
 // Map station IDs to likely clip categories
 const STATION_CATEGORY_MAP: Partial<Record<StationId, ClipCategory>> = {
@@ -53,6 +55,7 @@ export default function QuickClipButton() {
   const [mounted, setMounted] = useState(false);
   const [activeView, setActiveView] = useState<'stations' | 'categories' | 'defaults'>('stations');
   const [quickPriority, setQuickPriority] = useState<ClipPriority>('normal');
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const {
     clips,
     schedule,
@@ -61,7 +64,9 @@ export default function QuickClipButton() {
     setQuickMarkCategory,
     setClipDefaults,
     addClip,
+    deleteClip,
     setClipModalOpen,
+    setEditingClipId,
     getTodayClipCount,
     getFlaggedCount,
   } = useAppStore();
@@ -561,7 +566,7 @@ export default function QuickClipButton() {
               </div>
               <div className="space-y-1">
                 {recentClips.map(clip => (
-                  <div key={clip.id} className="flex items-center gap-2 text-[11px]">
+                  <div key={clip.id} className="flex items-center gap-2 text-[11px] group/clip">
                     <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: clip.categoryColor }} />
                     {clip.flagged && <Flag className="w-2.5 h-2.5 text-[#FFD100] flex-shrink-0" />}
                     {clip.priority === 'urgent' && (
@@ -571,7 +576,60 @@ export default function QuickClipButton() {
                       {clip.stationIcon && <span className="mr-1">{clip.stationIcon}</span>}
                       {clip.playerName || clip.categoryLabel}
                     </span>
-                    <span className="text-[#4A4A4A] flex-shrink-0">{clip.time}</span>
+                    <span className="text-[#4A4A4A] flex-shrink-0 group-hover/clip:hidden">{clip.time}</span>
+                    {/* Edit / Delete actions on hover */}
+                    <div className="hidden group-hover/clip:flex items-center gap-0.5 flex-shrink-0">
+                      {deleteConfirmId === clip.id ? (
+                        <>
+                          <span className="text-[10px] text-red-400 mr-0.5">Delete?</span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteClip(clip.id);
+                              syncClipDelete(clip.id);
+                              setDeleteConfirmId(null);
+                            }}
+                            className="px-1.5 py-0.5 bg-red-500 text-white rounded text-[10px] hover:bg-red-600"
+                          >
+                            Yes
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeleteConfirmId(null);
+                            }}
+                            className="px-1.5 py-0.5 bg-[#2A2A2A] text-[#9CA3AF] rounded text-[10px] hover:bg-[#3A3A3A]"
+                          >
+                            No
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditingClipId(clip.id);
+                              setClipModalOpen(true);
+                              setExpanded(false);
+                            }}
+                            className="p-1 text-[#6B7280] hover:text-[#FFD100] rounded transition-colors"
+                            title="Edit clip"
+                          >
+                            <Pencil className="w-3 h-3" />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeleteConfirmId(clip.id);
+                            }}
+                            className="p-1 text-[#6B7280] hover:text-red-400 rounded transition-colors"
+                            title="Delete clip"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>

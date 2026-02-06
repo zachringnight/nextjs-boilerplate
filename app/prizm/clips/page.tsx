@@ -59,6 +59,7 @@ export default function ClipsPage() {
     quickMarkCategory,
     setQuickMarkCategory,
     setClipModalOpen,
+    setEditingClipId,
     clipSortField,
     clipSortDirection,
     setClipSort,
@@ -1029,6 +1030,18 @@ export default function ClipsPage() {
 
                     {/* Status Actions */}
                     <div className="flex items-center gap-2 flex-wrap">
+                      {/* Edit clip */}
+                      <button
+                        onClick={() => {
+                          setEditingClipId(clip.id);
+                          setClipModalOpen(true);
+                        }}
+                        className="flex items-center gap-1 px-3 py-1.5 bg-[#3B82F6]/20 text-[#3B82F6] rounded-lg text-sm hover:bg-[#3B82F6]/30"
+                      >
+                        <Edit3 className="w-4 h-4" />
+                        Edit
+                      </button>
+
                       {/* Flag toggle */}
                       <button
                         onClick={() => handleToggleFlag(clip.id)}

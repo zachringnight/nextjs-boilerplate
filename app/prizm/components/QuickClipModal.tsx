@@ -16,18 +16,25 @@ import {
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { CATEGORY_CONFIG, MEDIA_CONFIG, PRIORITY_CONFIG } from '../lib/clip-constants';
-import { syncClipInsert } from '../lib/clip-sync';
+import { syncClipInsert, syncClipUpdate } from '../lib/clip-sync';
 
 export default function QuickClipModal() {
   const {
     clipModalOpen,
     setClipModalOpen,
     addClip,
+    updateClip,
+    clips,
+    editingClipId,
+    setEditingClipId,
     quickMarkCategory,
     setQuickMarkCategory,
     clipDefaults,
     largeText,
   } = useAppStore();
+
+  const editingClip = editingClipId ? clips.find(c => c.id === editingClipId) : null;
+  const isEditMode = !!editingClip;
 
   // Form state
   const [category, setCategory] = useState<ClipCategory>(quickMarkCategory);
@@ -48,25 +55,48 @@ export default function QuickClipModal() {
   const [showTimecodeRange, setShowTimecodeRange] = useState(false);
   const [clipName, setClipName] = useState('');
 
-  // Auto-generate clip name when player or station changes
+  // Auto-generate clip name when player or station changes (only in add mode)
   useEffect(() => {
+    if (isEditMode) return;
     const player = playerId ? getPlayerById(playerId) : null;
     const station = stationId ? getStationById(stationId) : null;
     if (player && station) setClipName(`${player.name} @ ${station.name}`);
     else if (player) setClipName(player.name);
     else if (station) setClipName(station.name);
     else setClipName('');
-  }, [playerId, stationId]);
+  }, [playerId, stationId, isEditMode]);
 
-  // Sync category with quickMarkCategory and defaults when modal opens
+  // Populate form when editing an existing clip or when modal opens for add
   useEffect(() => {
     if (clipModalOpen) {
-      setCategory(quickMarkCategory);
-      setCamera(clipDefaults.camera || '');
-      setCrewMember(clipDefaults.crew_member || '');
-      setMediaType(clipDefaults.media_type || 'video');
+      if (editingClip) {
+        // Edit mode: populate from existing clip
+        setCategory(editingClip.category);
+        setMediaType(editingClip.media_type);
+        setPlayerId(editingClip.player_id || '');
+        setStationId((editingClip.station_id as StationId) || '');
+        setNotes(editingClip.notes || '');
+        setTimecode(editingClip.timecode || '');
+        setTimecodeIn(editingClip.timecode_in || '');
+        setTimecodeOut(editingClip.timecode_out || '');
+        setCamera(editingClip.camera || '');
+        setCrewMember(editingClip.crew_member || '');
+        setTags([...editingClip.tags]);
+        setTagInput('');
+        setRating(editingClip.rating || 0);
+        setPriority(editingClip.priority || 'normal');
+        setFlagged(editingClip.flagged);
+        setShowTimecodeRange(!!(editingClip.timecode_in || editingClip.timecode_out));
+        setClipName(editingClip.name || '');
+      } else {
+        // Add mode: use defaults
+        setCategory(quickMarkCategory);
+        setCamera(clipDefaults.camera || '');
+        setCrewMember(clipDefaults.crew_member || '');
+        setMediaType(clipDefaults.media_type || 'video');
+      }
     }
-  }, [clipModalOpen, quickMarkCategory, clipDefaults]);
+  }, [clipModalOpen, editingClip, quickMarkCategory, clipDefaults]);
 
   // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
@@ -90,9 +120,14 @@ export default function QuickClipModal() {
       flagged,
     };
 
-    addClip(clipData);
-    syncClipInsert(clipData);
-    setQuickMarkCategory(category);
+    if (isEditMode && editingClipId) {
+      updateClip(editingClipId, clipData);
+      syncClipUpdate(editingClipId, clipData);
+    } else {
+      addClip(clipData);
+      syncClipInsert(clipData);
+      setQuickMarkCategory(category);
+    }
 
     // Reset form
     resetForm();
@@ -115,6 +150,7 @@ export default function QuickClipModal() {
     setPlayerId('');
     setStationId('');
     setClipName('');
+    setEditingClipId(null);
   };
 
   // Add tag
@@ -144,7 +180,7 @@ export default function QuickClipModal() {
       <div className="bg-[#1A1A1A] w-full sm:max-w-lg sm:rounded-xl rounded-t-xl max-h-[90vh] overflow-auto">
         <div className="sticky top-0 bg-[#1A1A1A] border-b border-[#2A2A2A] p-4 flex items-center justify-between z-10">
           <h2 className={cn('font-semibold text-white', largeText ? 'text-xl' : 'text-lg')}>
-            Add Clip Marker
+            {isEditMode ? 'Edit Clip' : 'Add Clip Marker'}
           </h2>
           <div className="flex items-center gap-2">
             <button
@@ -384,7 +420,7 @@ export default function QuickClipModal() {
               placeholder="Auto-generated from player & station"
               className="w-full bg-[#0D0D0D] border border-[#2A2A2A] rounded-lg px-3 py-2 text-white text-sm placeholder-[#6B7280] focus:border-[#FFD100] focus:outline-none"
             />
-            {clipName && (playerId || stationId) && (
+            {clipName && (playerId || stationId) && !isEditMode && (
               <p className="text-[10px] text-[#6B7280] mt-1">Auto-filled from player/station. Edit to customize.</p>
             )}
           </div>
@@ -481,11 +517,17 @@ export default function QuickClipModal() {
               'w-full py-3 font-semibold rounded-lg transition-colors flex items-center justify-center gap-2',
               priority === 'urgent'
                 ? 'bg-[#EF4444] text-white hover:bg-[#EF4444]/90'
-                : 'bg-[#FFD100] text-black hover:bg-[#FFD100]/90'
+                : isEditMode
+                  ? 'bg-[#3B82F6] text-white hover:bg-[#3B82F6]/90'
+                  : 'bg-[#FFD100] text-black hover:bg-[#FFD100]/90'
             )}
           >
             <Check className="w-5 h-5" />
-            {flagged ? 'Add Flagged Clip' : 'Add Clip Marker'}
+            {isEditMode
+              ? 'Save Changes'
+              : flagged
+                ? 'Add Flagged Clip'
+                : 'Add Clip Marker'}
             {priority !== 'normal' && (
               <span className="text-xs opacity-80 ml-1">({PRIORITY_CONFIG[priority].label})</span>
             )}
