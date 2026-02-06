@@ -55,10 +55,17 @@ export type ClipStatus = 'marked' | 'reviewed' | 'exported' | 'archived';
 
 export type MediaType = 'video' | 'photo' | 'audio';
 
+export type ClipPriority = 'urgent' | 'high' | 'normal' | 'low';
+
+export type ClipSortField = 'timestamp' | 'rating' | 'category' | 'priority' | 'status';
+export type ClipSortDirection = 'asc' | 'desc';
+
 export interface ClipMarker {
   id: string;
   timestamp: string; // ISO timestamp of when the clip was marked
   timecode?: string | null; // Camera timecode (e.g., "01:23:45:12")
+  timecode_in?: string | null; // In-point timecode for clip range
+  timecode_out?: string | null; // Out-point timecode for clip range
   player_id?: string | null; // Associated player ID
   station_id?: string | null; // Station where clip was captured
   category: ClipCategory;
@@ -69,6 +76,8 @@ export interface ClipMarker {
   camera?: string | null; // Camera identifier (e.g., "Camera A", "iPhone Pro")
   crew_member?: string | null; // Who marked the clip
   status: ClipStatus;
+  priority: ClipPriority; // Priority level for post-production triage
+  flagged: boolean; // Pinned/favorited for quick access
   created_at: string;
   updated_at: string;
 }
@@ -76,6 +85,8 @@ export interface ClipMarker {
 export interface ClipMarkerInsert {
   timestamp?: string;
   timecode?: string | null;
+  timecode_in?: string | null;
+  timecode_out?: string | null;
   player_id?: string | null;
   station_id?: string | null;
   category?: ClipCategory;
@@ -86,11 +97,15 @@ export interface ClipMarkerInsert {
   camera?: string | null;
   crew_member?: string | null;
   status?: ClipStatus;
+  priority?: ClipPriority;
+  flagged?: boolean;
 }
 
 export interface ClipMarkerUpdate {
   timestamp?: string;
   timecode?: string | null;
+  timecode_in?: string | null;
+  timecode_out?: string | null;
   player_id?: string | null;
   station_id?: string | null;
   category?: ClipCategory;
@@ -101,7 +116,15 @@ export interface ClipMarkerUpdate {
   camera?: string | null;
   crew_member?: string | null;
   status?: ClipStatus;
+  priority?: ClipPriority;
+  flagged?: boolean;
   updated_at?: string;
+}
+
+export interface ClipDefaults {
+  crew_member: string;
+  camera: string;
+  media_type: MediaType;
 }
 
 // Database schema definition for Supabase client
@@ -120,6 +143,7 @@ export interface Database {
       clip_category: ClipCategory;
       clip_status: ClipStatus;
       media_type: MediaType;
+      clip_priority: ClipPriority;
     };
   };
 }

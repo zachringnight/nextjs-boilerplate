@@ -12,6 +12,9 @@ import {
   DeliverableType,
   ClipMarker,
   ClipCategory,
+  ClipSortField,
+  ClipSortDirection,
+  ClipDefaults,
   PlayerStationCompletion,
 } from '../types';
 import { checklistStations } from '../data/stations';
@@ -73,14 +76,37 @@ interface AppState {
   clips: ClipMarker[];
   clipModalOpen: boolean;
   quickMarkCategory: ClipCategory;
+  clipDefaults: ClipDefaults;
+  clipSortField: ClipSortField;
+  clipSortDirection: ClipSortDirection;
+  selectedClipIds: string[];
   setClips: (clips: ClipMarker[]) => void;
   addClip: (clip: Partial<ClipMarker>) => ClipMarker;
   updateClip: (id: string, updates: Partial<ClipMarker>) => void;
   deleteClip: (id: string) => void;
+  duplicateClip: (id: string) => ClipMarker | null;
+  bulkUpdateClips: (ids: string[], updates: Partial<ClipMarker>) => void;
+  bulkDeleteClips: (ids: string[]) => void;
+  toggleClipSelection: (id: string) => void;
+  selectAllClips: (ids: string[]) => void;
+  clearClipSelection: () => void;
   setClipModalOpen: (open: boolean) => void;
   setQuickMarkCategory: (category: ClipCategory) => void;
+  setClipDefaults: (defaults: Partial<ClipDefaults>) => void;
+  setClipSort: (field: ClipSortField, direction: ClipSortDirection) => void;
+  toggleClipFlag: (id: string) => void;
   getTodayClipCount: () => number;
   getHighlightCount: () => number;
+  getFlaggedCount: () => number;
+  getClipAnalytics: () => {
+    byCategory: Record<string, number>;
+    byStatus: Record<string, number>;
+    byPriority: Record<string, number>;
+    byCrewMember: Record<string, number>;
+    avgRating: number;
+    totalToday: number;
+    totalFlagged: number;
+  };
 
   // Player Station Checklist
   playerStationCompletions: PlayerStationCompletion[];
@@ -260,23 +286,32 @@ export const useAppStore = create<AppState>()(
       clips: [],
       clipModalOpen: false,
       quickMarkCategory: 'highlight',
+      clipDefaults: { crew_member: '', camera: '', media_type: 'video' },
+      clipSortField: 'timestamp',
+      clipSortDirection: 'desc',
+      selectedClipIds: [],
       setClips: (clips) => set({ clips }),
       addClip: (clipData) => {
         const now = new Date().toISOString();
+        const defaults = get().clipDefaults;
         const newClip: ClipMarker = {
           id: `clip-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           timestamp: now,
           timecode: clipData.timecode || null,
+          timecode_in: clipData.timecode_in || null,
+          timecode_out: clipData.timecode_out || null,
           player_id: clipData.player_id || null,
           station_id: clipData.station_id || null,
           category: clipData.category || 'general',
           tags: clipData.tags || [],
           notes: clipData.notes || null,
           rating: clipData.rating || null,
-          media_type: clipData.media_type || 'video',
-          camera: clipData.camera || null,
-          crew_member: clipData.crew_member || null,
+          media_type: clipData.media_type || defaults.media_type || 'video',
+          camera: clipData.camera || defaults.camera || null,
+          crew_member: clipData.crew_member || defaults.crew_member || null,
           status: 'marked',
+          priority: clipData.priority || 'normal',
+          flagged: clipData.flagged || false,
           created_at: now,
           updated_at: now,
         };
@@ -299,10 +334,70 @@ export const useAppStore = create<AppState>()(
       deleteClip: (id) => {
         set((state) => ({
           clips: state.clips.filter((clip) => clip.id !== id),
+          selectedClipIds: state.selectedClipIds.filter((sid) => sid !== id),
         }));
       },
+      duplicateClip: (id) => {
+        const state = get();
+        const original = state.clips.find((c) => c.id === id);
+        if (!original) return null;
+        const now = new Date().toISOString();
+        const newClip: ClipMarker = {
+          ...original,
+          id: `clip-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          timestamp: now,
+          status: 'marked',
+          created_at: now,
+          updated_at: now,
+        };
+        set((state) => {
+          const updated = [newClip, ...state.clips];
+          return { clips: updated.length > 500 ? updated.slice(0, 500) : updated };
+        });
+        return newClip;
+      },
+      bulkUpdateClips: (ids, updates) => {
+        const now = new Date().toISOString();
+        set((state) => ({
+          clips: state.clips.map((clip) =>
+            ids.includes(clip.id)
+              ? { ...clip, ...updates, updated_at: now }
+              : clip
+          ),
+        }));
+      },
+      bulkDeleteClips: (ids) => {
+        set((state) => ({
+          clips: state.clips.filter((clip) => !ids.includes(clip.id)),
+          selectedClipIds: [],
+        }));
+      },
+      toggleClipSelection: (id) => {
+        set((state) => ({
+          selectedClipIds: state.selectedClipIds.includes(id)
+            ? state.selectedClipIds.filter((sid) => sid !== id)
+            : [...state.selectedClipIds, id],
+        }));
+      },
+      selectAllClips: (ids) => set({ selectedClipIds: ids }),
+      clearClipSelection: () => set({ selectedClipIds: [] }),
       setClipModalOpen: (open) => set({ clipModalOpen: open }),
       setQuickMarkCategory: (category) => set({ quickMarkCategory: category }),
+      setClipDefaults: (defaults) => {
+        set((state) => ({
+          clipDefaults: { ...state.clipDefaults, ...defaults },
+        }));
+      },
+      setClipSort: (field, direction) => set({ clipSortField: field, clipSortDirection: direction }),
+      toggleClipFlag: (id) => {
+        set((state) => ({
+          clips: state.clips.map((clip) =>
+            clip.id === id
+              ? { ...clip, flagged: !clip.flagged, updated_at: new Date().toISOString() }
+              : clip
+          ),
+        }));
+      },
       getTodayClipCount: () => {
         const state = get();
         const today = new Date().toDateString();
@@ -313,6 +408,47 @@ export const useAppStore = create<AppState>()(
       getHighlightCount: () => {
         const state = get();
         return state.clips.filter((c) => c.category === 'highlight').length;
+      },
+      getFlaggedCount: () => {
+        const state = get();
+        return state.clips.filter((c) => c.flagged).length;
+      },
+      getClipAnalytics: () => {
+        const state = get();
+        const byCategory: Record<string, number> = {};
+        const byStatus: Record<string, number> = {};
+        const byPriority: Record<string, number> = {};
+        const byCrewMember: Record<string, number> = {};
+        let ratingSum = 0;
+        let ratingCount = 0;
+        const today = new Date().toDateString();
+        let totalToday = 0;
+        let totalFlagged = 0;
+
+        for (const clip of state.clips) {
+          byCategory[clip.category] = (byCategory[clip.category] || 0) + 1;
+          byStatus[clip.status] = (byStatus[clip.status] || 0) + 1;
+          byPriority[clip.priority || 'normal'] = (byPriority[clip.priority || 'normal'] || 0) + 1;
+          if (clip.crew_member) {
+            byCrewMember[clip.crew_member] = (byCrewMember[clip.crew_member] || 0) + 1;
+          }
+          if (clip.rating) {
+            ratingSum += clip.rating;
+            ratingCount++;
+          }
+          if (new Date(clip.timestamp).toDateString() === today) totalToday++;
+          if (clip.flagged) totalFlagged++;
+        }
+
+        return {
+          byCategory,
+          byStatus,
+          byPriority,
+          byCrewMember,
+          avgRating: ratingCount > 0 ? Math.round((ratingSum / ratingCount) * 10) / 10 : 0,
+          totalToday,
+          totalFlagged,
+        };
       },
 
       // Player Station Checklist
@@ -410,6 +546,9 @@ export const useAppStore = create<AppState>()(
         selectedDay: state.selectedDay,
         clips: state.clips,
         quickMarkCategory: state.quickMarkCategory,
+        clipDefaults: state.clipDefaults,
+        clipSortField: state.clipSortField,
+        clipSortDirection: state.clipSortDirection,
         playerStationCompletions: state.playerStationCompletions,
       }),
     }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAppStore } from '../store';
-import { ClipCategory, MediaType } from '../types/database';
+import { ClipCategory, ClipPriority, MediaType } from '../types/database';
 import { players } from '../data/players';
 import { stations } from '../data/stations';
 import { StationId } from '../types';
@@ -12,9 +12,10 @@ import {
   Star,
   StarOff,
   Tag,
+  Flag,
 } from 'lucide-react';
 import { cn } from '../lib/utils';
-import { CATEGORY_CONFIG, MEDIA_CONFIG } from '../lib/clip-constants';
+import { CATEGORY_CONFIG, MEDIA_CONFIG, PRIORITY_CONFIG } from '../lib/clip-constants';
 import { syncClipInsert } from '../lib/clip-sync';
 
 export default function QuickClipModal() {
@@ -24,28 +25,37 @@ export default function QuickClipModal() {
     addClip,
     quickMarkCategory,
     setQuickMarkCategory,
+    clipDefaults,
     largeText,
   } = useAppStore();
 
   // Form state
   const [category, setCategory] = useState<ClipCategory>(quickMarkCategory);
-  const [mediaType, setMediaType] = useState<MediaType>('video');
+  const [mediaType, setMediaType] = useState<MediaType>(clipDefaults.media_type || 'video');
   const [playerId, setPlayerId] = useState('');
   const [stationId, setStationId] = useState<StationId | ''>('');
   const [notes, setNotes] = useState('');
   const [timecode, setTimecode] = useState('');
-  const [camera, setCamera] = useState('');
-  const [crewMember, setCrewMember] = useState('');
+  const [timecodeIn, setTimecodeIn] = useState('');
+  const [timecodeOut, setTimecodeOut] = useState('');
+  const [camera, setCamera] = useState(clipDefaults.camera || '');
+  const [crewMember, setCrewMember] = useState(clipDefaults.crew_member || '');
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
   const [rating, setRating] = useState<number>(0);
+  const [priority, setPriority] = useState<ClipPriority>('normal');
+  const [flagged, setFlagged] = useState(false);
+  const [showTimecodeRange, setShowTimecodeRange] = useState(false);
 
-  // Sync category with quickMarkCategory when modal opens
+  // Sync category with quickMarkCategory and defaults when modal opens
   useEffect(() => {
     if (clipModalOpen) {
       setCategory(quickMarkCategory);
+      setCamera(clipDefaults.camera || '');
+      setCrewMember(clipDefaults.crew_member || '');
+      setMediaType(clipDefaults.media_type || 'video');
     }
-  }, [clipModalOpen, quickMarkCategory]);
+  }, [clipModalOpen, quickMarkCategory, clipDefaults]);
 
   // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
@@ -58,10 +68,14 @@ export default function QuickClipModal() {
       station_id: stationId || null,
       notes: notes || null,
       timecode: timecode || null,
+      timecode_in: timecodeIn || null,
+      timecode_out: timecodeOut || null,
       camera: camera || null,
       crew_member: crewMember || null,
       tags,
       rating: rating || null,
+      priority,
+      flagged,
     };
 
     addClip(clipData);
@@ -76,11 +90,16 @@ export default function QuickClipModal() {
   const resetForm = () => {
     setNotes('');
     setTimecode('');
-    setCamera('');
-    setCrewMember('');
+    setTimecodeIn('');
+    setTimecodeOut('');
+    setCamera(clipDefaults.camera || '');
+    setCrewMember(clipDefaults.crew_member || '');
     setTags([]);
     setTagInput('');
     setRating(0);
+    setPriority('normal');
+    setFlagged(false);
+    setShowTimecodeRange(false);
     setPlayerId('');
     setStationId('');
   };
@@ -114,15 +133,62 @@ export default function QuickClipModal() {
           <h2 className={cn('font-semibold text-white', largeText ? 'text-xl' : 'text-lg')}>
             Add Clip Marker
           </h2>
-          <button
-            onClick={() => setClipModalOpen(false)}
-            className="p-2 text-[#9CA3AF] hover:text-white rounded-lg hover:bg-[#2A2A2A]"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setFlagged(!flagged)}
+              className={cn(
+                'p-2 rounded-lg transition-all',
+                flagged
+                  ? 'text-[#FFD100] bg-[#FFD100]/10'
+                  : 'text-[#6B7280] hover:text-[#FFD100] hover:bg-[#2A2A2A]'
+              )}
+              title={flagged ? 'Remove flag' : 'Flag this clip'}
+            >
+              <Flag className={cn('w-5 h-5', flagged && 'fill-[#FFD100]')} />
+            </button>
+            <button
+              onClick={() => setClipModalOpen(false)}
+              className="p-2 text-[#9CA3AF] hover:text-white rounded-lg hover:bg-[#2A2A2A]"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="p-4 space-y-4">
+          {/* Priority */}
+          <div>
+            <label className={cn('block text-[#9CA3AF] mb-2', largeText ? 'text-base' : 'text-sm')}>
+              Priority
+            </label>
+            <div className="flex gap-2">
+              {(Object.entries(PRIORITY_CONFIG) as [ClipPriority, typeof PRIORITY_CONFIG[ClipPriority]][]).map(([key, config]) => {
+                const Icon = config.icon;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setPriority(key)}
+                    className={cn(
+                      'flex-1 py-2 rounded-lg border text-sm font-medium transition-all flex items-center justify-center gap-1.5',
+                      priority === key
+                        ? 'border-current bg-opacity-10'
+                        : 'border-[#2A2A2A] text-[#6B7280] hover:border-[#3A3A3A]'
+                    )}
+                    style={{
+                      color: priority === key ? config.color : undefined,
+                      backgroundColor: priority === key ? `${config.color}15` : undefined,
+                      borderColor: priority === key ? config.color : undefined,
+                    }}
+                  >
+                    <Icon className="w-4 h-4" />
+                    {config.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Category */}
           <div>
             <label className={cn('block text-[#9CA3AF] mb-2', largeText ? 'text-base' : 'text-sm')}>
@@ -193,12 +259,44 @@ export default function QuickClipModal() {
             />
           </div>
 
-          {/* Timecode & Camera */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className={cn('block text-[#9CA3AF] mb-1', largeText ? 'text-base' : 'text-sm')}>
+          {/* Timecode */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className={cn('text-[#9CA3AF]', largeText ? 'text-base' : 'text-sm')}>
                 Timecode
               </label>
+              <button
+                type="button"
+                onClick={() => setShowTimecodeRange(!showTimecodeRange)}
+                className="text-[10px] text-[#FFD100] hover:text-[#FFD100]/80"
+              >
+                {showTimecodeRange ? 'Single timecode' : 'Use In/Out range'}
+              </button>
+            </div>
+            {showTimecodeRange ? (
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[10px] text-[#6B7280] uppercase tracking-wider block mb-1">In</label>
+                  <input
+                    type="text"
+                    value={timecodeIn}
+                    onChange={(e) => setTimecodeIn(e.target.value)}
+                    placeholder="01:23:45:12"
+                    className="w-full bg-[#0D0D0D] border border-[#2A2A2A] rounded-lg px-3 py-2 text-white placeholder-[#6B7280] focus:border-[#FFD100] focus:outline-none font-mono text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] text-[#6B7280] uppercase tracking-wider block mb-1">Out</label>
+                  <input
+                    type="text"
+                    value={timecodeOut}
+                    onChange={(e) => setTimecodeOut(e.target.value)}
+                    placeholder="01:24:30:00"
+                    className="w-full bg-[#0D0D0D] border border-[#2A2A2A] rounded-lg px-3 py-2 text-white placeholder-[#6B7280] focus:border-[#FFD100] focus:outline-none font-mono text-sm"
+                  />
+                </div>
+              </div>
+            ) : (
               <input
                 type="text"
                 value={timecode}
@@ -206,19 +304,21 @@ export default function QuickClipModal() {
                 placeholder="01:23:45:12"
                 className="w-full bg-[#0D0D0D] border border-[#2A2A2A] rounded-lg px-3 py-2 text-white placeholder-[#6B7280] focus:border-[#FFD100] focus:outline-none font-mono"
               />
-            </div>
-            <div>
-              <label className={cn('block text-[#9CA3AF] mb-1', largeText ? 'text-base' : 'text-sm')}>
-                Camera
-              </label>
-              <input
-                type="text"
-                value={camera}
-                onChange={(e) => setCamera(e.target.value)}
-                placeholder="Camera A"
-                className="w-full bg-[#0D0D0D] border border-[#2A2A2A] rounded-lg px-3 py-2 text-white placeholder-[#6B7280] focus:border-[#FFD100] focus:outline-none"
-              />
-            </div>
+            )}
+          </div>
+
+          {/* Camera */}
+          <div>
+            <label className={cn('block text-[#9CA3AF] mb-1', largeText ? 'text-base' : 'text-sm')}>
+              Camera
+            </label>
+            <input
+              type="text"
+              value={camera}
+              onChange={(e) => setCamera(e.target.value)}
+              placeholder="Camera A"
+              className="w-full bg-[#0D0D0D] border border-[#2A2A2A] rounded-lg px-3 py-2 text-white placeholder-[#6B7280] focus:border-[#FFD100] focus:outline-none"
+            />
           </div>
 
           {/* Station & Player */}
@@ -347,10 +447,18 @@ export default function QuickClipModal() {
           {/* Submit */}
           <button
             type="submit"
-            className="w-full py-3 bg-[#FFD100] text-black font-semibold rounded-lg hover:bg-[#FFD100]/90 transition-colors flex items-center justify-center gap-2"
+            className={cn(
+              'w-full py-3 font-semibold rounded-lg transition-colors flex items-center justify-center gap-2',
+              priority === 'urgent'
+                ? 'bg-[#EF4444] text-white hover:bg-[#EF4444]/90'
+                : 'bg-[#FFD100] text-black hover:bg-[#FFD100]/90'
+            )}
           >
             <Check className="w-5 h-5" />
-            Add Clip Marker
+            {flagged ? 'Add Flagged Clip' : 'Add Clip Marker'}
+            {priority !== 'normal' && (
+              <span className="text-xs opacity-80 ml-1">({PRIORITY_CONFIG[priority].label})</span>
+            )}
           </button>
         </form>
       </div>

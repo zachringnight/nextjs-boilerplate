@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { useAppStore } from '../store';
-import { ClipCategory } from '../types/database';
+import { ClipCategory, ClipPriority } from '../types/database';
 import { StationId } from '../types';
 import { stations as stationData, getStationById } from '../data/stations';
 import { players as playerData } from '../data/players';
@@ -17,9 +17,11 @@ import {
   Zap,
   Film,
   Eye,
+  Flag,
+  Settings,
 } from 'lucide-react';
 import { cn, hapticFeedback } from '../lib/utils';
-import { CATEGORY_CONFIG } from '../lib/clip-constants';
+import { CATEGORY_CONFIG, PRIORITY_CONFIG } from '../lib/clip-constants';
 import { syncClipInsert } from '../lib/clip-sync';
 
 // Map station IDs to likely clip categories
@@ -47,17 +49,21 @@ export default function QuickClipButton() {
   const pathname = usePathname();
   const [expanded, setExpanded] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [successInfo, setSuccessInfo] = useState<{ station?: string; player?: string; category: string } | null>(null);
+  const [successInfo, setSuccessInfo] = useState<{ station?: string; player?: string; category: string; priority?: string } | null>(null);
   const [mounted, setMounted] = useState(false);
-  const [activeView, setActiveView] = useState<'stations' | 'categories'>('stations');
+  const [activeView, setActiveView] = useState<'stations' | 'categories' | 'defaults'>('stations');
+  const [quickPriority, setQuickPriority] = useState<ClipPriority>('normal');
   const {
     clips,
     schedule,
     quickMarkCategory,
+    clipDefaults,
     setQuickMarkCategory,
+    setClipDefaults,
     addClip,
     setClipModalOpen,
     getTodayClipCount,
+    getFlaggedCount,
   } = useAppStore();
 
   // Don't show on the clips page itself
@@ -66,11 +72,21 @@ export default function QuickClipButton() {
   // Tick counter that increments every 30s to refresh active-station checks
   const [tick, setTick] = useState(0);
 
+  // Local state for defaults form
+  const [defaultCrew, setDefaultCrew] = useState(clipDefaults.crew_member);
+  const [defaultCamera, setDefaultCamera] = useState(clipDefaults.camera);
+
   useEffect(() => {
     setMounted(true);
     const id = setInterval(() => setTick(t => t + 1), 30_000);
     return () => clearInterval(id);
   }, []);
+
+  // Sync local defaults when store changes
+  useEffect(() => {
+    setDefaultCrew(clipDefaults.crew_member);
+    setDefaultCamera(clipDefaults.camera);
+  }, [clipDefaults]);
 
   // Get currently active stations from the live schedule
   const activeStations = useMemo((): ActiveStationInfo[] => {
@@ -92,7 +108,7 @@ export default function QuickClipButton() {
         return {
           stationId: slot.station,
           stationName: station?.name || slot.station,
-          stationIcon: station?.icon || '📍',
+          stationIcon: station?.icon || '',
           stationColor: station?.color || '#6b7280',
           playerId: slot.playerId,
           playerName: player?.name || slot.playerId,
@@ -117,6 +133,8 @@ export default function QuickClipButton() {
         stationName: station?.name,
         stationIcon: station?.icon,
         playerName: player?.name,
+        flagged: clip.flagged,
+        priority: clip.priority,
         time: time.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
       };
     });
@@ -127,7 +145,7 @@ export default function QuickClipButton() {
   const toastClearRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   // Show success feedback (clears previous timeouts on rapid marking)
-  const showFeedback = useCallback((info: { station?: string; player?: string; category: string }) => {
+  const showFeedback = useCallback((info: { station?: string; player?: string; category: string; priority?: string }) => {
     clearTimeout(toastTimeoutRef.current);
     clearTimeout(toastClearRef.current);
     setSuccessInfo(info);
@@ -144,6 +162,7 @@ export default function QuickClipButton() {
       category,
       station_id: stationInfo.stationId,
       player_id: stationInfo.playerId,
+      priority: quickPriority,
     };
     addClip(clipData);
     syncClipInsert(clipData);
@@ -152,30 +171,37 @@ export default function QuickClipButton() {
       station: stationInfo.stationName,
       player: stationInfo.playerName,
       category: CATEGORY_CONFIG[category].label,
+      priority: quickPriority !== 'normal' ? PRIORITY_CONFIG[quickPriority].label : undefined,
     });
     setExpanded(false);
-  }, [quickMarkCategory, addClip, showFeedback]);
+  }, [quickMarkCategory, quickPriority, addClip, showFeedback]);
 
   // Quick mark - one tap to mark a clip (uses current category)
   const quickMark = useCallback(() => {
-    const clipData = { category: quickMarkCategory };
+    const clipData = { category: quickMarkCategory, priority: quickPriority };
     addClip(clipData);
     syncClipInsert(clipData);
 
-    showFeedback({ category: CATEGORY_CONFIG[quickMarkCategory].label });
+    showFeedback({
+      category: CATEGORY_CONFIG[quickMarkCategory].label,
+      priority: quickPriority !== 'normal' ? PRIORITY_CONFIG[quickPriority].label : undefined,
+    });
     setExpanded(false);
-  }, [quickMarkCategory, addClip, showFeedback]);
+  }, [quickMarkCategory, quickPriority, addClip, showFeedback]);
 
   // Mark with specific category
   const markWithCategory = useCallback((category: ClipCategory) => {
-    const clipData = { category };
+    const clipData = { category, priority: quickPriority };
     addClip(clipData);
     syncClipInsert(clipData);
     setQuickMarkCategory(category);
 
-    showFeedback({ category: CATEGORY_CONFIG[category].label });
+    showFeedback({
+      category: CATEGORY_CONFIG[category].label,
+      priority: quickPriority !== 'normal' ? PRIORITY_CONFIG[quickPriority].label : undefined,
+    });
     setExpanded(false);
-  }, [addClip, setQuickMarkCategory, showFeedback]);
+  }, [quickPriority, addClip, setQuickMarkCategory, showFeedback]);
 
   // Mark a specific station from the "all stations" grid (not necessarily live)
   const markStationById = useCallback((stationId: StationId) => {
@@ -189,6 +215,7 @@ export default function QuickClipButton() {
       category,
       station_id: stationId,
       player_id: liveStation?.playerId || null,
+      priority: quickPriority,
     };
     addClip(clipData);
     syncClipInsert(clipData);
@@ -197,9 +224,19 @@ export default function QuickClipButton() {
       station: station?.name || stationId,
       player: liveStation?.playerName,
       category: CATEGORY_CONFIG[category].label,
+      priority: quickPriority !== 'normal' ? PRIORITY_CONFIG[quickPriority].label : undefined,
     });
     setExpanded(false);
-  }, [quickMarkCategory, activeStations, addClip, showFeedback]);
+  }, [quickMarkCategory, quickPriority, activeStations, addClip, showFeedback]);
+
+  // Save defaults
+  const saveDefaults = useCallback(() => {
+    setClipDefaults({
+      crew_member: defaultCrew.trim(),
+      camera: defaultCamera.trim(),
+    });
+    hapticFeedback([30]);
+  }, [defaultCrew, defaultCamera, setClipDefaults]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -227,7 +264,7 @@ export default function QuickClipButton() {
       }
 
       // Number keys 1-9 for quick category selection when expanded
-      if (expanded && e.key >= '1' && e.key <= '9') {
+      if (expanded && activeView === 'categories' && e.key >= '1' && e.key <= '9') {
         const categories = Object.keys(CATEGORY_CONFIG) as ClipCategory[];
         const index = parseInt(e.key) - 1;
         if (index < categories.length) {
@@ -239,7 +276,7 @@ export default function QuickClipButton() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [quickMark, markWithCategory, expanded, setClipModalOpen]);
+  }, [quickMark, markWithCategory, expanded, activeView, setClipModalOpen]);
 
   // Close on click outside
   useEffect(() => {
@@ -259,8 +296,10 @@ export default function QuickClipButton() {
   if (!mounted || isClipsPage) return null;
 
   const todayCount = getTodayClipCount();
+  const flaggedCount = getFlaggedCount();
   const CategoryIcon = CATEGORY_CONFIG[quickMarkCategory].icon;
   const hasLiveStations = activeStations.length > 0;
+  const PriorityIcon = PRIORITY_CONFIG[quickPriority].icon;
 
   return (
     <div className="quick-clip-container fixed bottom-24 right-4 z-40">
@@ -275,7 +314,12 @@ export default function QuickClipButton() {
               <Check className="w-4 h-4 text-[#22C55E]" />
             </div>
             <div className="flex flex-col min-w-0">
-              <span className="text-[11px] text-[#22C55E] font-medium">Clip Marked</span>
+              <span className="text-[11px] text-[#22C55E] font-medium">
+                Clip Marked
+                {successInfo.priority && (
+                  <span className="ml-1 text-[10px] opacity-80">({successInfo.priority})</span>
+                )}
+              </span>
               <span className="text-xs text-white truncate">
                 {successInfo.station && `${successInfo.station}`}
                 {successInfo.player && ` — ${successInfo.player}`}
@@ -316,6 +360,18 @@ export default function QuickClipButton() {
                 <Film className="w-3 h-3 inline mr-1" />
                 Category
               </button>
+              <button
+                onClick={() => setActiveView('defaults')}
+                className={cn(
+                  'px-2.5 py-1 rounded-md text-xs font-medium transition-all',
+                  activeView === 'defaults'
+                    ? 'bg-[#FFD100]/15 text-[#FFD100]'
+                    : 'text-[#6B7280] hover:text-white'
+                )}
+              >
+                <Settings className="w-3 h-3 inline mr-1" />
+                Defaults
+              </button>
             </div>
             <button
               onClick={() => setExpanded(false)}
@@ -323,6 +379,34 @@ export default function QuickClipButton() {
             >
               <X className="w-4 h-4" />
             </button>
+          </div>
+
+          {/* Priority Quick Selector */}
+          <div className="px-3 py-2 border-b border-[#2A2A2A] flex items-center gap-1.5">
+            <span className="text-[10px] text-[#6B7280] uppercase tracking-wider mr-1">Priority:</span>
+            {(Object.entries(PRIORITY_CONFIG) as [ClipPriority, typeof PRIORITY_CONFIG[ClipPriority]][]).map(([key, config]) => {
+              const Icon = config.icon;
+              return (
+                <button
+                  key={key}
+                  onClick={() => setQuickPriority(key)}
+                  className={cn(
+                    'px-2 py-0.5 rounded text-[10px] font-medium transition-all flex items-center gap-1',
+                    quickPriority === key
+                      ? 'ring-1'
+                      : 'opacity-50 hover:opacity-100'
+                  )}
+                  style={{
+                    backgroundColor: quickPriority === key ? `${config.color}20` : 'transparent',
+                    color: config.color,
+                    boxShadow: quickPriority === key ? `0 0 0 1px ${config.color}` : undefined,
+                  }}
+                >
+                  <Icon className="w-3 h-3" />
+                  {config.label}
+                </button>
+              );
+            })}
           </div>
 
           {/* Stations View */}
@@ -424,17 +508,65 @@ export default function QuickClipButton() {
             </div>
           )}
 
+          {/* Defaults View */}
+          {activeView === 'defaults' && (
+            <div className="p-3 space-y-3">
+              <div>
+                <label className="text-[10px] text-[#6B7280] uppercase tracking-wider block mb-1">Crew Member</label>
+                <input
+                  type="text"
+                  value={defaultCrew}
+                  onChange={(e) => setDefaultCrew(e.target.value)}
+                  placeholder="Your name..."
+                  className="w-full bg-[#0D0D0D] border border-[#2A2A2A] rounded-lg px-2.5 py-1.5 text-white text-xs placeholder-[#6B7280] focus:border-[#FFD100] focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="text-[10px] text-[#6B7280] uppercase tracking-wider block mb-1">Camera</label>
+                <input
+                  type="text"
+                  value={defaultCamera}
+                  onChange={(e) => setDefaultCamera(e.target.value)}
+                  placeholder="Camera A, iPhone..."
+                  className="w-full bg-[#0D0D0D] border border-[#2A2A2A] rounded-lg px-2.5 py-1.5 text-white text-xs placeholder-[#6B7280] focus:border-[#FFD100] focus:outline-none"
+                />
+              </div>
+              <button
+                onClick={saveDefaults}
+                className="w-full py-1.5 bg-[#FFD100] text-black text-xs font-semibold rounded-lg hover:bg-[#FFD100]/90 transition-colors flex items-center justify-center gap-1"
+              >
+                <Check className="w-3 h-3" />
+                Save Defaults
+              </button>
+              <p className="text-[9px] text-[#6B7280] text-center">
+                These auto-fill when creating clips
+              </p>
+            </div>
+          )}
+
           {/* Recent Clips */}
           {recentClips.length > 0 && (
             <div className="border-t border-[#2A2A2A] px-3 py-2">
               <div className="flex items-center justify-between mb-1.5">
                 <span className="text-[10px] font-semibold text-[#6B7280] uppercase tracking-wider">Recent</span>
-                <span className="text-[10px] text-[#4A4A4A]">{todayCount} today</span>
+                <div className="flex items-center gap-2">
+                  {flaggedCount > 0 && (
+                    <span className="text-[10px] text-[#FFD100] flex items-center gap-0.5">
+                      <Flag className="w-2.5 h-2.5" />
+                      {flaggedCount}
+                    </span>
+                  )}
+                  <span className="text-[10px] text-[#4A4A4A]">{todayCount} today</span>
+                </div>
               </div>
               <div className="space-y-1">
                 {recentClips.map(clip => (
                   <div key={clip.id} className="flex items-center gap-2 text-[11px]">
                     <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: clip.categoryColor }} />
+                    {clip.flagged && <Flag className="w-2.5 h-2.5 text-[#FFD100] flex-shrink-0" />}
+                    {clip.priority === 'urgent' && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#EF4444] flex-shrink-0 animate-pulse" />
+                    )}
                     <span className="text-[#9CA3AF] truncate flex-1">
                       {clip.stationIcon && <span className="mr-1">{clip.stationIcon}</span>}
                       {clip.playerName || clip.categoryLabel}
@@ -485,7 +617,9 @@ export default function QuickClipButton() {
             'quick-clip-fab relative w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all',
             showSuccess
               ? 'bg-[#22C55E] scale-110'
-              : 'bg-[#FFD100] hover:bg-[#FFD100]/90 active:scale-95',
+              : quickPriority === 'urgent'
+                ? 'bg-[#EF4444] hover:bg-[#EF4444]/90 active:scale-95'
+                : 'bg-[#FFD100] hover:bg-[#FFD100]/90 active:scale-95',
             hasLiveStations && !showSuccess && 'quick-clip-fab-live'
           )}
         >
@@ -502,6 +636,16 @@ export default function QuickClipButton() {
               style={{ backgroundColor: CATEGORY_CONFIG[quickMarkCategory].color }}
             >
               <CategoryIcon className="w-3 h-3 text-black" />
+            </div>
+          )}
+
+          {/* Priority indicator */}
+          {!showSuccess && quickPriority !== 'normal' && (
+            <div
+              className="absolute -top-1 -left-1 w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#0D0D0D]"
+              style={{ backgroundColor: PRIORITY_CONFIG[quickPriority].color }}
+            >
+              <PriorityIcon className="w-3 h-3 text-white" />
             </div>
           )}
 
