@@ -1,8 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import { ChevronRight } from 'lucide-react';
 import { Player, ScheduleSlot } from '../types';
 import { useAppStore } from '../store';
+import PlayerPhoto from './PlayerPhoto';
 
 interface PlayerCardProps {
   player: Player;
@@ -14,30 +16,14 @@ export default function PlayerCard({ player, nextSlot, showNextAppearance = true
   const { largeText } = useAppStore();
 
   return (
-    <Link href={`/prizm/players/${player.id}`}>
-      <div className="bg-[#1A1A1A] rounded-xl border border-[#2A2A2A] p-4 hover:border-[#FFD100]/50 transition-all cursor-pointer">
+    <Link href={`/prizm/players/${player.id}`} className="group block">
+      <div className="relative bg-[#1A1A1A] rounded-xl border border-[#2A2A2A] p-4 transition-all duration-200 hover:border-[#FFD100]/50 hover:bg-[#1E1E1E] hover:shadow-lg hover:shadow-[#FFD100]/5 active:scale-[0.98]">
         <div className="flex items-center gap-3">
-          {/* Player Photo */}
-          <div className="w-14 h-14 rounded-full bg-[#2A2A2A] flex items-center justify-center text-xl font-bold text-white overflow-hidden flex-shrink-0">
-            {player.photo ? (
-              <img
-                src={player.photo}
-                alt={player.name}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = 'none';
-                  target.parentElement!.innerHTML = player.name.charAt(0);
-                }}
-              />
-            ) : (
-              player.name.charAt(0)
-            )}
-          </div>
+          <PlayerPhoto src={player.photo} name={player.name} size="md" />
 
           {/* Player Info */}
           <div className="flex-1 min-w-0">
-            <p className={`font-semibold text-white truncate ${largeText ? 'text-lg' : 'text-base'}`}>
+            <p className={`font-semibold text-white truncate group-hover:text-[#FFD100] transition-colors ${largeText ? 'text-lg' : 'text-base'}`}>
               {player.name}
             </p>
             <p className={`text-[#9CA3AF] truncate ${largeText ? 'text-base' : 'text-sm'}`}>
@@ -47,6 +33,8 @@ export default function PlayerCard({ player, nextSlot, showNextAppearance = true
               {player.position}
             </p>
           </div>
+
+          <ChevronRight size={18} className="text-[#4B5563] group-hover:text-[#FFD100] transition-all duration-200 group-hover:translate-x-0.5 flex-shrink-0" />
         </div>
 
         {/* Next Appearance */}

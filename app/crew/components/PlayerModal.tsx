@@ -20,11 +20,11 @@ export default function PlayerModal({ player, onClose, largeText = false }: Play
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Backdrop */}
-      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
+      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm animate-[backdropFade_0.2s_ease-out]" onClick={onClose} />
 
       {/* Modal */}
       <div className="relative min-h-screen flex items-start justify-center p-4 pt-8">
-        <div className="relative bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl w-full max-w-2xl overflow-hidden">
+        <div className="relative bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl w-full max-w-2xl overflow-hidden animate-[slideUp_0.3s_ease-out]">
           {/* Close button */}
           <button
             onClick={onClose}

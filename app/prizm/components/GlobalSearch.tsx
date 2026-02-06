@@ -6,6 +6,7 @@ import { Search, X, Clock } from 'lucide-react';
 import { useAppStore } from '../store';
 import { searchPlayers } from '../data/players';
 import { getScheduleForPlayer, getNextSlot } from '../data/schedule';
+import PlayerPhoto from './PlayerPhoto';
 
 export default function GlobalSearch() {
   const router = useRouter();
@@ -56,9 +57,9 @@ export default function GlobalSearch() {
   if (!searchOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm" onClick={() => setSearchOpen(false)}>
+    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm animate-[backdropFade_0.15s_ease-out]" onClick={() => setSearchOpen(false)}>
       <div
-        className="fixed top-[10%] left-1/2 -translate-x-1/2 w-full max-w-lg mx-4"
+        className="fixed top-[10%] left-1/2 -translate-x-1/2 w-full max-w-lg mx-4 animate-[slideUp_0.25s_ease-out]"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="bg-[#1A1A1A] rounded-2xl border border-[#2A2A2A] shadow-2xl overflow-hidden">
@@ -119,29 +120,13 @@ export default function GlobalSearch() {
                     <button
                       key={player.id}
                       onClick={() => handleSelect(player.id, player.name)}
-                      className="flex items-center gap-3 w-full px-3 py-3 rounded-lg hover:bg-[#2A2A2A] transition-colors"
+                      className="group flex items-center gap-3 w-full px-3 py-3 rounded-lg hover:bg-[#2A2A2A] transition-all duration-150"
                     >
-                      {/* Player Photo */}
-                      <div className="w-10 h-10 rounded-full bg-[#2A2A2A] flex items-center justify-center text-lg font-bold text-white overflow-hidden flex-shrink-0">
-                        {player.photo ? (
-                          <img
-                            src={player.photo}
-                            alt={player.name}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.style.display = 'none';
-                              target.parentElement!.innerHTML = player.name.charAt(0);
-                            }}
-                          />
-                        ) : (
-                          player.name.charAt(0)
-                        )}
-                      </div>
+                      <PlayerPhoto src={player.photo} name={player.name} size="sm" />
 
                       {/* Player Info */}
                       <div className="flex-1 text-left">
-                        <p className={`font-medium text-white ${largeText ? 'text-lg' : 'text-base'}`}>
+                        <p className={`font-medium text-white group-hover:text-[#FFD100] transition-colors ${largeText ? 'text-lg' : 'text-base'}`}>
                           {player.name}
                         </p>
                         <p className={`text-[#9CA3AF] ${largeText ? 'text-base' : 'text-sm'}`}>

@@ -287,10 +287,10 @@ export default function CrewPage() {
       {showGlobalSearch && (
         <div className="fixed inset-0 z-50">
           <div
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm"
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm animate-[backdropFade_0.15s_ease-out]"
             onClick={closeGlobalSearch}
           />
-          <div className="relative flex justify-center pt-[15vh] px-4">
+          <div className="relative flex justify-center pt-[15vh] px-4 animate-[slideUp_0.25s_ease-out]">
             <div className="w-full max-w-xl bg-[#141414] border border-[#2a2a2a] rounded-xl shadow-2xl overflow-hidden">
               {/* Search Input */}
               <div className="flex items-center border-b border-[#2a2a2a] px-4">
@@ -328,11 +328,11 @@ export default function CrewPage() {
                       <button
                         key={player.id}
                         onClick={() => handleGlobalSearchSelect(player)}
-                        className="w-full px-4 py-3 flex items-center gap-3 hover:bg-[#1a1a1a] transition-colors text-left"
+                        className="group w-full px-4 py-3 flex items-center gap-3 hover:bg-[#1a1a1a] transition-all duration-150 text-left"
                       >
                         <span className="text-2xl">{player.flag}</span>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium truncate">
+                          <p className="font-medium truncate group-hover:text-[#FFD100] transition-colors">
                             {player.firstName} {player.lastName}
                           </p>
                           <p className="text-sm text-gray-500 truncate">
