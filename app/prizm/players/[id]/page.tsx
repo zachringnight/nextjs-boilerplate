@@ -8,6 +8,7 @@ import { getPlayerArrivalsForDay, DAY_LABELS, EVENT_DATES } from '../../data/sch
 import { stations, checklistStations } from '../../data/stations';
 import { useAppStore } from '../../store';
 import { StationId } from '../../types';
+import PlayerPhoto from '../../components/PlayerPhoto';
 import { ArrowLeft, Calendar, Award, CreditCard, Star, ClipboardCheck, Phone } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
@@ -94,27 +95,16 @@ export default function PlayerDetailPage({ params }: PageProps) {
       </div>
 
       {/* Hero Section */}
-      <div className="relative">
+      <div className="relative animate-[fadeIn_0.4s_ease-out]">
         <div className="h-32 bg-gradient-to-b from-[#FFD100]/20 to-[#0D0D0D]" />
         <div className="px-4 -mt-16">
           <div className="flex items-end gap-4">
-            {/* Player Photo */}
-            <div className="w-28 h-28 rounded-2xl bg-[#1A1A1A] border-4 border-[#0D0D0D] flex items-center justify-center text-4xl font-bold text-white overflow-hidden flex-shrink-0">
-              {player.photo ? (
-                <img
-                  src={player.photo}
-                  alt={player.name}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
-                    target.parentElement!.innerHTML = player.name.charAt(0);
-                  }}
-                />
-              ) : (
-                player.name.charAt(0)
-              )}
-            </div>
+            <PlayerPhoto
+              src={player.photo}
+              name={player.name}
+              size="xl"
+              className="rounded-2xl border-4 border-[#0D0D0D] shadow-xl"
+            />
 
             {/* Player Info */}
             <div className="pb-2">
@@ -135,7 +125,7 @@ export default function PlayerDetailPage({ params }: PageProps) {
       {/* Content */}
       <div className="p-4 space-y-6">
         {/* Schedule (arrival times + PR info) */}
-        <section className="bg-[#1A1A1A] rounded-xl border border-[#2A2A2A] p-4">
+        <section className="bg-[#1A1A1A] rounded-xl border border-[#2A2A2A] p-4 animate-[fadeIn_0.4s_ease-out_0.05s_both]">
           <h2 className={cn('font-semibold text-white flex items-center gap-2 mb-3', largeText ? 'text-xl' : 'text-lg')}>
             <Calendar size={20} className="text-[#FFD100]" />
             Event Schedule
@@ -195,7 +185,7 @@ export default function PlayerDetailPage({ params }: PageProps) {
         </section>
 
         {/* Station Checklist */}
-        <section className="bg-[#1A1A1A] rounded-xl border border-[#2A2A2A] p-4">
+        <section className="bg-[#1A1A1A] rounded-xl border border-[#2A2A2A] p-4 animate-[fadeIn_0.4s_ease-out_0.1s_both]">
           <h2 className={cn('font-semibold text-white flex items-center gap-2 mb-1', largeText ? 'text-xl' : 'text-lg')}>
             <ClipboardCheck size={20} className="text-[#FFD100]" />
             Station Checklist
@@ -207,7 +197,7 @@ export default function PlayerDetailPage({ params }: PageProps) {
           {/* Progress bar */}
           <div className="h-2 bg-[#2A2A2A] rounded-full overflow-hidden mb-4">
             <div
-              className="h-full transition-all duration-300"
+              className="h-full transition-all duration-500 ease-out"
               style={{
                 width: `${progress.percentage}%`,
                 backgroundColor: progress.percentage === 100 ? '#22c55e' : '#FFD100',
@@ -227,7 +217,7 @@ export default function PlayerDetailPage({ params }: PageProps) {
                   key={stationId}
                   onClick={() => togglePlayerStation(id, stationId)}
                   className={cn(
-                    'flex items-center gap-2 p-3 rounded-lg border transition-all',
+                    'flex items-center gap-2 p-3 rounded-lg border transition-all duration-200',
                     completed
                       ? 'bg-green-500/20 border-green-500/50'
                       : 'bg-[#0D0D0D] border-[#2A2A2A] hover:border-[#FFD100]/50'
@@ -236,7 +226,7 @@ export default function PlayerDetailPage({ params }: PageProps) {
                   {/* Checkbox */}
                   <div
                     className={cn(
-                      'w-5 h-5 rounded flex items-center justify-center flex-shrink-0',
+                      'w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-all duration-200',
                       completed ? 'bg-green-500' : 'border-2 border-[#4B5563]'
                     )}
                   >
@@ -267,7 +257,7 @@ export default function PlayerDetailPage({ params }: PageProps) {
         </section>
 
         {/* Bio */}
-        <section className="bg-[#1A1A1A] rounded-xl border border-[#2A2A2A] p-4">
+        <section className="bg-[#1A1A1A] rounded-xl border border-[#2A2A2A] p-4 animate-[fadeIn_0.4s_ease-out_0.15s_both]">
           <h2 className={`font-semibold text-white flex items-center gap-2 mb-3 ${largeText ? 'text-xl' : 'text-lg'}`}>
             <Star size={20} className="text-[#FFD100]" />
             Bio
@@ -278,7 +268,7 @@ export default function PlayerDetailPage({ params }: PageProps) {
         </section>
 
         {/* Stats */}
-        <section className="bg-[#1A1A1A] rounded-xl border border-[#2A2A2A] p-4">
+        <section className="bg-[#1A1A1A] rounded-xl border border-[#2A2A2A] p-4 animate-[fadeIn_0.4s_ease-out_0.2s_both]">
           <h2 className={`font-semibold text-white flex items-center gap-2 mb-3 ${largeText ? 'text-xl' : 'text-lg'}`}>
             <Award size={20} className="text-[#FFD100]" />
             Career Highlights
@@ -297,7 +287,7 @@ export default function PlayerDetailPage({ params }: PageProps) {
         </section>
 
         {/* Card History */}
-        <section className="bg-[#1A1A1A] rounded-xl border border-[#2A2A2A] p-4">
+        <section className="bg-[#1A1A1A] rounded-xl border border-[#2A2A2A] p-4 animate-[fadeIn_0.4s_ease-out_0.25s_both]">
           <h2 className={`font-semibold text-white flex items-center gap-2 mb-3 ${largeText ? 'text-xl' : 'text-lg'}`}>
             <CreditCard size={20} className="text-[#FFD100]" />
             Notable Panini Cards
@@ -306,7 +296,7 @@ export default function PlayerDetailPage({ params }: PageProps) {
             {player.cardHistory.map((card, i) => (
               <span
                 key={i}
-                className={`px-3 py-1.5 rounded-lg bg-[#2A2A2A] text-white ${largeText ? 'text-sm' : 'text-xs'}`}
+                className={`px-3 py-1.5 rounded-lg bg-[#2A2A2A] text-white border border-[#3A3A3A] ${largeText ? 'text-sm' : 'text-xs'}`}
               >
                 {card}
               </span>
@@ -315,7 +305,7 @@ export default function PlayerDetailPage({ params }: PageProps) {
         </section>
 
         {/* Career Moments */}
-        <section className="bg-[#1A1A1A] rounded-xl border border-[#2A2A2A] p-4">
+        <section className="bg-[#1A1A1A] rounded-xl border border-[#2A2A2A] p-4 animate-[fadeIn_0.4s_ease-out_0.3s_both]">
           <h2 className={`font-semibold text-white flex items-center gap-2 mb-3 ${largeText ? 'text-xl' : 'text-lg'}`}>
             <Star size={20} className="text-[#FFD100]" />
             Career Moments

@@ -1,6 +1,6 @@
 import type { Player } from '../../data/players';
 import PlayerAvatar from './PlayerAvatar';
-import { AlertTriangle, Languages } from 'lucide-react';
+import { AlertTriangle, Languages, ChevronRight } from 'lucide-react';
 
 interface PlayerCardProps {
   player: Player;
@@ -21,7 +21,7 @@ export default function PlayerCard({ player, onClick }: PlayerCardProps) {
   return (
     <button
       onClick={onClick}
-      className={`w-full bg-[#141414] border ${dayColors[player.day]} rounded-xl p-4 text-left transition-all hover:bg-[#1a1a1a] active:scale-[0.98]`}
+      className={`group w-full bg-[#141414] border ${dayColors[player.day]} rounded-xl p-4 text-left transition-all duration-200 hover:bg-[#1a1a1a] hover:shadow-lg hover:shadow-black/20 active:scale-[0.98]`}
     >
       <div className="flex gap-4">
         {/* Photo */}
@@ -30,8 +30,11 @@ export default function PlayerCard({ player, onClick }: PlayerCardProps) {
         {/* Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2 mb-1">
-            <h3 className="font-bold text-lg truncate">{player.firstName} {player.lastName}</h3>
-            <span className="text-2xl flex-shrink-0">{player.flag}</span>
+            <h3 className="font-bold text-lg truncate group-hover:text-[#FFD100] transition-colors">{player.firstName} {player.lastName}</h3>
+            <div className="flex items-center gap-1 flex-shrink-0">
+              <span className="text-2xl">{player.flag}</span>
+              <ChevronRight size={16} className="text-gray-600 group-hover:text-[#FFD100] transition-all duration-200 group-hover:translate-x-0.5" />
+            </div>
           </div>
 
           {player.pronunciation && (
@@ -64,7 +67,7 @@ export default function PlayerCard({ player, onClick }: PlayerCardProps) {
       </div>
 
       {/* Quick bio preview */}
-      <p className="text-sm text-gray-500 mt-3 line-clamp-2">
+      <p className="text-sm text-gray-500 mt-3 line-clamp-2 group-hover:text-gray-400 transition-colors">
         {player.bio[0]}
       </p>
     </button>

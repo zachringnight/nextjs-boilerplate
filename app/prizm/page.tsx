@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Header from './components/Header';
+import PlayerPhoto from './components/PlayerPhoto';
 import { useAppStore } from './store';
 import { getPlayerById } from './data/players';
 import {
@@ -16,6 +17,7 @@ import { formatDate, getEventStatus, getDayNumber } from './lib/time';
 import {
   Phone,
   Users,
+  ChevronRight,
 } from 'lucide-react';
 import { cn } from './lib/utils';
 
@@ -165,43 +167,27 @@ export default function DailyOverviewPage() {
                 arrival.departureTime <= currentTime;
 
               return (
-                <div
+                <Link
                   key={arrival.playerId}
+                  href={`/prizm/players/${player.id}`}
                   className={cn(
-                    'bg-[#1A1A1A] rounded-xl border overflow-hidden transition-all',
+                    'block bg-[#1A1A1A] rounded-xl border overflow-hidden transition-all duration-200 hover:border-[#FFD100]/50 hover:bg-[#1E1E1E] group',
                     isHere ? 'border-[#22c55e]' : isDone ? 'border-[#2A2A2A] opacity-60' : 'border-[#2A2A2A]'
                   )}
                 >
                   <div className="p-4 flex items-center gap-3">
-                    {/* Player Photo */}
-                    <div className="w-10 h-10 rounded-full bg-[#2A2A2A] flex items-center justify-center text-sm font-bold text-white overflow-hidden flex-shrink-0">
-                      {player.photo ? (
-                        <img
-                          src={player.photo}
-                          alt={player.name}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
-                            target.parentElement!.innerHTML = player.name.charAt(0);
-                          }}
-                        />
-                      ) : (
-                        player.name.charAt(0)
-                      )}
-                    </div>
+                    <PlayerPhoto src={player.photo} name={player.name} size="sm" />
 
                     {/* Player Info */}
                     <div className="flex-1 min-w-0">
-                      <Link
-                        href={`/prizm/players/${player.id}`}
+                      <span
                         className={cn(
-                          'font-semibold text-white hover:text-[#FFD100] transition-colors truncate block',
+                          'font-semibold text-white group-hover:text-[#FFD100] transition-colors truncate block',
                           largeText ? 'text-base' : 'text-sm'
                         )}
                       >
                         {player.name}
-                      </Link>
+                      </span>
                       <div className={cn('text-[#9CA3AF] flex items-center gap-2 flex-wrap', largeText ? 'text-sm' : 'text-xs')}>
                         <span>{player.team} — {player.position}</span>
                         {arrival.signingOnly && (
@@ -237,6 +223,8 @@ export default function DailyOverviewPage() {
                         <span className="text-[#22c55e] text-xs">Done</span>
                       )}
                     </div>
+
+                    <ChevronRight size={16} className="text-[#4B5563] group-hover:text-[#FFD100] transition-colors flex-shrink-0" />
                   </div>
 
                   {/* PR Call Info */}
@@ -254,17 +242,16 @@ export default function DailyOverviewPage() {
                           )}
                         </div>
                         {arrival.prCall.callIn && arrival.prCall.callIn !== 'TBD' && (
-                          <a
-                            href={`tel:${arrival.prCall.callIn}`}
-                            className="text-[#8B5CF6] text-xs font-mono hover:underline flex-shrink-0"
+                          <span
+                            className="text-[#8B5CF6] text-xs font-mono flex-shrink-0"
                           >
                             {arrival.prCall.callIn}
-                          </a>
+                          </span>
                         )}
                       </div>
                     </div>
                   )}
-                </div>
+                </Link>
               );
             })}
           </div>

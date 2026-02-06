@@ -1,15 +1,17 @@
 'use client';
 
 import { Suspense, useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import Header from '../components/Header';
+import PlayerPhoto from '../components/PlayerPhoto';
 import { useAppStore } from '../store';
 import { stations, getStationById } from '../data/stations';
 import { getScheduleForStation } from '../data/schedule';
 import { getPlayerById } from '../data/players';
 import { isCurrentSlot, isPastSlot } from '../lib/time';
 import { StationId } from '../types';
-import { ChevronDown, ChevronUp, Expand, Minimize } from 'lucide-react';
+import { ChevronDown, ChevronUp, Expand, Minimize, ExternalLink } from 'lucide-react';
 
 function StationsContent() {
   const searchParams = useSearchParams();
@@ -166,23 +168,7 @@ function StationsContent() {
                     <span className="font-mono text-white">{slot.endTime}</span>
                   </div>
 
-                  {/* Player Photo */}
-                  <div className="w-12 h-12 rounded-full bg-[#2A2A2A] flex items-center justify-center text-lg font-bold text-white overflow-hidden flex-shrink-0">
-                    {player.photo ? (
-                      <img
-                        src={player.photo}
-                        alt={player.name}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = 'none';
-                          target.parentElement!.innerHTML = player.name.charAt(0);
-                        }}
-                      />
-                    ) : (
-                      player.name.charAt(0)
-                    )}
-                  </div>
+                  <PlayerPhoto src={player.photo} name={player.name} size="lg" />
 
                   {/* Player Info */}
                   <div className="flex-1 text-left">
@@ -293,6 +279,15 @@ function StationsContent() {
                         </div>
                       </div>
                     )}
+
+                    {/* View Profile Link */}
+                    <Link
+                      href={`/prizm/players/${player.id}`}
+                      className="flex items-center gap-2 text-[#FFD100] hover:text-[#FFE44D] transition-colors text-sm font-medium pt-2"
+                    >
+                      <ExternalLink size={14} />
+                      View Full Player Profile
+                    </Link>
                   </div>
                 )}
               </div>
