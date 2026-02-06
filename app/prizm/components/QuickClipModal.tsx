@@ -179,8 +179,8 @@ export default function QuickClipModal() {
 
   return (
     <div className="fixed inset-0 bg-black/80 z-50 flex items-end sm:items-center justify-center">
-      <div className="bg-[#1A1A1A] w-full sm:max-w-lg sm:rounded-xl rounded-t-xl max-h-[90vh] overflow-auto">
-        <div className="sticky top-0 bg-[#1A1A1A] border-b border-[#2A2A2A] p-4 flex items-center justify-between z-10">
+      <div className="bg-[#1A1A1A] w-full sm:max-w-lg sm:rounded-xl rounded-t-xl max-h-[90vh] flex flex-col">
+        <div className="flex-shrink-0 bg-[#1A1A1A] border-b border-[#2A2A2A] p-4 flex items-center justify-between sm:rounded-t-xl rounded-t-xl">
           <h2 className={cn('font-semibold text-white', largeText ? 'text-xl' : 'text-lg')}>
             {isEditMode ? 'Edit Clip' : 'Add Clip Marker'}
           </h2>
@@ -206,7 +206,8 @@ export default function QuickClipModal() {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-4 space-y-4">
+        <form onSubmit={handleSubmit} className="flex flex-col min-h-0 flex-1">
+          <div className="p-4 space-y-4 overflow-auto flex-1 min-h-0">
           {/* Priority */}
           <div>
             <label className={cn('block text-[#9CA3AF] mb-2', largeText ? 'text-base' : 'text-sm')}>
@@ -512,28 +513,40 @@ export default function QuickClipModal() {
             </div>
           </div>
 
-          {/* Submit */}
-          <button
-            type="submit"
-            className={cn(
-              'w-full py-3 font-semibold rounded-lg transition-colors flex items-center justify-center gap-2',
-              priority === 'urgent'
-                ? 'bg-[#EF4444] text-white hover:bg-[#EF4444]/90'
-                : isEditMode
-                  ? 'bg-[#3B82F6] text-white hover:bg-[#3B82F6]/90'
-                  : 'bg-[#FFD100] text-black hover:bg-[#FFD100]/90'
-            )}
-          >
-            <Check className="w-5 h-5" />
-            {isEditMode
-              ? 'Save Changes'
-              : flagged
-                ? 'Add Flagged Clip'
-                : 'Add Clip Marker'}
-            {priority !== 'normal' && (
-              <span className="text-xs opacity-80 ml-1">({PRIORITY_CONFIG[priority].label})</span>
-            )}
-          </button>
+          </div>
+
+          {/* Sticky footer with action buttons */}
+          <div className="flex-shrink-0 border-t border-[#2A2A2A] p-4 bg-[#1A1A1A] flex gap-3">
+            <button
+              type="button"
+              onClick={() => { resetForm(); setClipModalOpen(false); }}
+              className="flex-1 py-3 font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 border border-[#2A2A2A] text-[#9CA3AF] hover:text-white hover:border-[#3A3A3A] bg-transparent"
+            >
+              <X className="w-5 h-5" />
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className={cn(
+                'flex-[2] py-3 font-semibold rounded-lg transition-colors flex items-center justify-center gap-2',
+                priority === 'urgent'
+                  ? 'bg-[#EF4444] text-white hover:bg-[#EF4444]/90'
+                  : isEditMode
+                    ? 'bg-[#3B82F6] text-white hover:bg-[#3B82F6]/90'
+                    : 'bg-[#FFD100] text-black hover:bg-[#FFD100]/90'
+              )}
+            >
+              <Check className="w-5 h-5" />
+              {isEditMode
+                ? 'Save Changes'
+                : flagged
+                  ? 'Add Flagged Clip'
+                  : 'Add Clip Marker'}
+              {priority !== 'normal' && (
+                <span className="text-xs opacity-80 ml-1">({PRIORITY_CONFIG[priority].label})</span>
+              )}
+            </button>
+          </div>
         </form>
       </div>
     </div>
