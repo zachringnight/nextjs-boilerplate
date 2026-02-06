@@ -1,7 +1,6 @@
 'use client';
 
 import { use, useState } from 'react';
-import { useMounted } from '../../hooks/useMounted';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { getPlayerById } from '../../data/players';
@@ -35,7 +34,6 @@ export default function PlayerDetailPage({ params }: PageProps) {
     isStationCompleted,
     getPlayerProgress,
   } = useAppStore();
-  const mounted = useMounted();
 
   const player = getPlayerById(id);
   const progress = getPlayerProgress(id);
@@ -47,14 +45,6 @@ export default function PlayerDetailPage({ params }: PageProps) {
   }).filter(Boolean);
 
   const getStation = (stationId: StationId) => stations.find((s) => s.id === stationId);
-
-  if (!mounted) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0D0D0D]">
-        <div className="text-[#9CA3AF]">Loading...</div>
-      </div>
-    );
-  }
 
   if (!player) {
     return (

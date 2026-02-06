@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useMounted } from '../hooks/useMounted';
 import Link from 'next/link';
 import { useAppStore } from '../store';
 import { getScheduleForDay, DAY_LABELS, EVENT_DATES } from '../data/schedule';
@@ -16,7 +15,6 @@ export default function PrintPage() {
   const [selectedDay, setSelectedDay] = useState<string>(EVENT_DATES[0]);
   const [printType, setPrintType] = useState<PrintType>('daily');
   const [showPreview, setShowPreview] = useState(false);
-  const mounted = useMounted();
 
   const handlePrint = () => {
     window.print();
@@ -52,14 +50,6 @@ export default function PrintPage() {
         return a.startTime.localeCompare(b.startTime);
       });
   };
-
-  if (!mounted) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-[#9CA3AF]">Loading...</div>
-      </div>
-    );
-  }
 
   if (showPreview) {
     return (
