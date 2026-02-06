@@ -7,26 +7,25 @@
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { Database } from '../types/database';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 // Singleton instance
-let supabaseInstance: SupabaseClient<Database> | null = null;
+let supabaseInstance: SupabaseClient | null = null;
 
 /**
  * Get the Supabase client instance
  * Returns null if environment variables are not configured
  */
-export function getSupabase(): SupabaseClient<Database> | null {
+export function getSupabase(): SupabaseClient | null {
   if (!supabaseUrl || !supabaseAnonKey) {
     console.warn('Supabase environment variables not configured. Running in offline mode.');
     return null;
   }
 
   if (!supabaseInstance) {
-    supabaseInstance = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+    supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
         persistSession: true,
         autoRefreshToken: true,
@@ -52,7 +51,7 @@ export function isSupabaseConfigured(): boolean {
 /**
  * Get Supabase client or throw error if not configured
  */
-export function requireSupabase(): SupabaseClient<Database> {
+export function requireSupabase(): SupabaseClient {
   const client = getSupabase();
   if (!client) {
     throw new Error('Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY environment variables.');

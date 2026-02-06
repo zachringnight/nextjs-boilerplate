@@ -49,6 +49,7 @@ export interface ClipMarker {
 }
 
 export interface ClipMarkerInsert {
+  id?: string;
   name?: string | null;
   timestamp?: string;
   timecode?: string | null;
@@ -264,26 +265,31 @@ export interface Database {
         Row: ClipMarker;
         Insert: ClipMarkerInsert;
         Update: ClipMarkerUpdate;
+        Relationships: [];
       };
       notes: {
         Row: NoteRow;
         Insert: NoteInsert;
         Update: NoteUpdate;
+        Relationships: [];
       };
       deliverables: {
         Row: DeliverableRow;
         Insert: DeliverableInsert;
         Update: DeliverableUpdate;
+        Relationships: [];
       };
       schedule_slots: {
         Row: ScheduleSlotRow;
         Insert: ScheduleSlotInsert;
         Update: ScheduleSlotUpdate;
+        Relationships: [];
       };
       player_station_completions: {
         Row: PlayerStationCompletionRow;
         Insert: PlayerStationCompletionInsert;
         Update: PlayerStationCompletionUpdate;
+        Relationships: [];
       };
     };
     Views: Record<string, never>;

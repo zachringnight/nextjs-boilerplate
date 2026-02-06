@@ -411,7 +411,7 @@ export const useAppStore = create<AppState>()(
         const now = new Date().toISOString();
         const defaults = get().clipDefaults;
         const newClip: ClipMarker = {
-          id: `clip-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          id: crypto.randomUUID(),
           name: clipData.name || generateClipName(clipData.player_id, clipData.station_id),
           timestamp: now,
           timecode: clipData.timecode || null,
@@ -473,7 +473,7 @@ export const useAppStore = create<AppState>()(
         const now = new Date().toISOString();
         const newClip: ClipMarker = {
           ...original,
-          id: `clip-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          id: crypto.randomUUID(),
           timestamp: now,
           status: 'marked',
           created_at: now,

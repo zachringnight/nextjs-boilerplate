@@ -3,6 +3,7 @@
 import { useEffect, useCallback, useRef } from 'react';
 import { useAppStore } from '../store';
 import { checkSupabaseConnection, getSupabase, isSupabaseConfigured } from '../lib/supabase';
+import { flushSyncQueue } from '../lib/clip-sync';
 import { ClipMarker } from '../types/database';
 import QuickClipButton from './QuickClipButton';
 import QuickClipModal from './QuickClipModal';
@@ -12,6 +13,7 @@ export default function ClipProvider() {
   const isInitialLoad = useRef(true);
   const isOnline = useRef(true);
   const supabaseAvailableRef = useRef<boolean | null>(null);
+  const channelRef = useRef<ReturnType<NonNullable<ReturnType<typeof getSupabase>>['channel']> | null>(null);
 
   const ensureSupabaseAvailable = useCallback(async () => {
     if (!isOnline.current || !isSupabaseConfigured()) return false;
@@ -27,7 +29,7 @@ export default function ClipProvider() {
 
     if (supabase && (await ensureSupabaseAvailable())) {
       try {
-        const { data, error } = await (supabase as any)
+        const { data, error } = await supabase
           .from('clip_markers')
           .select('*')
           .order('timestamp', { ascending: false });
@@ -45,12 +47,42 @@ export default function ClipProvider() {
     // When offline, Zustand's persisted state already has the clips
   }, [ensureSupabaseAvailable, setClips]);
 
-  // Initial load and online status
+  // Subscribe (or re-subscribe) to realtime changes
+  const subscribe = useCallback(async () => {
+    const supabase = getSupabase();
+    if (!supabase || !isSupabaseConfigured()) return;
+    if (!(await ensureSupabaseAvailable())) return;
+
+    // Tear down previous channel if it exists
+    if (channelRef.current) {
+      supabase.removeChannel(channelRef.current);
+      channelRef.current = null;
+    }
+
+    channelRef.current = supabase
+      .channel('clip-markers-global')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'clip_markers' },
+        () => {
+          loadClips();
+        }
+      )
+      .subscribe();
+  }, [ensureSupabaseAvailable, loadClips]);
+
+  // Initial load, online/offline handlers, and sync queue flush
   useEffect(() => {
-    const handleOnline = () => {
+    const handleOnline = async () => {
       isOnline.current = true;
       supabaseAvailableRef.current = null;
-      loadClips();
+
+      // Flush any queued sync operations first, then reload
+      await flushSyncQueue();
+      await loadClips();
+
+      // Re-subscribe to realtime (channel may have died while offline)
+      subscribe();
     };
     const handleOffline = () => {
       isOnline.current = false;
@@ -64,45 +96,28 @@ export default function ClipProvider() {
     // Initial load
     if (isInitialLoad.current) {
       isInitialLoad.current = false;
-      loadClips();
+      // Flush any leftover queue from a previous session, then load
+      flushSyncQueue().then(() => loadClips());
     }
 
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, [ensureSupabaseAvailable, loadClips]);
+  }, [ensureSupabaseAvailable, loadClips, subscribe]);
 
   // Subscribe to realtime updates
   useEffect(() => {
-    let channel: ReturnType<NonNullable<ReturnType<typeof getSupabase>>['channel']> | null = null;
-
-    const subscribe = async () => {
-      const supabase = getSupabase();
-      if (!supabase || !isSupabaseConfigured()) return;
-      if (!(await ensureSupabaseAvailable())) return;
-
-      channel = supabase
-        .channel('clip-markers-global')
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: 'clip_markers' },
-          () => {
-            loadClips();
-          }
-        )
-        .subscribe();
-    };
-
     subscribe();
 
     return () => {
-      if (channel) {
+      if (channelRef.current) {
         const supabase = getSupabase();
-        if (supabase) supabase.removeChannel(channel);
+        if (supabase) supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
       }
     };
-  }, [ensureSupabaseAvailable, loadClips]);
+  }, [subscribe]);
 
   return (
     <>
