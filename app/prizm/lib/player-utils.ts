@@ -1,4 +1,4 @@
-import { getScheduleForPlayer } from '../data/schedule';
+import { getScheduleForPlayer, EVENT_TIMEZONE } from '../data/schedule';
 import { stationMap } from '../data/stations';
 import type { ScheduleSlot, StationId } from '../types';
 
@@ -35,10 +35,16 @@ export const STATUS_FILTERS = [
 export const getStationLabel = (stationId: StationId) =>
   stationMap.get(stationId)?.name ?? stationId;
 
-const toDateString = (date: Date) => date.toISOString().split('T')[0];
+const toDateString = (date: Date) =>
+  date.toLocaleDateString('en-CA', { timeZone: EVENT_TIMEZONE });
 
 const toTimeString = (date: Date) =>
-  `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+  date.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    timeZone: EVENT_TIMEZONE,
+  });
 
 export const formatTime = (time: string) => {
   if (!time || time === '00:00') return 'TBD';

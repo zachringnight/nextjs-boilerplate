@@ -30,6 +30,16 @@ export const formatDate = (date: Date): string => {
   return date.toLocaleDateString('en-CA', { timeZone: EVENT_TIMEZONE });
 };
 
+// Format date as short display, e.g. "Fri, Feb 6"
+export const formatDateShort = (date: Date): string => {
+  return date.toLocaleDateString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    timeZone: EVENT_TIMEZONE,
+  });
+};
+
 // Parse time string (HH:MM) to Date object for a given date
 export const parseTimeToDate = (dateStr: string, timeStr: string): Date => {
   return new Date(`${dateStr}T${timeStr}:00`);

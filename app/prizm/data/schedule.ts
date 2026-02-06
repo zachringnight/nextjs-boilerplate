@@ -902,8 +902,8 @@ export const getScheduleForPlayer = (schedule: ScheduleSlot[], playerId: string)
 };
 
 export const getCurrentSlot = (schedule: ScheduleSlot[], station: StationId, now: Date): ScheduleSlot | null => {
-  const today = now.toISOString().split('T')[0];
-  const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  const today = now.toLocaleDateString('en-CA', { timeZone: EVENT_TIMEZONE });
+  const currentTime = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: EVENT_TIMEZONE });
 
   return schedule.find(slot =>
     slot.station === station &&
@@ -915,8 +915,8 @@ export const getCurrentSlot = (schedule: ScheduleSlot[], station: StationId, now
 };
 
 export const getNextSlot = (schedule: ScheduleSlot[], station: StationId, now: Date): ScheduleSlot | null => {
-  const today = now.toISOString().split('T')[0];
-  const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  const today = now.toLocaleDateString('en-CA', { timeZone: EVENT_TIMEZONE });
+  const currentTime = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: EVENT_TIMEZONE });
 
   const upcomingSlots = schedule
     .filter(slot =>
@@ -944,7 +944,7 @@ export const getPlayersForDay = (schedule: ScheduleSlot[], date: string): string
 
 // Count completed players for today (all their slots done)
 export const getCompletedPlayerCount = (schedule: ScheduleSlot[], date: string, now: Date): number => {
-  const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  const currentTime = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: EVENT_TIMEZONE });
   const todaySchedule = schedule.filter(slot => slot.date === date && slot.status === 'scheduled');
 
   const playerSlots = new Map<string, ScheduleSlot[]>();
