@@ -13,7 +13,8 @@
     "type-check": "tsc --noEmit",
     "validate": "npm run type-check && npm run lint",
     "clean": "rm -rf .next out node_modules/.cache",
-    "test:supabase": "tsx scripts/test-supabase-connection.ts"
+    "test:supabase": "tsx scripts/test-supabase-connection.ts",
+    "check:env": "tsx scripts/check-environment.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.95.0",
