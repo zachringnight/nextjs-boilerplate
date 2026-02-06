@@ -60,4 +60,25 @@ export function requireSupabase(): SupabaseClient<Database> {
   return client;
 }
 
+/**
+ * Verify Supabase connectivity.
+ * Returns true when the client can reach Supabase successfully.
+ */
+export async function checkSupabaseConnection(): Promise<boolean> {
+  const client = getSupabase();
+  if (!client) return false;
+
+  try {
+    const { error } = await client.auth.getSession();
+    if (error) {
+      console.warn('Supabase connection check failed:', error.message);
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.warn('Supabase connection check failed:', error);
+    return false;
+  }
+}
+
 export const supabase = getSupabase();
