@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useMounted } from '../hooks/useMounted';
 import Header from '../components/Header';
 import { useAppStore } from '../store';
 import { NoteCategory, NotePriority, NoteStatus, StationId } from '../types';
@@ -50,7 +49,6 @@ const STATUS_CONFIG: Record<NoteStatus, { label: string; color: string }> = {
 
 export default function NotesPage() {
   const { notes, addNote, updateNote, deleteNote, resolveNote, clearResolvedNotes, largeText } = useAppStore();
-  const mounted = useMounted();
   const [showAddForm, setShowAddForm] = useState(false);
   const [filterStatus, setFilterStatus] = useState<NoteStatus | 'all'>('all');
   const [filterCategory, setFilterCategory] = useState<NoteCategory | 'all'>('all');
@@ -107,14 +105,6 @@ export default function NotesPage() {
     }
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
-
-  if (!mounted) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-[#9CA3AF]">Loading...</div>
-      </div>
-    );
-  }
 
   return (
     <div>
