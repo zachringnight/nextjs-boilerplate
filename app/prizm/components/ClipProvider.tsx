@@ -27,7 +27,6 @@ export default function ClipProvider() {
 
     if (supabase && (await ensureSupabaseAvailable())) {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { data, error } = await (supabase as any)
           .from('clip_markers')
           .select('*')
@@ -103,7 +102,7 @@ export default function ClipProvider() {
         if (supabase) supabase.removeChannel(channel);
       }
     };
-  }, [loadClips]);
+  }, [ensureSupabaseAvailable, loadClips]);
 
   return (
     <>

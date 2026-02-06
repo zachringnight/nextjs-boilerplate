@@ -1,6 +1,7 @@
 'use client';
 
-import { use, useEffect, useState } from 'react';
+import { use, useState } from 'react';
+import { useMounted } from '../../hooks/useMounted';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { getPlayerById } from '../../data/players';
@@ -34,11 +35,7 @@ export default function PlayerDetailPage({ params }: PageProps) {
     isStationCompleted,
     getPlayerProgress,
   } = useAppStore();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useMounted();
 
   const player = getPlayerById(id);
   const progress = getPlayerProgress(id);

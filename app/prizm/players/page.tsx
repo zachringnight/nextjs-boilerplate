@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
+import { useMounted } from '../hooks/useMounted';
 import Header from '../components/Header';
 import PlayerCard from '../components/PlayerCard';
 import { players } from '../data/players';
@@ -11,11 +12,7 @@ import { Search, X } from 'lucide-react';
 export default function PlayersPage() {
   const { schedule, largeText } = useAppStore();
   const [searchQuery, setSearchQuery] = useState('');
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useMounted();
 
   const filteredPlayers = useMemo(() => {
     if (!searchQuery.trim()) return players;
@@ -92,7 +89,7 @@ export default function PlayersPage() {
         {filteredPlayers.length === 0 ? (
           <div className="text-center py-12">
             <p className={`text-[#9CA3AF] ${largeText ? 'text-lg' : 'text-base'}`}>
-              No players found for "{searchQuery}"
+              No players found for &ldquo;{searchQuery}&rdquo;
             </p>
           </div>
         ) : (

@@ -17,8 +17,7 @@ export async function syncClipInsert(
   if (!supabase || !navigator.onLine) return false;
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any).from('clip_markers').insert({
+const { error } = await (supabase as any).from('clip_markers').insert({
       name: clipData.name || null,
       timestamp: new Date().toISOString(),
       category: clipData.category || 'general',
@@ -56,8 +55,7 @@ export async function syncClipUpdate(
   if (!supabase || !navigator.onLine) return false;
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
+const { error } = await (supabase as any)
       .from('clip_markers')
       .update({ ...updates, updated_at: new Date().toISOString() })
       .eq('id', id);
@@ -77,8 +75,7 @@ export async function syncClipDelete(id: string): Promise<boolean> {
   if (!supabase || !navigator.onLine) return false;
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
+const { error } = await (supabase as any)
       .from('clip_markers')
       .delete()
       .eq('id', id);
@@ -101,8 +98,7 @@ export async function syncBulkClipUpdate(
   if (!supabase || !navigator.onLine) return false;
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
+const { error } = await (supabase as any)
       .from('clip_markers')
       .update({ ...updates, updated_at: new Date().toISOString() })
       .in('id', ids);
@@ -122,8 +118,7 @@ export async function syncBulkClipDelete(ids: string[]): Promise<boolean> {
   if (!supabase || !navigator.onLine) return false;
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
+const { error } = await (supabase as any)
       .from('clip_markers')
       .delete()
       .in('id', ids);

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useMounted } from '../hooks/useMounted';
 import { usePathname } from 'next/navigation';
 import { useAppStore } from '../store';
 import { ClipCategory, ClipPriority } from '../types/database';
@@ -52,7 +53,7 @@ export default function QuickClipButton() {
   const [expanded, setExpanded] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [successInfo, setSuccessInfo] = useState<{ station?: string; player?: string; category: string; priority?: string } | null>(null);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useMounted();
   const [activeView, setActiveView] = useState<'stations' | 'categories' | 'defaults'>('stations');
   const [quickPriority, setQuickPriority] = useState<ClipPriority>('normal');
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
@@ -82,7 +83,6 @@ export default function QuickClipButton() {
   const [defaultCamera, setDefaultCamera] = useState(clipDefaults.camera);
 
   useEffect(() => {
-    setMounted(true);
     const id = setInterval(() => setTick(t => t + 1), 30_000);
     return () => clearInterval(id);
   }, []);

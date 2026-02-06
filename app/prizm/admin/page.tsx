@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useMounted } from '../hooks/useMounted';
 import Header from '../components/Header';
 import { useAppStore } from '../store';
 import { players, getPlayerById } from '../data/players';
@@ -21,7 +22,7 @@ export default function AdminPage() {
     largeText
   } = useAppStore();
 
-  const [mounted, setMounted] = useState(false);
+  const mounted = useMounted();
   const [editingSlot, setEditingSlot] = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
@@ -33,10 +34,6 @@ export default function AdminPage() {
     startTime: '10:00',
     endTime: '10:30'
   });
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const daySchedule = getScheduleForDay(schedule, selectedDay);
 

@@ -63,7 +63,7 @@ export default function StationChecklistPage() {
         percentage: totalPlayers > 0 ? Math.round((count / totalPlayers) * 100) : 0,
       };
     });
-  }, [playerStationCompletions, showSigningOnly, getStationCompletionCount]);
+  }, [showSigningOnly, getStationCompletionCount]);
 
   return (
     <div className="min-h-screen bg-zinc-950 pb-24">

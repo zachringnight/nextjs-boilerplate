@@ -40,6 +40,7 @@ export default function GlobalSearch() {
   useEffect(() => {
     if (searchOpen && inputRef.current) {
       inputRef.current.focus();
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional: reset search query when opening
       setQuery('');
     }
   }, [searchOpen]);
@@ -150,7 +151,7 @@ export default function GlobalSearch() {
             {query && results.length === 0 && (
               <div className="p-8 text-center">
                 <p className={`text-[#9CA3AF] ${largeText ? 'text-lg' : 'text-base'}`}>
-                  No players found for "{query}"
+                  No players found for &ldquo;{query}&rdquo;
                 </p>
               </div>
             )}
