@@ -18,6 +18,7 @@ import {
   getPlayerStatus,
   getSortKeyForSlot,
 } from '../lib/player-utils';
+import { EVENT_TIMEZONE } from '../data/schedule';
 
 export default function PlayersContent() {
   const { schedule, largeText, notes } = useAppStore();
@@ -146,7 +147,7 @@ export default function PlayersContent() {
     [sheetPlayerId]
   );
 
-  const timelineDate = selectedDay ?? (now ? now.toISOString().split('T')[0] : null);
+  const timelineDate = selectedDay ?? (now ? now.toLocaleDateString('en-CA', { timeZone: EVENT_TIMEZONE }) : null);
 
   const selectedPlayerSchedule = useMemo(() => {
     if (!selectedPlayer) return [];

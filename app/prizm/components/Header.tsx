@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { Search, Type, Timer, Bell, BellOff } from 'lucide-react';
 import { useAppStore } from '../store';
-import { formatTime12, getCurrentDayNumber, getEventStatus } from '../lib/time';
+import { formatTime12, getCurrentDayNumber, getEventStatus, formatDateShort } from '../lib/time';
 import { useEffect, useState } from 'react';
 import { useMounted } from '../hooks/useMounted';
 
@@ -28,29 +28,32 @@ export default function Header({
     setNotificationsEnabled,
   } = useAppStore();
   const [currentTime, setCurrentTime] = useState<string>('');
+  const [currentDate, setCurrentDate] = useState<string>('');
+  const [statusMessage, setStatusMessage] = useState<string>('');
   const mounted = useMounted();
 
   useEffect(() => {
-    const updateTime = () => {
-      setCurrentTime(formatTime12(new Date()));
+    const update = () => {
+      const now = new Date();
+      setCurrentTime(formatTime12(now));
+      setCurrentDate(formatDateShort(now));
+
+      const dayNum = getCurrentDayNumber();
+      const status = getEventStatus();
+      switch (status) {
+        case 'pre-show': setStatusMessage('Pre-Show'); break;
+        case 'lunch': setStatusMessage('Lunch Break'); break;
+        case 'wrapped': setStatusMessage("That's a Wrap!"); break;
+        case 'off-day': setStatusMessage('Event Preview'); break;
+        default: setStatusMessage(`Day ${dayNum} of 3`); break;
+      }
     };
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
+    update();
+    const interval = setInterval(update, 1000);
     return () => clearInterval(interval);
   }, []);
 
-  const dayNum = getCurrentDayNumber();
   const status = getEventStatus();
-
-  const getStatusMessage = () => {
-    switch (status) {
-      case 'pre-show': return 'Pre-Show';
-      case 'lunch': return 'Lunch Break';
-      case 'wrapped': return "That's a Wrap!";
-      case 'off-day': return 'Event Preview';
-      default: return `Day ${dayNum} of 3`;
-    }
-  };
 
   const handleNotificationToggle = async () => {
     if (!notificationsEnabled) {
@@ -78,10 +81,12 @@ export default function Header({
           <div className={`flex items-center gap-2 text-[#9CA3AF] ${largeText ? 'text-base' : 'text-sm'}`}>
             {mounted && (
               <>
+                <span>{currentDate}</span>
+                <span>•</span>
                 <span>{currentTime}</span>
                 <span>•</span>
                 <span className={status === 'active' ? 'text-[#22c55e]' : ''}>
-                  {getStatusMessage()}
+                  {statusMessage}
                 </span>
               </>
             )}
