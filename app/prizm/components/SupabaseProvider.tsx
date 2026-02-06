@@ -2,7 +2,7 @@
 
 import { useEffect, useCallback, useRef } from 'react';
 import { useAppStore } from '../store';
-import { getSupabase, isSupabaseConfigured } from '../lib/supabase';
+import { checkSupabaseConnection, getSupabase, isSupabaseConfigured } from '../lib/supabase';
 import {
   fetchNotes,
   fetchDeliverables,
@@ -95,9 +95,18 @@ export default function SupabaseProvider() {
   const store = useAppStore;
   const isInitialLoad = useRef(true);
   const onlineRef = useRef(true);
+  const supabaseAvailableRef = useRef<boolean | null>(null);
+
+  const ensureSupabaseAvailable = useCallback(async () => {
+    if (!onlineRef.current || !isSupabaseConfigured()) return false;
+    if (supabaseAvailableRef.current === true) return true;
+    const isAvailable = await checkSupabaseConnection();
+    supabaseAvailableRef.current = isAvailable;
+    return isAvailable;
+  }, []);
 
   const loadAllData = useCallback(async () => {
-    if (!onlineRef.current || !isSupabaseConfigured()) return;
+    if (!(await ensureSupabaseAvailable())) return;
 
     const [notesData, deliverablesData, scheduleData, completionsData] =
       await Promise.all([
@@ -121,12 +130,13 @@ export default function SupabaseProvider() {
         playerStationCompletions: completionsData.map(toAppCompletion),
       });
     }
-  }, [store]);
+  }, [ensureSupabaseAvailable, store]);
 
   // Initial load and online/offline handling
   useEffect(() => {
     const handleOnline = () => {
       onlineRef.current = true;
+      supabaseAvailableRef.current = null;
       loadAllData();
     };
     const handleOffline = () => {
@@ -151,58 +161,68 @@ export default function SupabaseProvider() {
 
   // Subscribe to realtime changes on all tables
   useEffect(() => {
-    const supabase = getSupabase();
-    if (!supabase || !isSupabaseConfigured()) return;
+    let channel: ReturnType<NonNullable<ReturnType<typeof getSupabase>>['channel']> | null = null;
 
-    const channel = supabase
-      .channel('all-tables-sync')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'notes' },
-        () => {
-          fetchNotes().then((data) => {
-            if (data) store.setState({ notes: data.map(toAppNote) });
-          });
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'deliverables' },
-        () => {
-          fetchDeliverables().then((data) => {
-            if (data && data.length > 0)
-              store.setState({ deliverables: data.map(toAppDeliverable) });
-          });
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'schedule_slots' },
-        () => {
-          fetchScheduleSlots().then((data) => {
-            if (data && data.length > 0)
-              store.setState({ schedule: data.map(toAppScheduleSlot) });
-          });
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'player_station_completions' },
-        () => {
-          fetchCompletions().then((data) => {
-            if (data)
-              store.setState({
-                playerStationCompletions: data.map(toAppCompletion),
-              });
-          });
-        }
-      )
-      .subscribe();
+    const subscribe = async () => {
+      const supabase = getSupabase();
+      if (!supabase || !isSupabaseConfigured()) return;
+      if (!(await ensureSupabaseAvailable())) return;
+
+      channel = supabase
+        .channel('all-tables-sync')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'notes' },
+          () => {
+            fetchNotes().then((data) => {
+              if (data) store.setState({ notes: data.map(toAppNote) });
+            });
+          }
+        )
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'deliverables' },
+          () => {
+            fetchDeliverables().then((data) => {
+              if (data && data.length > 0)
+                store.setState({ deliverables: data.map(toAppDeliverable) });
+            });
+          }
+        )
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'schedule_slots' },
+          () => {
+            fetchScheduleSlots().then((data) => {
+              if (data && data.length > 0)
+                store.setState({ schedule: data.map(toAppScheduleSlot) });
+            });
+          }
+        )
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'player_station_completions' },
+          () => {
+            fetchCompletions().then((data) => {
+              if (data)
+                store.setState({
+                  playerStationCompletions: data.map(toAppCompletion),
+                });
+            });
+          }
+        )
+        .subscribe();
+    };
+
+    subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      if (channel) {
+        const supabase = getSupabase();
+        if (supabase) supabase.removeChannel(channel);
+      }
     };
-  }, [store]);
+  }, [store, ensureSupabaseAvailable]);
 
   return null;
 }

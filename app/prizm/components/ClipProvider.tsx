@@ -2,7 +2,7 @@
 
 import { useEffect, useCallback, useRef } from 'react';
 import { useAppStore } from '../store';
-import { getSupabase, isSupabaseConfigured } from '../lib/supabase';
+import { checkSupabaseConnection, getSupabase, isSupabaseConfigured } from '../lib/supabase';
 import { ClipMarker } from '../types/database';
 import QuickClipButton from './QuickClipButton';
 import QuickClipModal from './QuickClipModal';
@@ -11,12 +11,21 @@ export default function ClipProvider() {
   const { setClips } = useAppStore();
   const isInitialLoad = useRef(true);
   const isOnline = useRef(true);
+  const supabaseAvailableRef = useRef<boolean | null>(null);
+
+  const ensureSupabaseAvailable = useCallback(async () => {
+    if (!isOnline.current || !isSupabaseConfigured()) return false;
+    if (supabaseAvailableRef.current === true) return true;
+    const isAvailable = await checkSupabaseConnection();
+    supabaseAvailableRef.current = isAvailable;
+    return isAvailable;
+  }, []);
 
   // Load clips from Supabase (Zustand persist handles offline fallback)
   const loadClips = useCallback(async () => {
     const supabase = getSupabase();
 
-    if (supabase && isOnline.current) {
+    if (supabase && (await ensureSupabaseAvailable())) {
       try {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { data, error } = await (supabase as any)
@@ -35,12 +44,13 @@ export default function ClipProvider() {
       }
     }
     // When offline, Zustand's persisted state already has the clips
-  }, [setClips]);
+  }, [ensureSupabaseAvailable, setClips]);
 
   // Initial load and online status
   useEffect(() => {
     const handleOnline = () => {
       isOnline.current = true;
+      supabaseAvailableRef.current = null;
       loadClips();
     };
     const handleOffline = () => {
@@ -62,26 +72,36 @@ export default function ClipProvider() {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, [loadClips]);
+  }, [ensureSupabaseAvailable, loadClips]);
 
   // Subscribe to realtime updates
   useEffect(() => {
-    const supabase = getSupabase();
-    if (!supabase || !isSupabaseConfigured()) return;
+    let channel: ReturnType<NonNullable<ReturnType<typeof getSupabase>>['channel']> | null = null;
 
-    const channel = supabase
-      .channel('clip-markers-global')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'clip_markers' },
-        () => {
-          loadClips();
-        }
-      )
-      .subscribe();
+    const subscribe = async () => {
+      const supabase = getSupabase();
+      if (!supabase || !isSupabaseConfigured()) return;
+      if (!(await ensureSupabaseAvailable())) return;
+
+      channel = supabase
+        .channel('clip-markers-global')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'clip_markers' },
+          () => {
+            loadClips();
+          }
+        )
+        .subscribe();
+    };
+
+    subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      if (channel) {
+        const supabase = getSupabase();
+        if (supabase) supabase.removeChannel(channel);
+      }
     };
   }, [loadClips]);
 
