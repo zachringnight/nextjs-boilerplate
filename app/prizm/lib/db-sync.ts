@@ -31,7 +31,7 @@ export async function fetchNotes(): Promise<NoteRecord[] | null> {
   const supabase = getSupabase();
   if (!supabase || !isOnline()) return null;
   try {
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
       .from('notes')
       .select('*')
       .order('created_at', { ascending: false });
@@ -47,7 +47,7 @@ export async function syncNoteInsert(note: NoteRecord): Promise<boolean> {
   const supabase = getSupabase();
   if (!supabase || !isOnline()) return false;
   try {
-    const { error } = await (supabase as any).from('notes').insert({
+    const { error } = await supabase.from('notes').insert({
       id: note.id,
       content: note.content,
       category: note.category,
@@ -75,7 +75,7 @@ export async function syncNoteUpdate(
   const supabase = getSupabase();
   if (!supabase || !isOnline()) return false;
   try {
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from('notes')
       .update({ ...updates, updated_at: new Date().toISOString() })
       .eq('id', id);
@@ -91,7 +91,7 @@ export async function syncNoteDelete(id: string): Promise<boolean> {
   const supabase = getSupabase();
   if (!supabase || !isOnline()) return false;
   try {
-    const { error } = await (supabase as any).from('notes').delete().eq('id', id);
+    const { error } = await supabase.from('notes').delete().eq('id', id);
     if (error) throw error;
     return true;
   } catch (err) {
@@ -104,7 +104,7 @@ export async function syncBulkNoteDelete(ids: string[]): Promise<boolean> {
   const supabase = getSupabase();
   if (!supabase || !isOnline()) return false;
   try {
-    const { error } = await (supabase as any).from('notes').delete().in('id', ids);
+    const { error } = await supabase.from('notes').delete().in('id', ids);
     if (error) throw error;
     return true;
   } catch (err) {
@@ -136,7 +136,7 @@ export async function fetchDeliverables(): Promise<DeliverableRecord[] | null> {
   const supabase = getSupabase();
   if (!supabase || !isOnline()) return null;
   try {
-    const { data, error } = await (supabase as any).from('deliverables').select('*');
+    const { data, error } = await supabase.from('deliverables').select('*');
     if (error) throw error;
     return data as DeliverableRecord[];
   } catch (err) {
@@ -151,7 +151,7 @@ export async function syncDeliverableUpsert(
   const supabase = getSupabase();
   if (!supabase || !isOnline()) return false;
   try {
-    const { error } = await (supabase as any).from('deliverables').upsert({
+    const { error } = await supabase.from('deliverables').upsert({
       id: deliverable.id,
       title: deliverable.title,
       description: deliverable.description || null,
@@ -180,7 +180,7 @@ export async function syncDeliverableUpdate(
   const supabase = getSupabase();
   if (!supabase || !isOnline()) return false;
   try {
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from('deliverables')
       .update(updates)
       .eq('id', id);
@@ -196,7 +196,7 @@ export async function syncDeliverableDelete(id: string): Promise<boolean> {
   const supabase = getSupabase();
   if (!supabase || !isOnline()) return false;
   try {
-    const { error } = await (supabase as any).from('deliverables').delete().eq('id', id);
+    const { error } = await supabase.from('deliverables').delete().eq('id', id);
     if (error) throw error;
     return true;
   } catch (err) {
@@ -225,7 +225,7 @@ export async function syncBulkDeliverableUpsert(
       assignee: d.assignee || null,
       priority: d.priority || null,
     }));
-    const { error } = await (supabase as any).from('deliverables').upsert(rows);
+    const { error } = await supabase.from('deliverables').upsert(rows);
     if (error) throw error;
     return true;
   } catch (err) {
@@ -254,7 +254,7 @@ export async function fetchScheduleSlots(): Promise<ScheduleSlotRecord[] | null>
   const supabase = getSupabase();
   if (!supabase || !isOnline()) return null;
   try {
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
       .from('schedule_slots')
       .select('*')
       .order('date', { ascending: true })
@@ -273,7 +273,7 @@ export async function syncScheduleSlotUpsert(
   const supabase = getSupabase();
   if (!supabase || !isOnline()) return false;
   try {
-    const { error } = await (supabase as any).from('schedule_slots').upsert({
+    const { error } = await supabase.from('schedule_slots').upsert({
       id: slot.id,
       player_id: slot.player_id,
       date: slot.date,
@@ -296,7 +296,7 @@ export async function syncScheduleSlotDelete(id: string): Promise<boolean> {
   const supabase = getSupabase();
   if (!supabase || !isOnline()) return false;
   try {
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from('schedule_slots')
       .delete()
       .eq('id', id);
@@ -325,7 +325,7 @@ export async function syncBulkScheduleSlotUpsert(
       pr_call_info: s.pr_call_info || null,
       notes: s.notes || null,
     }));
-    const { error } = await (supabase as any).from('schedule_slots').upsert(rows);
+    const { error } = await supabase.from('schedule_slots').upsert(rows);
     if (error) throw error;
     return true;
   } catch (err) {
@@ -351,7 +351,7 @@ export async function fetchCompletions(): Promise<CompletionRecord[] | null> {
   const supabase = getSupabase();
   if (!supabase || !isOnline()) return null;
   try {
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
       .from('player_station_completions')
       .select('*');
     if (error) throw error;
@@ -368,7 +368,7 @@ export async function syncCompletionUpsert(
   const supabase = getSupabase();
   if (!supabase || !isOnline()) return false;
   try {
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from('player_station_completions')
       .upsert(
         {
@@ -396,7 +396,7 @@ export async function syncCompletionDelete(
   const supabase = getSupabase();
   if (!supabase || !isOnline()) return false;
   try {
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from('player_station_completions')
       .delete()
       .eq('player_id', playerId)
@@ -413,7 +413,7 @@ export async function syncResetCompletions(): Promise<boolean> {
   const supabase = getSupabase();
   if (!supabase || !isOnline()) return false;
   try {
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from('player_station_completions')
       .delete()
       .neq('player_id', '');

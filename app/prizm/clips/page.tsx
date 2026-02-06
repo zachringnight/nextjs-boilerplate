@@ -90,7 +90,7 @@ export default function ClipsPage() {
 
     if (supabase && isOnline) {
       try {
-        const { data, error } = await (supabase as any)
+        const { data, error } = await supabase
           .from('clip_markers')
           .select('*')
           .order('timestamp', { ascending: false });
