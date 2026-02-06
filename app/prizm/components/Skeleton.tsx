@@ -65,27 +65,27 @@ export function StationGridSkeleton({ count = 4 }: { count?: number }) {
 }
 
 // Player card skeleton
-export function PlayerCardSkeleton() {
+export function PlayerRowSkeleton() {
   return (
-    <div className="bg-[#1A1A1A] rounded-xl border border-[#2A2A2A] p-4">
-      <div className="flex items-center gap-3">
-        <Skeleton className="w-16 h-16 rounded-full" />
+    <div className="bg-[#141414] rounded-2xl border border-[#2A2A2A] p-3">
+      <div className="flex items-start justify-between gap-4">
         <div className="space-y-2 flex-1">
-          <Skeleton className="h-5 w-3/4" />
-          <Skeleton className="h-4 w-1/2" />
+          <Skeleton className="h-5 w-1/2" />
+          <Skeleton className="h-4 w-2/3" />
           <Skeleton className="h-4 w-1/3" />
         </div>
+        <Skeleton className="h-6 w-16 rounded-full" />
       </div>
     </div>
   );
 }
 
-// Grid of player skeletons
-export function PlayerGridSkeleton({ count = 6 }: { count?: number }) {
+// List of player skeletons
+export function PlayerListSkeleton({ count = 8 }: { count?: number }) {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+    <div className="space-y-2">
       {Array.from({ length: count }).map((_, i) => (
-        <PlayerCardSkeleton key={i} />
+        <PlayerRowSkeleton key={i} />
       ))}
     </div>
   );
@@ -182,9 +182,16 @@ export function PageSkeleton({ type = 'live' }: { type?: 'live' | 'schedule' | '
 
         {type === 'players' && (
           <>
-            {/* Search bar */}
-            <Skeleton className="h-12 w-full rounded-lg mb-4" />
-            <PlayerGridSkeleton />
+            <div className="space-y-3 mb-4">
+              <Skeleton className="h-11 w-full rounded-xl" />
+              <div className="flex gap-2">
+                <Skeleton className="h-7 w-14 rounded-full" />
+                <Skeleton className="h-7 w-14 rounded-full" />
+                <Skeleton className="h-7 w-14 rounded-full" />
+                <Skeleton className="h-7 w-20 rounded-full" />
+              </div>
+            </div>
+            <PlayerListSkeleton />
           </>
         )}
       </div>
