@@ -40,12 +40,14 @@ export default function PlayersContent() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional: read URL params on mount for SSR safety
     setAutoFocusSearch(params.get('focus') === '1');
   }, []);
 
   useEffect(() => {
     const syncKey = 'prizm:lastSync';
     const stored = window.localStorage.getItem(syncKey);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional: read localStorage on mount for SSR safety
     setLastSync(stored);
     const handleOnline = () => {
       setIsOnline(true);
@@ -67,6 +69,7 @@ export default function PlayersContent() {
     if (!isOnline) return;
     const timestamp = new Date().toISOString();
     window.localStorage.setItem('prizm:lastSync', timestamp);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional: sync last sync timestamp when online status or schedule changes
     setLastSync(timestamp);
   }, [isOnline, schedule]);
 
