@@ -6,6 +6,7 @@
 -- =============================================
 CREATE TABLE IF NOT EXISTS clip_markers (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name VARCHAR(200),
   timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   timecode VARCHAR(20),
   timecode_in VARCHAR(20),

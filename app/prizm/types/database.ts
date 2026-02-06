@@ -27,6 +27,7 @@ export type ClipSortDirection = 'asc' | 'desc';
 
 export interface ClipMarker {
   id: string;
+  name?: string | null; // Descriptive name (e.g., "Jahmyr Gibbs @ LED Wall")
   timestamp: string; // ISO timestamp of when the clip was marked
   timecode?: string | null; // Camera timecode (e.g., "01:23:45:12")
   timecode_in?: string | null; // In-point timecode for clip range
@@ -48,6 +49,7 @@ export interface ClipMarker {
 }
 
 export interface ClipMarkerInsert {
+  name?: string | null;
   timestamp?: string;
   timecode?: string | null;
   timecode_in?: string | null;
@@ -67,6 +69,7 @@ export interface ClipMarkerInsert {
 }
 
 export interface ClipMarkerUpdate {
+  name?: string | null;
   timestamp?: string;
   timecode?: string | null;
   timecode_in?: string | null;
