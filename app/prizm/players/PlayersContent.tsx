@@ -225,7 +225,7 @@ export default function PlayersContent() {
               <button
                 key={day.key}
                 onClick={() => setSelectedDay(selectedDay === day.date ? null : day.date)}
-                className={`rounded-full border px-3 py-1 text-xs font-semibold transition ${
+                className={`touch-target rounded-full border px-4 py-2 text-sm font-semibold transition ${
                   selectedDay === day.date
                     ? 'border-[#FFD100] bg-[#FFD100]/15 text-[#FFD100]'
                     : 'border-[#2A2A2A] text-[#D1D5DB] hover:border-[#FFD100]/70'
@@ -241,7 +241,7 @@ export default function PlayersContent() {
                 onClick={() =>
                   setSelectedStation(selectedStation === station.id ? null : station.id)
                 }
-                className={`rounded-full border px-3 py-1 text-xs font-semibold transition ${
+                className={`touch-target rounded-full border px-4 py-2 text-sm font-semibold transition ${
                   selectedStation === station.id
                     ? 'border-[#FFD100] bg-[#FFD100]/15 text-[#FFD100]'
                     : 'border-[#2A2A2A] text-[#D1D5DB] hover:border-[#FFD100]/70'
@@ -259,7 +259,7 @@ export default function PlayersContent() {
                 onClick={() =>
                   setSelectedStatus(selectedStatus === status.key ? null : status.key)
                 }
-                className={`rounded-full border px-3 py-1 text-xs font-semibold transition ${
+                className={`touch-target rounded-full border px-4 py-2 text-sm font-semibold transition ${
                   selectedStatus === status.key
                     ? 'border-[#FFD100] bg-[#FFD100]/15 text-[#FFD100]'
                     : 'border-[#2A2A2A] text-[#D1D5DB] hover:border-[#FFD100]/70'
@@ -270,12 +270,12 @@ export default function PlayersContent() {
             ))}
 
             <div className="ml-auto flex items-center gap-2">
-              <span className="text-xs text-[#9CA3AF]">Sort:</span>
+              <span className="text-sm text-[#9CA3AF]">Sort:</span>
               {(['next', 'az', 'team'] as const).map((option) => (
                 <button
                   key={option}
                   onClick={() => setSortOption(option)}
-                  className={`rounded-full border px-3 py-1 text-xs font-semibold transition ${
+                  className={`touch-target rounded-full border px-4 py-2 text-sm font-semibold transition ${
                     sortOption === option
                       ? 'border-[#FFD100] bg-[#FFD100]/15 text-[#FFD100]'
                       : 'border-[#2A2A2A] text-[#D1D5DB] hover:border-[#FFD100]/70'
@@ -324,11 +324,17 @@ export default function PlayersContent() {
         </div>
       )}
 
-      <div className="p-4 space-y-2">
+      <div className="p-4 space-y-2.5">
         {sortedPlayers.length === 0 ? (
-          <div className="text-center py-12">
-            <p className={`text-[#9CA3AF] ${largeText ? 'text-lg' : 'text-base'}`}>
-              No players found for &ldquo;{searchQuery || 'these filters'}&rdquo;
+          <div className="text-center py-12 px-6">
+            <div className="w-16 h-16 rounded-2xl bg-[#1A1A1A] border border-[#2A2A2A] flex items-center justify-center mx-auto mb-4">
+              <Search size={28} className="text-[#4B5563]" />
+            </div>
+            <p className={`text-white font-semibold mb-1 ${largeText ? 'text-lg' : 'text-base'}`}>
+              No players found
+            </p>
+            <p className={`text-[#6B7280] ${largeText ? 'text-sm' : 'text-xs'}`}>
+              {searchQuery ? `No results for "${searchQuery}"` : 'Try adjusting your filters'}
             </p>
           </div>
         ) : (
@@ -339,35 +345,37 @@ export default function PlayersContent() {
             const statusLabel = PLAYER_STATUS_LABELS[statusKey];
             const statusTone =
               statusKey === 'now'
-                ? 'bg-[#FFD100]/20 text-[#FFD100]'
+                ? 'bg-[#FFD100]/20 text-[#FFD100] font-bold'
                 : statusKey === 'up-next'
-                  ? 'bg-blue-500/15 text-blue-200'
+                  ? 'bg-blue-500/15 text-blue-300'
                   : statusKey === 'complete'
-                    ? 'bg-emerald-500/15 text-emerald-200'
+                    ? 'bg-emerald-500/15 text-emerald-300'
                     : statusKey === 'tbd'
-                      ? 'bg-amber-500/15 text-amber-200'
+                      ? 'bg-amber-500/15 text-amber-300'
                       : 'bg-[#2A2A2A] text-[#D1D5DB]';
 
             return (
               <button
                 key={player.id}
                 onClick={() => setSheetPlayerId(player.id)}
-                className="w-full text-left rounded-2xl border border-[#2A2A2A] bg-[#141414] p-3 transition hover:border-[#FFD100]/60 hover:bg-[#1B1B1B] active:scale-[0.99]"
+                className={`w-full text-left rounded-2xl border bg-[#141414] p-4 transition-all hover:border-[#FFD100]/60 hover:bg-[#1B1B1B] active:scale-[0.99] ${
+                  statusKey === 'now' ? 'border-[#FFD100]/40 glow-gold' : 'border-[#2A2A2A]'
+                }`}
               >
                 <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <p className={`font-semibold text-white truncate ${largeText ? 'text-lg' : 'text-base'}`}>
                       {player.name}
                     </p>
                     <p className={`text-[#9CA3AF] truncate ${largeText ? 'text-base' : 'text-sm'}`}>
-                      {player.team} • {player.position}
+                      {player.team} &middot; {player.position}
                     </p>
-                    <p className={`mt-1 text-[#F3F4F6] ${largeText ? 'text-base' : 'text-sm'}`}>
+                    <p className={`mt-1.5 text-[#D1D5DB] ${largeText ? 'text-base' : 'text-sm'}`}>
                       {formatAssignment(nextSlot)}
                     </p>
                   </div>
-                  <div className="flex flex-col items-end gap-2">
-                    <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${statusTone}`}>
+                  <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                    <span className={`rounded-full px-3 py-1 text-[11px] font-semibold ${statusTone}`}>
                       {statusLabel}
                     </span>
                     {noteCount > 0 && (

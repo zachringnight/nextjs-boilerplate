@@ -14,6 +14,14 @@ import { isCurrentSlot, isPastSlot } from '../lib/time';
 import { StationId } from '../types';
 import { ChevronDown, ChevronUp, Expand, Minimize, ExternalLink } from 'lucide-react';
 
+// Format 24h time to 12h AM/PM
+const to12h = (time: string) => {
+  const [h, m] = time.split(':').map(Number);
+  const suffix = h >= 12 ? 'PM' : 'AM';
+  const hour = h % 12 || 12;
+  return `${hour}:${String(m).padStart(2, '0')} ${suffix}`;
+};
+
 function StationsInner() {
   const searchParams = useSearchParams();
   const initialStation = (searchParams.get('station') as StationId) || 'signing';
@@ -86,25 +94,25 @@ function StationsInner() {
       <Header title="Station Tool" />
 
       {/* Station Tabs */}
-      <div className="sticky top-[73px] z-30 bg-[#0D0D0D] border-b border-[#2A2A2A] overflow-x-auto">
+      <div className="sticky top-[75px] z-30 bg-[#0D0D0D] border-b border-[#2A2A2A] overflow-x-auto">
         <div className="flex min-w-max">
           {stations.map((s) => (
             <button
               key={s.id}
               onClick={() => setSelectedStation(s.id)}
-              className={`flex-1 min-w-[80px] py-3 px-3 text-center transition-colors ${
+              className={`flex-1 min-w-[80px] py-3 px-4 text-center transition-all touch-target ${
                 selectedStation === s.id
-                  ? 'border-b-2 bg-opacity-10'
-                  : 'text-[#9CA3AF] hover:text-white'
+                  ? 'border-b-[3px]'
+                  : 'text-[#6B7280] hover:text-white border-b-[3px] border-transparent'
               } ${largeText ? 'text-base' : 'text-sm'}`}
               style={{
                 borderColor: selectedStation === s.id ? s.color : 'transparent',
                 color: selectedStation === s.id ? s.color : undefined,
-                backgroundColor: selectedStation === s.id ? s.color + '10' : undefined
+                backgroundColor: selectedStation === s.id ? s.color + '08' : undefined
               }}
             >
-              <div className="text-xl">{s.icon}</div>
-              <div className="font-medium truncate">{s.name.replace(' Station', '').replace(' / Buffer', '')}</div>
+              <div className="text-xl mb-0.5">{s.icon}</div>
+              <div className="font-semibold truncate text-xs">{s.name.replace(' Station', '').replace(' / Buffer', '')}</div>
             </button>
           ))}
         </div>
@@ -126,9 +134,15 @@ function StationsInner() {
       {/* Station Schedule */}
       <div className="p-4 space-y-3">
         {stationSchedule.length === 0 ? (
-          <div className="text-center py-12">
-            <p className={`text-[#9CA3AF] ${largeText ? 'text-lg' : 'text-base'}`}>
-              No scheduled players for this station today
+          <div className="text-center py-12 px-6">
+            <div className="w-16 h-16 rounded-2xl bg-[#1A1A1A] border border-[#2A2A2A] flex items-center justify-center mx-auto mb-4">
+              <span className="text-3xl">{station?.icon || '📋'}</span>
+            </div>
+            <p className={`text-white font-semibold mb-1 ${largeText ? 'text-lg' : 'text-base'}`}>
+              No players scheduled
+            </p>
+            <p className={`text-[#6B7280] ${largeText ? 'text-sm' : 'text-xs'}`}>
+              No upcoming players at {station?.name || 'this station'} today
             </p>
           </div>
         ) : (
@@ -148,7 +162,7 @@ function StationsInner() {
                 key={slot.id}
                 className={`rounded-xl border overflow-hidden transition-all ${
                   isCurrent
-                    ? 'border-[#22c55e] bg-[#22c55e]/5'
+                    ? 'border-[#22c55e] bg-[#22c55e]/5 glow-green'
                     : isPast
                     ? 'border-[#2A2A2A] bg-[#1A1A1A]/50 opacity-60'
                     : 'border-[#2A2A2A] bg-[#1A1A1A]'
@@ -160,10 +174,10 @@ function StationsInner() {
                   className="w-full flex items-center gap-3 p-4"
                 >
                   {/* Time */}
-                  <div className={`w-20 flex-shrink-0 text-left ${largeText ? 'text-base' : 'text-sm'}`}>
-                    <span className="font-mono text-white">{slot.startTime}</span>
+                  <div className={`w-28 flex-shrink-0 text-left ${largeText ? 'text-base' : 'text-sm'}`}>
+                    <span className="font-mono text-white">{to12h(slot.startTime)}</span>
                     <span className="text-[#9CA3AF]"> - </span>
-                    <span className="font-mono text-white">{slot.endTime}</span>
+                    <span className="font-mono text-white">{to12h(slot.endTime)}</span>
                   </div>
 
                   <PlayerPhoto src={player.photo} name={player.name} size="lg" />
@@ -181,15 +195,16 @@ function StationsInner() {
                   {/* Status + Expand */}
                   <div className="flex items-center gap-2">
                     {isCurrent && (
-                      <span className="px-2 py-1 rounded-full bg-[#22c55e] text-black text-xs font-bold animate-pulse">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#22c55e] text-black text-xs font-bold">
+                        <span className="w-1.5 h-1.5 bg-black rounded-full animate-pulse" />
                         NOW
                       </span>
                     )}
                     {isPast && (
-                      <span className="text-[#22c55e] text-lg">✓</span>
+                      <span className="text-[#22c55e] text-sm font-medium">Done</span>
                     )}
                     {!isCurrent && !isPast && (
-                      <span className="px-2 py-1 rounded-full bg-[#2A2A2A] text-[#9CA3AF] text-xs">
+                      <span className="px-2.5 py-1 rounded-full bg-[#2A2A2A] text-[#9CA3AF] text-xs font-medium">
                         Upcoming
                       </span>
                     )}

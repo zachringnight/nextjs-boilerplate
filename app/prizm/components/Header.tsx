@@ -72,20 +72,23 @@ export default function Header({
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-[#0D0D0D]/95 backdrop-blur-sm border-b border-[#2A2A2A]">
+    <header className="sticky top-0 z-40 glass">
+      {/* Premium gold accent line */}
+      <div className="h-[2px] gold-gradient" />
       <div className="flex items-center justify-between px-4 py-3">
         <div className="flex flex-col">
-          <h1 className={`font-bold text-white ${largeText ? 'text-2xl' : 'text-xl'}`}>
+          <h1 className={`font-bold text-white tracking-tight ${largeText ? 'text-2xl' : 'text-xl'}`}>
             {title}
           </h1>
           <div className={`flex items-center gap-2 text-[#9CA3AF] ${largeText ? 'text-base' : 'text-sm'}`}>
             {mounted && (
               <>
                 <span>{currentDate}</span>
-                <span>•</span>
-                <span>{currentTime}</span>
-                <span>•</span>
-                <span className={status === 'active' ? 'text-[#22c55e]' : ''}>
+                <span className="text-[#4B5563]">&middot;</span>
+                <span className="font-mono tabular-nums">{currentTime}</span>
+                <span className="text-[#4B5563]">&middot;</span>
+                <span className={`font-medium ${status === 'active' ? 'text-[#22c55e]' : 'text-[#9CA3AF]'}`}>
+                  {status === 'active' && <span className="inline-block w-1.5 h-1.5 bg-[#22c55e] rounded-full mr-1.5 pulse-ring" />}
                   {statusMessage}
                 </span>
               </>
@@ -97,7 +100,7 @@ export default function Header({
           {showSearch && (
             <button
               onClick={() => setSearchOpen(true)}
-              className="p-2 rounded-lg bg-[#1A1A1A] hover:bg-[#2A2A2A] transition-colors"
+              className="p-2.5 rounded-xl bg-[#1A1A1A] hover:bg-[#2A2A2A] transition-colors touch-target"
               aria-label="Search (Cmd+K)"
             >
               <Search size={20} className="text-[#9CA3AF]" />
@@ -107,7 +110,7 @@ export default function Header({
           {showTimer && (
             <Link
               href="/prizm/timer"
-              className="p-2 rounded-lg bg-[#1A1A1A] hover:bg-[#2A2A2A] transition-colors"
+              className="p-2.5 rounded-xl bg-[#1A1A1A] hover:bg-[#2A2A2A] transition-colors touch-target"
               aria-label="Timer"
             >
               <Timer size={20} className="text-[#9CA3AF]" />
@@ -117,7 +120,7 @@ export default function Header({
           {showNotifications && (
             <button
               onClick={handleNotificationToggle}
-              className={`p-2 rounded-lg transition-colors ${
+              className={`p-2.5 rounded-xl transition-colors touch-target ${
                 notificationsEnabled
                   ? 'bg-[#FFD100]/20 text-[#FFD100]'
                   : 'bg-[#1A1A1A] hover:bg-[#2A2A2A] text-[#9CA3AF]'
@@ -130,7 +133,7 @@ export default function Header({
 
           <button
             onClick={toggleLargeText}
-            className={`p-2 rounded-lg transition-colors ${
+            className={`p-2.5 rounded-xl transition-colors touch-target ${
               largeText
                 ? 'bg-[#FFD100] text-black'
                 : 'bg-[#1A1A1A] hover:bg-[#2A2A2A] text-[#9CA3AF]'
