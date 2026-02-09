@@ -97,7 +97,7 @@ export default function BottomNav() {
             <span className="font-semibold text-white tracking-tight">More Tools</span>
             <button
               onClick={() => setShowMore(false)}
-              className="p-1 text-[#6B7280] hover:text-white rounded-lg hover:bg-[#2A2A2A] transition-colors"
+              className="p-1 text-[#6B7280] hover:text-white rounded-lg hover:bg-[#2A2A2A] transition-colors touch-target"
             >
               <X size={18} />
             </button>
