@@ -10,17 +10,9 @@ import { useAppStore } from '../store';
 import { stations, getStationById } from '../data/stations';
 import { getScheduleForStation } from '../data/schedule';
 import { getPlayerById } from '../data/players';
-import { isCurrentSlot, isPastSlot } from '../lib/time';
+import { isCurrentSlot, isPastSlot, to12h } from '../lib/time';
 import { StationId } from '../types';
 import { ChevronDown, ChevronUp, Expand, Minimize, ExternalLink } from 'lucide-react';
-
-// Format 24h time to 12h AM/PM
-const to12h = (time: string) => {
-  const [h, m] = time.split(':').map(Number);
-  const suffix = h >= 12 ? 'PM' : 'AM';
-  const hour = h % 12 || 12;
-  return `${hour}:${String(m).padStart(2, '0')} ${suffix}`;
-};
 
 function StationsInner() {
   const searchParams = useSearchParams();

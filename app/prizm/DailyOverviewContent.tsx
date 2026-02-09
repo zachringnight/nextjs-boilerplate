@@ -13,7 +13,7 @@ import {
   getPlayersForDay,
   getCompletedPlayerCount,
 } from './data/schedule';
-import { formatDate, getEventStatus, getDayNumber } from './lib/time';
+import { formatDate, getEventStatus, getDayNumber, to12h } from './lib/time';
 import {
   Phone,
   Users,
@@ -25,14 +25,6 @@ import {
   Clock,
 } from 'lucide-react';
 import { cn } from './lib/utils';
-
-// Format 24h time to 12h AM/PM
-const to12h = (time: string) => {
-  const [h, m] = time.split(':').map(Number);
-  const suffix = h >= 12 ? 'PM' : 'AM';
-  const hour = h % 12 || 12;
-  return `${hour}:${String(m).padStart(2, '0')} ${suffix}`;
-};
 
 const STATUS_LABELS: Record<string, { text: string; color: string }> = {
   'pre-show': { text: 'Upcoming', color: 'bg-[#F59E0B] text-black' },

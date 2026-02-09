@@ -25,6 +25,14 @@ export const formatTime12 = (date: Date): string => {
   });
 };
 
+// Convert time string (HH:MM) to 12-hour format (h:mm AM/PM)
+export const to12h = (time: string): string => {
+  const [h, m] = time.split(':').map(Number);
+  const suffix = h >= 12 ? 'PM' : 'AM';
+  const hour = h % 12 || 12;
+  return `${hour}:${String(m).padStart(2, '0')} ${suffix}`;
+};
+
 // Format date as YYYY-MM-DD
 export const formatDate = (date: Date): string => {
   return date.toLocaleDateString('en-CA', { timeZone: EVENT_TIMEZONE });

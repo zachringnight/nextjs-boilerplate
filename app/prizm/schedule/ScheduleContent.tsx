@@ -13,7 +13,7 @@ import {
   getPRCallsForDay,
   PlayerArrival,
 } from '../data/schedule';
-import { formatDate } from '../lib/time';
+import { formatDate, to12h } from '../lib/time';
 import {
   Clock,
   Phone,
@@ -23,14 +23,6 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { cn } from '../lib/utils';
-
-// Format 24h time to 12h AM/PM
-const to12h = (time: string) => {
-  const [h, m] = time.split(':').map(Number);
-  const suffix = h >= 12 ? 'PM' : 'AM';
-  const hour = h % 12 || 12;
-  return `${hour}:${String(m).padStart(2, '0')} ${suffix}`;
-};
 
 export default function ScheduleContent() {
   const { schedule, largeText } = useAppStore();

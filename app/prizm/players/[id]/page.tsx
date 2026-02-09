@@ -11,18 +11,11 @@ import { StationId } from '../../types';
 import PlayerPhoto from '../../components/PlayerPhoto';
 import { ArrowLeft, Calendar, Award, CreditCard, Star, ClipboardCheck, Phone } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { to12h } from '../../lib/time';
 
 interface PageProps {
   params: Promise<{ id: string }>;
 }
-
-// Format 24h time to 12h AM/PM
-const to12h = (time: string) => {
-  const [h, m] = time.split(':').map(Number);
-  const suffix = h >= 12 ? 'PM' : 'AM';
-  const hour = h % 12 || 12;
-  return `${hour}:${String(m).padStart(2, '0')} ${suffix}`;
-};
 
 export default function PlayerDetailPage({ params }: PageProps) {
   const { id } = use(params);
