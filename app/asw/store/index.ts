@@ -115,7 +115,7 @@ export const useASWStore = create<ASWState>()(
         const now = new Date().toISOString();
         const note: Note = {
           ...noteData,
-          id: `note-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          id: `note-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
           createdAt: now,
           updatedAt: now,
         };
@@ -216,7 +216,7 @@ export const useASWStore = create<ASWState>()(
         if (updated) syncDeliverableUpsert(deliverableToRecord(updated));
       },
       addDeliverable: (deliverableData) => {
-        const id = `deliverable-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        const id = `deliverable-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
         const deliverable: Deliverable = {
           ...deliverableData,
           id,
@@ -259,56 +259,82 @@ export const useASWStore = create<ASWState>()(
       // Player Station Checklist
       playerStationCompletions: [],
       togglePlayerStation: (playerId, stationId, completedBy) => {
-        const state = get();
-        const existingIndex = state.playerStationCompletions.findIndex(
-          (c) => c.playerId === playerId && c.stationId === stationId
-        );
+        let shouldDelete = false;
+        let upsertPayload:
+          | {
+              player_id: string;
+              station_id: ASWStationId;
+              completed: boolean;
+              completed_at: string;
+              completed_by: string | null;
+            }
+          | null = null;
 
-        if (existingIndex >= 0) {
-          const existing = state.playerStationCompletions[existingIndex];
-          if (existing.completed) {
-            set({
-              playerStationCompletions: state.playerStationCompletions.filter(
-                (_, i) => i !== existingIndex
-              ),
-            });
-            syncCompletionDelete(playerId, stationId);
+        set((state) => {
+          const existingIndex = state.playerStationCompletions.findIndex(
+            (c) => c.playerId === playerId && c.stationId === stationId
+          );
+
+          if (existingIndex >= 0) {
+            const existing = state.playerStationCompletions[existingIndex];
+
+            if (existing.completed) {
+              // Toggle off: remove completion
+              shouldDelete = true;
+              return {
+                playerStationCompletions: state.playerStationCompletions.filter(
+                  (_, i) => i !== existingIndex
+                ),
+              };
+            } else {
+              // Toggle on: mark existing as completed
+              const now = new Date().toISOString();
+              upsertPayload = {
+                player_id: playerId,
+                station_id: stationId,
+                completed: true,
+                completed_at: now,
+                completed_by: completedBy || null,
+              };
+              return {
+                playerStationCompletions: state.playerStationCompletions.map((c, i) =>
+                  i === existingIndex
+                    ? { ...c, completed: true, completedAt: now, completedBy }
+                    : c
+                ),
+              };
+            }
           } else {
+            // No existing record: create a new completed entry
             const now = new Date().toISOString();
-            set({
-              playerStationCompletions: state.playerStationCompletions.map((c, i) =>
-                i === existingIndex
-                  ? { ...c, completed: true, completedAt: now, completedBy }
-                  : c
-              ),
-            });
-            syncCompletionUpsert({
+            const newCompletion: PlayerStationCompletion = {
+              playerId,
+              stationId,
+              completed: true,
+              completedAt: now,
+              completedBy,
+            };
+            upsertPayload = {
               player_id: playerId,
               station_id: stationId,
               completed: true,
               completed_at: now,
               completed_by: completedBy || null,
-            });
+            };
+            return {
+              playerStationCompletions: [
+                ...state.playerStationCompletions,
+                newCompletion,
+              ],
+            };
           }
-        } else {
-          const now = new Date().toISOString();
-          const newCompletion: PlayerStationCompletion = {
-            playerId,
-            stationId,
-            completed: true,
-            completedAt: now,
-            completedBy,
-          };
-          set({
-            playerStationCompletions: [...state.playerStationCompletions, newCompletion],
-          });
-          syncCompletionUpsert({
-            player_id: playerId,
-            station_id: stationId,
-            completed: true,
-            completed_at: now,
-            completed_by: completedBy || null,
-          });
+        });
+
+        // Perform database sync after state update
+        if (shouldDelete) {
+          syncCompletionDelete(playerId, stationId);
+        } else if (upsertPayload) {
+          syncCompletionUpsert(upsertPayload);
         }
       },
       isStationCompleted: (playerId, stationId) => {
@@ -348,12 +374,11 @@ export const useASWStore = create<ASWState>()(
     {
       name: 'asw-storage',
       storage: createJSONStorage(() => localStorage),
+      // Only persist UI-related preferences; Supabase remains the source of truth
+      // for notes, deliverables, and playerStationCompletions to avoid stale-data flashes.
       partialize: (state) => ({
         viewMode: state.viewMode,
         largeText: state.largeText,
-        notes: state.notes,
-        deliverables: state.deliverables,
-        playerStationCompletions: state.playerStationCompletions,
       }),
     }
   )

@@ -13,7 +13,6 @@ interface Props {
 interface State {
   hasError: boolean;
   error: Error | null;
-  errorInfo: React.ErrorInfo | null;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
@@ -22,7 +21,6 @@ export class ErrorBoundary extends Component<Props, State> {
     this.state = {
       hasError: false,
       error: null,
-      errorInfo: null,
     };
   }
 
@@ -31,7 +29,6 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    this.setState({ errorInfo });
     console.error('[ErrorBoundary] Caught error:', error);
     console.error('[ErrorBoundary] Component stack:', errorInfo.componentStack);
     this.props.onError?.(error, errorInfo);
@@ -41,7 +38,6 @@ export class ErrorBoundary extends Component<Props, State> {
     this.setState({
       hasError: false,
       error: null,
-      errorInfo: null,
     });
   };
 
@@ -108,17 +104,36 @@ export function StationErrorFallback({ stationName }: { stationName: string }) {
   );
 }
 
+const errorBoundaryCache = new WeakMap<
+  React.ComponentType<any>,
+  Map<string, React.ComponentType<any>>
+>();
+
 export function withErrorBoundary<P extends object>(
   WrappedComponent: React.ComponentType<P>,
   componentName: string
-) {
-  return function WithErrorBoundaryWrapper(props: P) {
+): React.ComponentType<P> {
+  let componentMap = errorBoundaryCache.get(WrappedComponent);
+  if (!componentMap) {
+    componentMap = new Map<string, React.ComponentType<any>>();
+    errorBoundaryCache.set(WrappedComponent, componentMap);
+  }
+
+  const existing = componentMap.get(componentName) as React.ComponentType<P> | undefined;
+  if (existing) {
+    return existing;
+  }
+
+  const WithErrorBoundaryWrapper: React.FC<P> = (props: P) => {
     return (
       <ErrorBoundary componentName={componentName}>
         <WrappedComponent {...props} />
       </ErrorBoundary>
     );
   };
+
+  componentMap.set(componentName, WithErrorBoundaryWrapper);
+  return WithErrorBoundaryWrapper;
 }
 
 export default ErrorBoundary;

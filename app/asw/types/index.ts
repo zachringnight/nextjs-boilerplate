@@ -37,10 +37,10 @@ export interface Player {
 
 export type ASWStationId = 'tunnel' | 'product';
 
-export const ASW_STATIONS: { id: ASWStationId; name: string; icon: string; color: string }[] = [
+export const ASW_STATIONS = [
   { id: 'tunnel', name: 'Tunnel', icon: '\uD83D\uDEB6', color: '#22c55e' },
   { id: 'product', name: 'Product', icon: '\uD83D\uDCF8', color: '#f59e0b' },
-];
+] as const;
 
 export const CHECKLIST_STATIONS: ASWStationId[] = ['tunnel', 'product'];
 

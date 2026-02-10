@@ -291,6 +291,8 @@ export default function ChecklistPage() {
                       <button
                         onClick={() => toggleExpand(player.id)}
                         className="w-full p-4 flex items-center gap-3 hover:bg-[#2A2A2A]/50 transition-colors"
+                        aria-expanded={isExpanded}
+                        aria-label={isExpanded ? 'Collapse player details' : 'Expand player details'}
                       >
                         <div className="w-12 h-12 rounded-full bg-[#2A2A2A] flex items-center justify-center text-lg font-bold text-white overflow-hidden flex-shrink-0">
                           <span>{player.flag}</span>
@@ -314,8 +316,8 @@ export default function ChecklistPage() {
                           </div>
 
                           {/* Progress Ring */}
-                          <div className="relative w-10 h-10">
-                            <svg className="w-full h-full transform -rotate-90">
+                          <div className="relative w-10 h-10" aria-label={`${progress.percentage}% complete`}>
+                            <svg className="w-full h-full transform -rotate-90" aria-hidden="true">
                               <circle cx="20" cy="20" r="16" stroke="#2A2A2A" strokeWidth="3" fill="none" />
                               <circle
                                 cx="20" cy="20" r="16"
@@ -326,7 +328,7 @@ export default function ChecklistPage() {
                             </svg>
                             {progress.percentage === 100 && (
                               <div className="absolute inset-0 flex items-center justify-center">
-                                <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20" aria-label="Completed">
                                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                 </svg>
                               </div>
@@ -367,7 +369,7 @@ export default function ChecklistPage() {
                                     }`}
                                   >
                                     {completed && (
-                                      <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                      <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20" aria-label="Completed">
                                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                       </svg>
                                     )}

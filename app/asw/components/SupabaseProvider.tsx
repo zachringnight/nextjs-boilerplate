@@ -68,7 +68,6 @@ function toAppCompletion(row: CompletionRecord): PlayerStationCompletion {
 }
 
 export default function SupabaseProvider() {
-  const store = useASWStore;
   const isInitialLoad = useRef(true);
   const onlineRef = useRef(true);
   const supabaseAvailableRef = useRef<boolean | null>(null);
@@ -92,17 +91,17 @@ export default function SupabaseProvider() {
       ]);
 
     if (notesData) {
-      store.setState({ notes: notesData.map(toAppNote) });
+      useASWStore.setState({ notes: notesData.map(toAppNote) });
     }
     if (deliverablesData && deliverablesData.length > 0) {
-      store.setState({ deliverables: deliverablesData.map(toAppDeliverable) });
+      useASWStore.setState({ deliverables: deliverablesData.map(toAppDeliverable) });
     }
     if (completionsData) {
-      store.setState({
+      useASWStore.setState({
         playerStationCompletions: completionsData.map(toAppCompletion),
       });
     }
-  }, [ensureSupabaseAvailable, store]);
+  }, [ensureSupabaseAvailable]);
 
   // Initial load and online/offline handling
   useEffect(() => {
@@ -133,21 +132,23 @@ export default function SupabaseProvider() {
 
   // Subscribe to realtime changes
   useEffect(() => {
-    let channel: ReturnType<NonNullable<ReturnType<typeof getSupabase>>['channel']> | null = null;
+    let mounted = true;
+    let currentChannel: ReturnType<NonNullable<ReturnType<typeof getSupabase>>['channel']> | null = null;
 
     const subscribe = async () => {
       const supabase = getSupabase();
       if (!supabase || !isSupabaseConfigured()) return;
       if (!(await ensureSupabaseAvailable())) return;
+      if (!mounted) return;
 
-      channel = supabase
+      currentChannel = supabase
         .channel('asw-tables-sync')
         .on(
           'postgres_changes',
           { event: '*', schema: 'public', table: 'notes' },
           () => {
             fetchNotes().then((data) => {
-              if (data) store.setState({ notes: data.map(toAppNote) });
+              if (data && mounted) useASWStore.setState({ notes: data.map(toAppNote) });
             });
           }
         )
@@ -156,8 +157,8 @@ export default function SupabaseProvider() {
           { event: '*', schema: 'public', table: 'deliverables' },
           () => {
             fetchDeliverables().then((data) => {
-              if (data && data.length > 0)
-                store.setState({ deliverables: data.map(toAppDeliverable) });
+              if (data && data.length > 0 && mounted)
+                useASWStore.setState({ deliverables: data.map(toAppDeliverable) });
             });
           }
         )
@@ -166,8 +167,8 @@ export default function SupabaseProvider() {
           { event: '*', schema: 'public', table: 'player_station_completions' },
           () => {
             fetchCompletions().then((data) => {
-              if (data)
-                store.setState({
+              if (data && mounted)
+                useASWStore.setState({
                   playerStationCompletions: data.map(toAppCompletion),
                 });
             });
@@ -179,12 +180,13 @@ export default function SupabaseProvider() {
     subscribe();
 
     return () => {
-      if (channel) {
+      mounted = false;
+      if (currentChannel) {
         const supabase = getSupabase();
-        if (supabase) supabase.removeChannel(channel);
+        if (supabase) supabase.removeChannel(currentChannel);
       }
     };
-  }, [store, ensureSupabaseAvailable]);
+  }, [ensureSupabaseAvailable]);
 
   return null;
 }
