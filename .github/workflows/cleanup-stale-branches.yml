@@ -1,0 +1,78 @@
+name: Cleanup Stale Branches
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_deletion:
+        description: 'Type "DELETE" to confirm branch deletion'
+        required: true
+        type: string
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    if: github.event.inputs.confirm_deletion == 'DELETE'
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Delete stale branches
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Deleting stale branches..."
+          
+          # Array of branches to delete
+          branches=(
+            "claude/add-button-feature-4LGiM"
+            "claude/add-station-checklist-Y3CV2"
+            "claude/clip-edit-delete-features-B2zJ8"
+            "claude/date-aware-player-checklist-yLrXC"
+            "claude/enhance-clip-marker-szQre"
+            "claude/fix-clip-marker-2WKbl"
+            "claude/fix-turbopack-lint-Ners8"
+            "claude/improve-clip-tracker-RR8W4"
+            "claude/polish-player-cards-No5gL"
+            "claude/remove-prod-lists-perf-KvZSO"
+            "claude/review-marker-tool-improvements-mmIfA"
+            "claude/test-supabase-connection-XcY66"
+            "codex/ensure-supabase-connection-is-working"
+            "codex/summarize-missing-athlete-information"
+            "codex/update-player-schedule-dates"
+            "copilot/address-review-comments-pr17"
+            "copilot/fix-thursday-schedule-issues"
+            "copilot/sub-pr-50"
+            "copilot/sub-pr-50-again"
+            "copilot/sub-pr-50-another-one"
+            "copilot/test-supabase-connection"
+          )
+          
+          deleted=0
+          failed=0
+          
+          for branch in "${branches[@]}"; do
+            echo "Deleting $branch..."
+            if gh api -X DELETE "/repos/${{ github.repository }}/git/refs/heads/$branch" 2>/dev/null; then
+              echo "  ✓ Deleted successfully"
+              ((deleted++))
+            else
+              echo "  ✗ Failed (may already be deleted)"
+              ((failed++))
+            fi
+          done
+          
+          echo ""
+          echo "Summary:"
+          echo "  Successfully deleted: $deleted"
+          echo "  Failed/Already deleted: $failed"
+          
+      - name: Verify remaining branches
+        run: |
+          echo ""
+          echo "Remaining branches:"
+          git ls-remote --heads origin | awk '{print "  " $2}' | sed 's|refs/heads/||'
