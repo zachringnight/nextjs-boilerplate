@@ -10,9 +10,20 @@
 import type { Deliverable, EventDay } from '../types';
 import { players } from './players';
 
+// Map numeric player day to EventDay, with validation to prevent silent misclassification
+function mapPlayerDayToEventDay(day: number): EventDay {
+  if (day === 1) {
+    return 'Thursday';
+  }
+  if (day === 2) {
+    return 'Friday';
+  }
+  throw new Error(`Invalid player day value: ${day}. Expected 1 or 2.`);
+}
+
 // Generate per-player deliverables (tunnel video + product photos for each player)
 const playerDeliverables: Deliverable[] = players.flatMap((player) => {
-  const dueDay: EventDay = player.day === 1 ? 'Thursday' : 'Friday';
+  const dueDay: EventDay = mapPlayerDayToEventDay(player.day);
   return [
     {
       id: `del-tunnel-${player.id}`,

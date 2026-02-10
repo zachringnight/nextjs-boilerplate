@@ -68,7 +68,6 @@ function toAppCompletion(row: CompletionRecord): PlayerStationCompletion {
 }
 
 export default function SupabaseProvider() {
-  const store = useASWStore;
   const isInitialLoad = useRef(true);
   const onlineRef = useRef(true);
   const supabaseAvailableRef = useRef<boolean | null>(null);
@@ -92,17 +91,17 @@ export default function SupabaseProvider() {
       ]);
 
     if (notesData) {
-      store.setState({ notes: notesData.map(toAppNote) });
+      useASWStore.setState({ notes: notesData.map(toAppNote) });
     }
     if (deliverablesData && deliverablesData.length > 0) {
-      store.setState({ deliverables: deliverablesData.map(toAppDeliverable) });
+      useASWStore.setState({ deliverables: deliverablesData.map(toAppDeliverable) });
     }
     if (completionsData) {
-      store.setState({
+      useASWStore.setState({
         playerStationCompletions: completionsData.map(toAppCompletion),
       });
     }
-  }, [ensureSupabaseAvailable, store]);
+  }, [ensureSupabaseAvailable]);
 
   // Initial load and online/offline handling
   useEffect(() => {
@@ -147,7 +146,7 @@ export default function SupabaseProvider() {
           { event: '*', schema: 'public', table: 'notes' },
           () => {
             fetchNotes().then((data) => {
-              if (data) store.setState({ notes: data.map(toAppNote) });
+              if (data) useASWStore.setState({ notes: data.map(toAppNote) });
             });
           }
         )
@@ -157,7 +156,7 @@ export default function SupabaseProvider() {
           () => {
             fetchDeliverables().then((data) => {
               if (data && data.length > 0)
-                store.setState({ deliverables: data.map(toAppDeliverable) });
+                useASWStore.setState({ deliverables: data.map(toAppDeliverable) });
             });
           }
         )
@@ -167,7 +166,7 @@ export default function SupabaseProvider() {
           () => {
             fetchCompletions().then((data) => {
               if (data)
-                store.setState({
+                useASWStore.setState({
                   playerStationCompletions: data.map(toAppCompletion),
                 });
             });
@@ -184,7 +183,7 @@ export default function SupabaseProvider() {
         if (supabase) supabase.removeChannel(channel);
       }
     };
-  }, [store, ensureSupabaseAvailable]);
+  }, [ensureSupabaseAvailable]);
 
   return null;
 }

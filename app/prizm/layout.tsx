@@ -1,9 +1,5 @@
 import { redirect } from 'next/navigation';
 
-export default function PrizmLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function PrizmLayout() {
   redirect('/asw');
 }

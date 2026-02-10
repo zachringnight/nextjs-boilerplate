@@ -77,7 +77,7 @@ export async function syncNoteUpdate(
   try {
     const { error } = await supabase
       .from('notes')
-      .update({ ...updates, updated_at: new Date().toISOString() })
+      .update(updates)
       .eq('id', id);
     if (error) throw error;
     return true;

@@ -54,7 +54,6 @@ export default function NotesPage() {
   const [filterCategory, setFilterCategory] = useState<NoteCategory | 'all'>('all');
   const [filterStatus, setFilterStatus] = useState<NoteStatus | 'all'>('all');
   const [filterPriority, setFilterPriority] = useState<NotePriority | 'all'>('all');
-  const [editingId, setEditingId] = useState<string | null>(null);
 
   // New note form state
   const [newContent, setNewContent] = useState('');
@@ -88,7 +87,7 @@ export default function NotesPage() {
       category: newCategory,
       priority: newPriority,
       status: 'open',
-      stationId: (newStation as ASWStationId) || undefined,
+      stationId: newStation || undefined,
       playerId: newPlayer || undefined,
     });
     setNewContent('');

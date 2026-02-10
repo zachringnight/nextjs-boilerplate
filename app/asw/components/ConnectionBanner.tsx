@@ -1,18 +1,14 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { WifiOff, RefreshCw } from 'lucide-react';
 
 export default function ConnectionBanner() {
   const [isOnline, setIsOnline] = useState(true);
   const [showBanner, setShowBanner] = useState(false);
   const [lastOnline, setLastOnline] = useState<Date | null>(null);
-  const didInit = useRef(false);
 
   useEffect(() => {
-    if (didInit.current) return;
-    didInit.current = true;
-
     const goOnline = () => {
       setIsOnline(true);
       setShowBanner(false);

@@ -115,7 +115,7 @@ export const useASWStore = create<ASWState>()(
         const now = new Date().toISOString();
         const note: Note = {
           ...noteData,
-          id: `note-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          id: `note-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
           createdAt: now,
           updatedAt: now,
         };
@@ -216,7 +216,7 @@ export const useASWStore = create<ASWState>()(
         if (updated) syncDeliverableUpsert(deliverableToRecord(updated));
       },
       addDeliverable: (deliverableData) => {
-        const id = `deliverable-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        const id = `deliverable-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
         const deliverable: Deliverable = {
           ...deliverableData,
           id,
@@ -348,12 +348,11 @@ export const useASWStore = create<ASWState>()(
     {
       name: 'asw-storage',
       storage: createJSONStorage(() => localStorage),
+      // Only persist UI-related preferences; Supabase remains the source of truth
+      // for notes, deliverables, and playerStationCompletions to avoid stale-data flashes.
       partialize: (state) => ({
         viewMode: state.viewMode,
         largeText: state.largeText,
-        notes: state.notes,
-        deliverables: state.deliverables,
-        playerStationCompletions: state.playerStationCompletions,
       }),
     }
   )
