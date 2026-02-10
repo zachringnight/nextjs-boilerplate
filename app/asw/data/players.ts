@@ -1,33 +1,24 @@
 import type { Player, PlayerQuestion } from '../types';
 
-// Team abbreviation mappings (NBA + College + International)
+// Team abbreviation mappings
 const TEAMS: Record<string, { full: string; abbr: string }> = {
   // NBA Teams
-  MIL: { full: 'Milwaukee Bucks', abbr: 'MIL' },
-  DET: { full: 'Detroit Pistons', abbr: 'DET' },
-  MEM: { full: 'Memphis Grizzlies', abbr: 'MEM' },
-  ATL: { full: 'Atlanta Hawks', abbr: 'ATL' },
-  SAC: { full: 'Sacramento Kings', abbr: 'SAC' },
+  SAS: { full: 'San Antonio Spurs', abbr: 'SAS' },
   PHI: { full: 'Philadelphia 76ers', abbr: 'PHI' },
-  MIN: { full: 'Minnesota Timberwolves', abbr: 'MIN' },
-  BOS: { full: 'Boston Celtics', abbr: 'BOS' },
-  LAL: { full: 'Los Angeles Lakers', abbr: 'LAL' },
-  PHX: { full: 'Phoenix Suns', abbr: 'PHX' },
-  DAL: { full: 'Dallas Mavericks', abbr: 'DAL' },
-  // College Teams
-  BAY: { full: 'Baylor Bears', abbr: 'BAY' },
-  OU: { full: 'Oklahoma Sooners', abbr: 'OU' },
-  TEX: { full: 'Texas Longhorns', abbr: 'TEX' },
-  ARIZ: { full: 'Arizona Wildcats', abbr: 'ARIZ' },
-  UMD: { full: 'Maryland Terrapins', abbr: 'UMD' },
-  UK: { full: 'Kentucky Wildcats', abbr: 'UK' },
-  UCONN: { full: 'UConn Huskies', abbr: 'UCONN' },
-  ND: { full: 'Notre Dame Fighting Irish', abbr: 'ND' },
-  UCLA: { full: 'UCLA Bruins', abbr: 'UCLA' },
-  AUB: { full: 'Auburn Tigers', abbr: 'AUB' },
-  DUKE: { full: 'Duke Blue Devils', abbr: 'DUKE' },
-  ARK: { full: 'Arkansas Razorbacks', abbr: 'ARK' },
-  GONZ: { full: 'Gonzaga Bulldogs', abbr: 'GONZ' },
+  MEM: { full: 'Memphis Grizzlies', abbr: 'MEM' },
+  OKC: { full: 'Oklahoma City Thunder', abbr: 'OKC' },
+  NOP: { full: 'New Orleans Pelicans', abbr: 'NOP' },
+  WAS: { full: 'Washington Wizards', abbr: 'WAS' },
+  CHI: { full: 'Chicago Bulls', abbr: 'CHI' },
+  SAC: { full: 'Sacramento Kings', abbr: 'SAC' },
+  TOR: { full: 'Toronto Raptors', abbr: 'TOR' },
+  LAC: { full: 'Los Angeles Clippers', abbr: 'LAC' },
+  // WNBA Teams
+  FEV: { full: 'Indiana Fever', abbr: 'FEV' },
+  // College / HS / Other
+  USC: { full: 'USC Trojans', abbr: 'USC' },
+  DME: { full: 'DME Academy', abbr: 'DME' },
+  COR: { full: 'Coronado HS', abbr: 'COR' },
 };
 
 // Standard tunnel interview questions for all athletes
@@ -51,11 +42,929 @@ const tunnelQuestions: string[] = [
 
 export const players: Player[] = [
   // ============================================
-  // THURSDAY, FEBRUARY 12 — DAY 1 (16 players)
-  // Stars, Legends, and Rookies
+  // FRIDAY, FEBRUARY 13 — DAY 1 (9 players)
   // ============================================
 
-  // --- NBA STARS ---
+  {
+    id: 'jerry-easter-jr',
+    name: 'JERRY EASTER JR',
+    firstName: 'Jerry',
+    lastName: 'Easter Jr',
+    position: 'Guard',
+    team: TEAMS.USC.full,
+    teamAbbr: 'USC',
+    conference: 'Western',
+    nationality: 'United States',
+    flag: '\uD83C\uDDFA\uD83C\uDDF8',
+    photo: '/asw/players/easter.jpg',
+    jerseyNumber: 0,
+    day: 1,
+    scheduledTime: 'TBD',
+    playerNumber: 1,
+    notes: ['Exclusive - 120 min', 'Agent: Jerry Easter Sr', 'Rep: Caleb', 'Guests: Jerry (father), Trena (mother)'],
+    embargoed: false,
+    translatorNeeded: false,
+    bio: [
+      'Guard on the USC Trojans roster',
+      'Hometown: Toledo, Ohio — strong family grounding and community pride',
+      'Ohio all-state honors with a prolific scoring prep résumé',
+      'Multi-sport background; attack-minded guard who plays with confidence and swagger',
+    ],
+    talkingPoints: [
+      'Rookie mindset — plays with confidence and scoring mentality',
+      'Talks warmly about Toledo (museum, zoo) and family support — easy entry to "who keeps you grounded?"',
+      'Strong family presence: father Jerry and mother Trena are deeply involved in his journey',
+    ],
+    questions: [
+      { station: 'tunnel', questions: tunnelQuestions },
+      {
+        station: 'product',
+        questions: [
+          'What does your first "college card" moment feel like?',
+          'What family keepsakes do you treasure most?',
+          'How would you represent Toledo pride on a card back?',
+          'What details do you want collectors to see on your card?',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'carter-bryant',
+    name: 'CARTER BRYANT',
+    firstName: 'Carter',
+    lastName: 'Bryant',
+    position: 'Forward',
+    team: TEAMS.SAS.full,
+    teamAbbr: 'SAS',
+    conference: 'Western',
+    nationality: 'United States',
+    flag: '\uD83C\uDDFA\uD83C\uDDF8',
+    photo: '/asw/players/cbryant.jpg',
+    jerseyNumber: 0,
+    day: 1,
+    scheduledTime: '12:00 PM',
+    playerNumber: 2,
+    notes: ['Exclusive - 90 min', 'Agent: Alex Snyder', 'Rep: Baile'],
+    embargoed: false,
+    translatorNeeded: false,
+    bio: [
+      'Two-way wing/forward for the San Antonio Spurs — "3-and-D" profile',
+      'Spurs rookie; first-round pick in 2025 NBA Draft out of Arizona',
+      'Spot-up shooting plus defensive versatility with elite athletic tools',
+      'Has talked about playing freer, less perfectionist, trusting instincts — improving his impact',
+    ],
+    talkingPoints: [
+      'Dunk Contest buzz has been circulating around the league',
+      'Playing freer and trusting instincts — a growth narrative for rookie season content',
+      'Arizona-to-Spurs pipeline — what the franchise culture means to a young player',
+    ],
+    questions: [
+      { station: 'tunnel', questions: tunnelQuestions },
+      {
+        station: 'product',
+        questions: [
+          'What photo do you want on your flagship Spurs rookie card?',
+          'What does your "rookie card moment" look like?',
+          'Which defensive highlights deserve a card insert?',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'lisa-leslie',
+    name: 'LISA LESLIE',
+    firstName: 'Lisa',
+    lastName: 'Leslie',
+    position: 'Center',
+    team: 'Retired (LA Sparks)',
+    teamAbbr: 'WNBA',
+    conference: 'Western',
+    nationality: 'United States',
+    flag: '\uD83C\uDDFA\uD83C\uDDF8',
+    photo: '/asw/players/leslie.jpg',
+    jerseyNumber: 9,
+    day: 1,
+    scheduledTime: '12:00 PM',
+    playerNumber: 3,
+    notes: ['60 min appearance', 'Agent: Allison Galer', 'Rep: Baile'],
+    embargoed: false,
+    translatorNeeded: false,
+    bio: [
+      'Face-of-the-league era for the LA Sparks — centerpiece of early WNBA legacy',
+      'USC alumna; multiple WNBA MVPs and Olympic gold medals',
+      'First player to dunk in a WNBA game — a historic milestone moment',
+      'Hall of Fame recognition with an enduring cultural footprint',
+    ],
+    talkingPoints: [
+      'The first WNBA dunk is a trading-card "milestone moment" anchor',
+      'Dominant true center: elite interior scoring, rebounding, rim protection, and star power',
+      'How would she tell the story of early WNBA through cards?',
+    ],
+    questions: [
+      { station: 'tunnel', questions: tunnelQuestions },
+      {
+        station: 'product',
+        questions: [
+          'If you could curate one Lisa Leslie insert set, what themes would it have?',
+          'How would you tell the story of early WNBA through trading cards?',
+          'What moment defines your legacy in one photo?',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'sophie-cunningham',
+    name: 'SOPHIE CUNNINGHAM',
+    firstName: 'Sophie',
+    lastName: 'Cunningham',
+    position: 'Guard',
+    team: TEAMS.FEV.full,
+    teamAbbr: 'FEV',
+    conference: 'Eastern',
+    nationality: 'United States',
+    flag: '\uD83C\uDDFA\uD83C\uDDF8',
+    photo: '/asw/players/scunningham.jpg',
+    jerseyNumber: 1,
+    day: 1,
+    scheduledTime: '12:30 PM',
+    playerNumber: 4,
+    notes: ['Signing Only', 'Agent: Rishi Daulet', 'Rep: Karishma'],
+    embargoed: false,
+    translatorNeeded: false,
+    bio: [
+      'Guard/wing for the Indiana Fever',
+      'Missouri alumna; SEC Freshman of the Year and multi-time All-SEC selection',
+      "Commissioner's Cup champion with gritty, enforcer reputation",
+      'Competitive, physical, edge-setting perimeter player who brings toughness and energy',
+    ],
+    talkingPoints: [
+      'Known for a gritty "enforcer" reputation and willingness to mix it up',
+      'Strong hometown identity — what keeps her grounded off the court',
+      "What moment from her Cup run does she want memorialized on a card?",
+    ],
+    questions: [
+      { station: 'tunnel', questions: tunnelQuestions },
+      {
+        station: 'product',
+        questions: [
+          'What does "toughness" look like on a card? (photo selection, captions, parallels)',
+          "What moment from your Commissioner's Cup run deserves to be on a card?",
+        ],
+      },
+    ],
+  },
+  {
+    id: 'vj-edgecombe',
+    name: 'VJ EDGECOMBE',
+    firstName: 'VJ',
+    lastName: 'Edgecombe',
+    pronunciation: 'VEE-JAY EDJ-kum',
+    position: 'Guard',
+    team: TEAMS.PHI.full,
+    teamAbbr: 'PHI',
+    conference: 'Eastern',
+    nationality: 'Bahamas',
+    flag: '\uD83C\uDDE7\uD83C\uDDF8',
+    photo: '/asw/players/edgecombe.jpg',
+    jerseyNumber: 4,
+    day: 1,
+    scheduledTime: '1:30 PM',
+    playerNumber: 5,
+    notes: ['Exclusive - 90 min', 'Agent: Anthony Ricks', 'Rep: Baile'],
+    embargoed: false,
+    translatorNeeded: false,
+    bio: [
+      'Guard/wing for the Philadelphia 76ers — high pick in the 2025 NBA Draft',
+      'Baylor product; Big 12 Freshman of the Year with elite defensive activity',
+      'High-motor, defensive playmaker and transition force — steals and activity pop',
+      'Signature early pro storyline: huge NBA debut scoring burst that became a headline',
+    ],
+    talkingPoints: [
+      '"Face of the rookie class" energy — immediate impact on both ends',
+      'Bahamian pride — bringing Caribbean basketball to the world stage',
+      'NBA debut headline scoring burst — the kind of moment collectors remember',
+    ],
+    questions: [
+      { station: 'tunnel', questions: tunnelQuestions },
+      {
+        station: 'product',
+        questions: [
+          'What does your "rookie debut" card look like?',
+          'What parallels would you chase as a collector?',
+          'Which defensive highlights deserve inserts — steals, chase-downs, momentum plays?',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'cam-spencer',
+    name: 'CAM SPENCER',
+    firstName: 'Cam',
+    lastName: 'Spencer',
+    position: 'Guard',
+    team: TEAMS.MEM.full,
+    teamAbbr: 'MEM',
+    conference: 'Western',
+    nationality: 'United States',
+    flag: '\uD83C\uDDFA\uD83C\uDDF8',
+    photo: '/asw/players/spencer.jpg',
+    jerseyNumber: 0,
+    day: 1,
+    scheduledTime: 'TBD',
+    playerNumber: 6,
+    notes: ['Signing Only', 'Agent: Chase Lanier', 'Rep: Baile'],
+    embargoed: false,
+    translatorNeeded: false,
+    bio: [
+      'Guard for the Memphis Grizzlies — shooting is the calling card',
+      'UConn alumnus; "high IQ competitor" with long-range shooting identity',
+      'Has had big scoring bursts including a notable high-point output in the Grizzlies org',
+      'Movement/spot-up shooter, smart connector, competitive edge',
+    ],
+    talkingPoints: [
+      'Shooter identity translates perfectly to card insert concepts',
+      'UConn pedigree — from national champion program to NBA rotation',
+      'Smart, competitive player who elevates those around him',
+    ],
+    questions: [
+      { station: 'tunnel', questions: tunnelQuestions },
+      {
+        station: 'product',
+        questions: [
+          'What shot would you put on your signature card?',
+          'Shooter-focused insert concepts: heat-check moments, "from the logo" theme?',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'mike-miller',
+    name: 'MIKE MILLER',
+    firstName: 'Mike',
+    lastName: 'Miller',
+    position: 'Forward',
+    team: 'Retired (NBA)',
+    teamAbbr: 'RET',
+    conference: 'Eastern',
+    nationality: 'United States',
+    flag: '\uD83C\uDDFA\uD83C\uDDF8',
+    photo: '/asw/players/miller.jpg',
+    jerseyNumber: 13,
+    day: 1,
+    scheduledTime: 'TBD',
+    playerNumber: 7,
+    notes: ['Signing Only', 'Agent: Mike Miller (LIFT)', 'Rep: Caleb'],
+    embargoed: false,
+    translatorNeeded: false,
+    bio: [
+      '17-year NBA career; Rookie of the Year (2001) and Sixth Man of the Year (2006)',
+      'Two-time NBA champion with the Miami Heat',
+      'Elite shooter who spaced the floor — smart off-ball mover, instant offense off the bench',
+      'One of the most respected role players and shooters of his generation',
+    ],
+    talkingPoints: [
+      'Heat championship era — what those runs meant for his legacy and card value',
+      'Shooter identity: best photo for a "shooter card" and what makes it iconic',
+      'What makes a great role-player card collectible? His perspective as a veteran',
+    ],
+    questions: [
+      { station: 'tunnel', questions: tunnelQuestions },
+      {
+        station: 'product',
+        questions: [
+          'What\'s your "best shooter card photo" — which moment captures it?',
+          'Favorite Heat-era teammate cards?',
+          'What makes a great role-player card collectible?',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'jared-mccain',
+    name: 'JARED MCCAIN',
+    firstName: 'Jared',
+    lastName: 'McCain',
+    position: 'Guard',
+    team: TEAMS.OKC.full,
+    teamAbbr: 'OKC',
+    conference: 'Western',
+    nationality: 'United States',
+    flag: '\uD83C\uDDFA\uD83C\uDDF8',
+    photo: '/asw/players/mccain.jpg',
+    jerseyNumber: 0,
+    day: 1,
+    scheduledTime: '5:00 PM',
+    playerNumber: 8,
+    notes: ['Exclusive - 60 min', 'Agent: Nailah Waterfield (Excel)', 'Rep: Caleb', 'Guest: Nailah Waterfield'],
+    embargoed: false,
+    translatorNeeded: false,
+    bio: [
+      'Guard for the Oklahoma City Thunder — Pick 16 in the 2024 NBA Draft',
+      'Duke alumnus; score-first guard with high-ceiling potential',
+      'Traded to OKC ahead of the deadline — "fresh start, new role" narrative',
+      'Natural conversation: "what\'s your go-to bucket?"',
+    ],
+    talkingPoints: [
+      'Duke-to-NBA collector journey — what he collected growing up',
+      'Fresh start in OKC — new team energy and what his Thunder card has to include',
+      'Score-first guard potential — lives for the big shot',
+    ],
+    questions: [
+      { station: 'tunnel', questions: tunnelQuestions },
+      {
+        station: 'product',
+        questions: [
+          'What does your "Thunder first card" have to include?',
+          'Duke-to-NBA collector journey — what did you collect growing up?',
+          'What\'s your go-to bucket that you want captured on a card?',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'ryan-hampton',
+    name: 'RYAN HAMPTON',
+    firstName: 'Ryan',
+    lastName: 'Hampton',
+    position: 'Small Forward',
+    team: TEAMS.DME.full,
+    teamAbbr: 'DME',
+    conference: 'Eastern',
+    nationality: 'United States',
+    flag: '\uD83C\uDDFA\uD83C\uDDF8',
+    photo: '/asw/players/hampton.jpg',
+    jerseyNumber: 0,
+    day: 1,
+    scheduledTime: '12:00 PM',
+    playerNumber: 9,
+    notes: ['Exclusive - 90 min', 'Agent: Rod & Markita Hampton', 'Rep: Baile', 'Guests: Rod (father), Markita (mother)'],
+    embargoed: false,
+    translatorNeeded: false,
+    bio: [
+      'Small forward at DME Academy — top-tier national HS prospect',
+      'Hometown: Tulsa, Oklahoma; high ranking in major recruiting outlets',
+      'Elite wing prospect with two-way impact, athleticism, creation and finishing ability',
+      'Family-driven: parents Rod and Markita deeply involved in his development',
+    ],
+    talkingPoints: [
+      '"First Bowman-style moment" energy — what a pre-pro card should capture',
+      'What details matter: HS fit, signature move, personal logo, number choice',
+      'Two-way impact and what he\'s sharpening this season heading toward college',
+    ],
+    questions: [
+      { station: 'tunnel', questions: tunnelQuestions },
+      {
+        station: 'product',
+        questions: [
+          'What should your first pre-pro card capture? (HS fit, signature move, personal logo)',
+          'What number did you choose and why?',
+          'What does your game look like in one photo?',
+        ],
+      },
+    ],
+  },
+
+  // ============================================
+  // SATURDAY, FEBRUARY 14 — DAY 2 (11 players)
+  // ============================================
+
+  {
+    id: 'jeremiah-fears',
+    name: 'JEREMIAH FEARS',
+    firstName: 'Jeremiah',
+    lastName: 'Fears',
+    position: 'Guard',
+    team: TEAMS.NOP.full,
+    teamAbbr: 'NOP',
+    conference: 'Western',
+    nationality: 'United States',
+    flag: '\uD83C\uDDFA\uD83C\uDDF8',
+    photo: '/asw/players/fears.jpg',
+    jerseyNumber: 1,
+    day: 2,
+    scheduledTime: 'TBD',
+    playerNumber: 10,
+    notes: ['Exclusive - 120 min', 'Agent: Marco Manlunas (LIFT)', 'Rep: Caleb', 'Guests: Pel SM Team (+4), Marco, CJ, Nas'],
+    embargoed: false,
+    translatorNeeded: false,
+    bio: [
+      'Guard for the New Orleans Pelicans — top-10 pick in the 2025 NBA Draft',
+      'Oklahoma product; SEC All-Freshman Team selection',
+      'Ball-handler who can score and create; defensive activity was a hallmark in college',
+      'Dynamic guard with a fearless approach to the game',
+    ],
+    talkingPoints: [
+      '"New Orleans identity card" — colors, vibes, and what that culture means to him',
+      'Fearless competitor who lives for the big moment — what moment defines his game',
+      'What would his rookie insert look like? One photo to capture his game',
+    ],
+    questions: [
+      { station: 'tunnel', questions: tunnelQuestions },
+      {
+        station: 'product',
+        questions: [
+          'What does a "New Orleans identity card" look like — colors, vibes?',
+          'What would you want in a rookie insert?',
+          'What moment defines your game in one photo?',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'devaughn-dorrough',
+    name: 'DEVAUGHN DORROUGH',
+    firstName: 'DeVaughn',
+    lastName: 'Dorrough',
+    position: 'Forward',
+    team: TEAMS.COR.full,
+    teamAbbr: 'COR',
+    conference: 'Western',
+    nationality: 'United States',
+    flag: '\uD83C\uDDFA\uD83C\uDDF8',
+    photo: '/asw/players/dorrough.jpg',
+    jerseyNumber: 0,
+    day: 2,
+    scheduledTime: 'TBD',
+    playerNumber: 11,
+    notes: ['Exclusive - 90 min', 'Agent: Torrie Evans', 'Rep: Caleb', 'Guest: Robert Kinnard'],
+    embargoed: false,
+    translatorNeeded: false,
+    bio: [
+      'Forward / power forward at Coronado HS (Henderson, NV)',
+      'Originally from Elk Grove, CA — Class of 2028 national prospect',
+      'Has a USA Basketball player page — strong legitimacy signal',
+      'Top-tier recruit drawing attention from major programs nationwide',
+    ],
+    talkingPoints: [
+      'Class of 2028 — one of the youngest and most exciting prospects at the event',
+      'USA Basketball connection adds national and international credibility',
+      'What does he want collectors to know before he hits the national spotlight?',
+    ],
+    questions: [
+      { station: 'tunnel', questions: tunnelQuestions },
+      {
+        station: 'product',
+        questions: [
+          'What do you want on your first "early-career card"?',
+          'What\'s your autograph style — have you been working on it?',
+          'What should collectors know about you before you hit the national spotlight?',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'tre-johnson',
+    name: 'TRE JOHNSON',
+    firstName: 'Tre',
+    lastName: 'Johnson',
+    position: 'Shooting Guard',
+    team: TEAMS.WAS.full,
+    teamAbbr: 'WAS',
+    conference: 'Eastern',
+    nationality: 'United States',
+    flag: '\uD83C\uDDFA\uD83C\uDDF8',
+    photo: '/asw/players/tjohnson.jpg',
+    jerseyNumber: 3,
+    day: 2,
+    scheduledTime: '10:45 AM',
+    playerNumber: 12,
+    notes: ['Exclusive - 90 min', 'Agent: Elise Tanzberger', 'Rep: Baile'],
+    embargoed: false,
+    translatorNeeded: false,
+    bio: [
+      'Shooting guard for the Washington Wizards — lottery pick in 2025 NBA Draft',
+      'Texas product; SEC Freshman of the Year with major prep all-star credentials',
+      'High-volume scoring guard; big-shot maker with three-level scoring identity',
+      'Generational scoring ability — reminiscent of elite shot-makers',
+    ],
+    talkingPoints: [
+      '"Scorer\'s card" concepts — heat-check parallels and what captures his game',
+      'What game would he want captured as a card insert set?',
+      'Favorite Wizards legends he\'d want a dual card with',
+    ],
+    questions: [
+      { station: 'tunnel', questions: tunnelQuestions },
+      {
+        station: 'product',
+        questions: [
+          'What does a "scorer\'s card" look like? Heat-check parallels?',
+          'What game do you want captured as a card insert set?',
+          'Which Wizards legend would you want on a dual card with?',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'derik-queen',
+    name: 'DERIK QUEEN',
+    firstName: 'Derik',
+    lastName: 'Queen',
+    position: 'Center',
+    team: TEAMS.NOP.full,
+    teamAbbr: 'NOP',
+    conference: 'Western',
+    nationality: 'United States',
+    flag: '\uD83C\uDDFA\uD83C\uDDF8',
+    photo: '/asw/players/queen.jpg',
+    jerseyNumber: 25,
+    day: 2,
+    scheduledTime: '12:00 PM',
+    playerNumber: 13,
+    notes: ['Signing Only', 'Agent: Ashanti Ruben', 'Rep: Baile'],
+    embargoed: false,
+    translatorNeeded: false,
+    bio: [
+      'Center for the New Orleans Pelicans — first-round pick in 2025 NBA Draft',
+      'Maryland product; Big Ten Freshman of the Year and All-Big Ten honors',
+      'Big body with touch and presence; post craft, rebounding, rim protection',
+      'Strong freshman-season narrative with big-stage HS honors',
+    ],
+    talkingPoints: [
+      '"Big-man inserts" — blocks, poster finishes, and what defines his game',
+      'Power vs finesse: what should his rookie card photo show?',
+      'Maryland hometown hero story — what that fan connection means',
+    ],
+    questions: [
+      { station: 'tunnel', questions: tunnelQuestions },
+      {
+        station: 'product',
+        questions: [
+          'What should your rookie card photo show — power or finesse?',
+          '"Big-man inserts": blocks, poster finishes — which moment?',
+          'What does "big moment composure" look like on a card?',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'matas-buzelis',
+    name: 'MATAS BUZELIS',
+    firstName: 'Matas',
+    lastName: 'Buzelis',
+    pronunciation: 'MAH-tahs boo-ZEH-lis',
+    position: 'Forward',
+    team: TEAMS.CHI.full,
+    teamAbbr: 'CHI',
+    conference: 'Eastern',
+    nationality: 'United States',
+    flag: '\uD83C\uDDFA\uD83C\uDDF8',
+    photo: '/asw/players/buzelis.jpg',
+    jerseyNumber: 0,
+    day: 2,
+    scheduledTime: '12:30 PM',
+    playerNumber: 14,
+    notes: ['Exclusive - 90 min', 'Agent: Jenny Sacks (Excel)', 'Rep: Caleb', 'Guests: Jenny Sacks, Kristina Jankauskaite (mother)'],
+    embargoed: false,
+    translatorNeeded: false,
+    bio: [
+      'Forward for the Chicago Bulls — hometown kid playing for his city',
+      'G League Ignite development path; Gatorade state player recognition',
+      'Big wing with creation flashes; open-floor skill and versatility',
+      'Lithuanian heritage — mother Kristina Jankauskaite in attendance',
+    ],
+    talkingPoints: [
+      '"Chicago kid" narrative on cards — what city imagery belongs in a Bulls insert',
+      'Which play defines him: pull-up 3, coast-to-coast, or weakside block?',
+      'G League Ignite-to-NBA pathway and what that journey taught him',
+    ],
+    questions: [
+      { station: 'tunnel', questions: tunnelQuestions },
+      {
+        station: 'product',
+        questions: [
+          'What Chicago city imagery do you want in a Bulls insert card?',
+          'Which play defines you: pull-up 3, coast-to-coast, or weakside block?',
+          'What does the "Chicago kid comes home" narrative mean for your card story?',
+        ],
+      },
+    ],
+  },
+
+  // --- TIME NOT LISTED GROUP (Day 2) ---
+
+  {
+    id: 'nique-clifford',
+    name: 'NIQUE CLIFFORD',
+    firstName: 'Nique',
+    lastName: 'Clifford',
+    position: 'Small Forward',
+    team: TEAMS.SAC.full,
+    teamAbbr: 'SAC',
+    conference: 'Western',
+    nationality: 'United States',
+    flag: '\uD83C\uDDFA\uD83C\uDDF8',
+    photo: '/asw/players/clifford.jpg',
+    jerseyNumber: 0,
+    day: 2,
+    scheduledTime: 'TBD',
+    playerNumber: 15,
+    notes: ['Signing Only', 'Agent: Alex Tarshis (LIFE)', 'Rep: Caleb'],
+    embargoed: false,
+    translatorNeeded: false,
+    bio: [
+      'Small forward for the Sacramento Kings',
+      'Hometown: Colorado Springs, Colorado; Colorado and Colorado State alumnus',
+      'All-Mountain West honors; Mountain West tournament MVP',
+      'Do-everything wing who rebounds like a bigger player — stat-stuffing profile',
+    ],
+    talkingPoints: [
+      'What stat is he most proud of? Connector wings fill the box score differently',
+      'What kind of insert theme fits a "connector wing" identity?',
+      'Who would he want on a dual auto card?',
+    ],
+    questions: [
+      { station: 'tunnel', questions: tunnelQuestions },
+      {
+        station: 'product',
+        questions: [
+          'What stat are you most proud of?',
+          'What insert theme fits a "connector wing"?',
+          'Who would you want on a dual auto?',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'cedric-coward',
+    name: 'CEDRIC COWARD',
+    firstName: 'Cedric',
+    lastName: 'Coward',
+    position: 'Shooting Guard',
+    team: TEAMS.MEM.full,
+    teamAbbr: 'MEM',
+    conference: 'Western',
+    nationality: 'United States',
+    flag: '\uD83C\uDDFA\uD83C\uDDF8',
+    photo: '/asw/players/coward.jpg',
+    jerseyNumber: 0,
+    day: 2,
+    scheduledTime: 'TBD',
+    playerNumber: 16,
+    notes: ['60 min appearance', 'Agent: Alex Tarshis (LIFE)', 'Rep: Caleb'],
+    embargoed: false,
+    translatorNeeded: false,
+    bio: [
+      'Shooting guard for the Memphis Grizzlies',
+      'Hometown: Fresno, California; college path through Willamette, Eastern Washington, Washington State',
+      'Shot-maker wing who can get hot fast — all-conference honors',
+      'Headline game: went 6-for-6 from three with a big point total as a rookie',
+    ],
+    talkingPoints: [
+      '"Perfect from 3" game is a talkable collector moment — card insert potential',
+      'Underdog path from Willamette to the NBA — what that journey means',
+      'What does he want collectors to remember from his first season?',
+    ],
+    questions: [
+      { station: 'tunnel', questions: tunnelQuestions },
+      {
+        station: 'product',
+        questions: [
+          'Your "perfect from 3" game — does that deserve its own insert?',
+          'What do you want collectors to remember from your first season?',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'ajay-mitchell',
+    name: 'AJAY MITCHELL',
+    firstName: 'Ajay',
+    lastName: 'Mitchell',
+    position: 'Guard',
+    team: TEAMS.OKC.full,
+    teamAbbr: 'OKC',
+    conference: 'Western',
+    nationality: 'Belgium',
+    flag: '\uD83C\uDDE7\uD83C\uDDEA',
+    photo: '/asw/players/mitchell.jpg',
+    jerseyNumber: 0,
+    day: 2,
+    scheduledTime: 'TBD',
+    playerNumber: 17,
+    notes: ['Signing Only', 'Agent: Alex Tarshis (LIFE)', 'Rep: Caleb'],
+    embargoed: false,
+    translatorNeeded: false,
+    bio: [
+      'Guard for the Oklahoma City Thunder',
+      'Hometown: Ans, Belgium — international pathway to the NBA',
+      'UC Santa Barbara product; Big West Player of the Year with multiple All-Big West selections',
+      'Signed a multi-year deal after contributing during OKC\'s title run season',
+    ],
+    talkingPoints: [
+      'Belgium-to-NBA journey is a compelling card-back story',
+      'What flag/country cues would he want in parallels?',
+      'What OKC moment deserves a commemorative card?',
+    ],
+    questions: [
+      { station: 'tunnel', questions: tunnelQuestions },
+      {
+        station: 'product',
+        questions: [
+          'How do you tell the Belgium-to-NBA journey on a card back?',
+          'What flag or country cues would you want in card parallels?',
+          'What OKC moment deserves a commemorative card?',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'alijah-martin',
+    name: 'ALIJAH MARTIN',
+    firstName: 'Alijah',
+    lastName: 'Martin',
+    position: 'Shooting Guard',
+    team: TEAMS.TOR.full,
+    teamAbbr: 'TOR',
+    conference: 'Eastern',
+    nationality: 'United States',
+    flag: '\uD83C\uDDFA\uD83C\uDDF8',
+    photo: '/asw/players/martin.jpg',
+    jerseyNumber: 0,
+    day: 2,
+    scheduledTime: 'TBD',
+    playerNumber: 18,
+    notes: ['Signing Only', 'Agent: Alex Tarshis (LIFE)', 'Rep: Caleb'],
+    embargoed: false,
+    translatorNeeded: false,
+    bio: [
+      'Shooting guard for the Toronto Raptors (two-way context)',
+      'Hometown: Summit, Mississippi; Florida Atlantic and Florida alumnus',
+      'NCAA champion (2025) — big-game experience and timely scoring',
+      'Physical guard with defensive toughness and championship pedigree',
+    ],
+    talkingPoints: [
+      'Tournament run memories — what moment deserves to be captured on a card',
+      'Championship DNA and what that experience means at the NBA level',
+      'Which teammate would he want on a dual auto?',
+    ],
+    questions: [
+      { station: 'tunnel', questions: tunnelQuestions },
+      {
+        station: 'product',
+        questions: [
+          'What\'s your favorite "tournament run" memory to capture as a card moment?',
+          'Which teammate would you want on a dual auto?',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'percy-miller',
+    name: 'PERCY MILLER (MASTER P)',
+    firstName: 'Percy',
+    lastName: 'Miller',
+    position: 'Guard',
+    team: 'Retired (NBA)',
+    teamAbbr: 'RET',
+    conference: 'Western',
+    nationality: 'United States',
+    flag: '\uD83C\uDDFA\uD83C\uDDF8',
+    photo: '/asw/players/masterp.jpg',
+    jerseyNumber: 0,
+    day: 2,
+    scheduledTime: 'TBD',
+    playerNumber: 19,
+    notes: ['Signing Only', 'Agent: Percy Miller', 'Rep: Karishma'],
+    embargoed: false,
+    translatorNeeded: false,
+    bio: [
+      'High-profile crossover figure with deep hoops community ties',
+      'President of Basketball Operations at University of New Orleans (UNO)',
+      'Entrepreneur and philanthropist — central to his official identity',
+      'Cultural icon bridging music, business, and basketball worlds',
+    ],
+    talkingPoints: [
+      'What does a "culture-builder" card set look like?',
+      'How would he blend music/entrepreneurship into collectible storytelling?',
+      'What causes would he spotlight via memorabilia and card partnerships?',
+    ],
+    questions: [
+      { station: 'tunnel', questions: tunnelQuestions },
+      {
+        station: 'product',
+        questions: [
+          'What would a "culture-builder" card set look like?',
+          'How would you blend music and entrepreneurship into collectible storytelling?',
+          'What causes would you spotlight through memorabilia?',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'yanic-konan-niederhauser',
+    name: 'YANIC KONAN NIEDERHAUSER',
+    firstName: 'Yanic',
+    lastName: 'Konan Niederhauser',
+    pronunciation: 'YAH-nik KOH-nan NEE-der-how-zer',
+    position: 'Center',
+    team: TEAMS.LAC.full,
+    teamAbbr: 'LAC',
+    conference: 'Western',
+    nationality: 'Switzerland',
+    flag: '\uD83C\uDDE8\uD83C\uDDED',
+    photo: '/asw/players/niederhauser.jpg',
+    jerseyNumber: 0,
+    day: 2,
+    scheduledTime: 'TBD',
+    playerNumber: 20,
+    notes: ['Signing Only', 'Agent: Jordan Sarason (Excel)', 'Rep: Caleb'],
+    embargoed: false,
+    translatorNeeded: false,
+    bio: [
+      'Center for the Los Angeles Clippers',
+      'Hometown: Bern, Switzerland; Northern Illinois and Penn State alumnus',
+      'Rim protection standout — blocks were a major stat calling card in college',
+      'Viral draft-night sprint to the stage became a widely shared clip',
+    ],
+    talkingPoints: [
+      'Switzerland-to-NBA story is a unique card-back narrative',
+      'What do international collectors ask him for? What resonates globally?',
+      'Which highlight is his signature: a block or a dunk?',
+    ],
+    questions: [
+      { station: 'tunnel', questions: tunnelQuestions },
+      {
+        station: 'product',
+        questions: [
+          'How do you tell the Switzerland-to-NBA story on card backs?',
+          'What do international collectors ask you for?',
+          'Which "block or dunk" highlight is your signature moment?',
+        ],
+      },
+    ],
+  },
+];
+
+// ============================================
+// INTERVIEW QUESTIONS (TUNNEL STATION)
+// ============================================
+
+export const tunnelInterviewQuestions = {
+  partnership: {
+    title: 'PARTNERSHIP QUESTIONS',
+    questions: [
+      "What does the Panini x All-Star Weekend collaboration mean to you personally?",
+      "How does it feel knowing your card will be in collectors' hands this weekend?",
+      "What do you want fans to know about this moment in basketball?",
+      "Why is the trading card hobby important for connecting fans to athletes?",
+    ],
+  },
+  adVO: {
+    title: 'AD VO QUESTIONS (Clean, Quotable Lines)',
+    questions: [
+      'Finish this sentence: "All-Star Weekend is ___."',
+      "In one line: why should fans be collecting basketball cards right now?",
+      "What's your message to the next generation of basketball players?",
+      "One word for your mindset this season.",
+      "What does it mean to see yourself on a Panini card?",
+    ],
+  },
+  hybrid: {
+    title: 'HYBRID (Works for Both)',
+    questions: [
+      "What do you want a young fan to feel when they pull your card?",
+      "Why does basketball have the best athletes in the world?",
+      "What makes this All-Star Weekend special?",
+    ],
+  },
+};
+
+// ============================================
+// PRE-COMPUTED DATA
+// ============================================
+
+export const day1Players = players.filter(p => p.day === 1);
+export const day2Players = players.filter(p => p.day === 2);
+
+export const playerCounts = {
+  total: players.length,
+  day1: day1Players.length,
+  day2: day2Players.length,
+  embargoed: players.filter(p => p.embargoed).length,
+  clear: players.filter(p => !p.embargoed).length,
+  translatorNeeded: players.filter(p => p.translatorNeeded).length,
+} as const;
+
+// Player lookups
+export const playerById = new Map<string, Player>(players.map(p => [p.id, p]));
+export const playerByFirstName = new Map<string, Player>(players.map(p => [p.firstName.toLowerCase(), p]));
+
+export function getPlayerByFirstName(firstName: string): Player | undefined {
+  return playerByFirstName.get(firstName.toLowerCase());
+}
+
+export function getPlayerById(id: string): Player | undefined {
+  return playerById.get(id);
+}
+
+// ============================================
+// ARCHIVED PLAYERS (previous event roster)
+// These are retained in the repo but not shown on the live site.
+// The live site uses only the `players` export above.
+// ============================================
+
+export const archivedPlayers: Player[] = [
+  // --- PREVIOUS DAY 1 STARS ---
   {
     id: 'giannis-antetokounmpo',
     name: 'GIANNIS ANTETOKOUNMPO',
@@ -63,7 +972,7 @@ export const players: Player[] = [
     lastName: 'Antetokounmpo',
     pronunciation: 'YAH-nis ah-det-oh-KOON-bo',
     position: 'Forward',
-    team: TEAMS.MIL.full,
+    team: 'Milwaukee Bucks',
     teamAbbr: 'MIL',
     conference: 'Eastern',
     nationality: 'Greece',
@@ -98,7 +1007,7 @@ export const players: Player[] = [
     firstName: 'Cade',
     lastName: 'Cunningham',
     position: 'Guard',
-    team: TEAMS.DET.full,
+    team: 'Detroit Pistons',
     teamAbbr: 'DET',
     conference: 'Eastern',
     nationality: 'United States',
@@ -134,7 +1043,7 @@ export const players: Player[] = [
     lastName: 'Morant',
     pronunciation: 'JAH moh-RANT',
     position: 'Guard',
-    team: TEAMS.MEM.full,
+    team: 'Memphis Grizzlies',
     teamAbbr: 'MEM',
     conference: 'Western',
     nationality: 'United States',
@@ -169,7 +1078,7 @@ export const players: Player[] = [
     firstName: 'Trae',
     lastName: 'Young',
     position: 'Guard',
-    team: TEAMS.ATL.full,
+    team: 'Atlanta Hawks',
     teamAbbr: 'ATL',
     conference: 'Eastern',
     nationality: 'United States',
@@ -198,15 +1107,13 @@ export const players: Player[] = [
       { station: 'product', questions: [] },
     ],
   },
-
-  // --- NBA LEGENDS ---
   {
     id: 'magic-johnson',
     name: 'MAGIC JOHNSON',
     firstName: 'Magic',
     lastName: 'Johnson',
     position: 'Guard',
-    team: TEAMS.LAL.full,
+    team: 'Los Angeles Lakers',
     teamAbbr: 'LAL',
     conference: 'Western',
     nationality: 'United States',
@@ -241,7 +1148,7 @@ export const players: Player[] = [
     firstName: 'Larry',
     lastName: 'Bird',
     position: 'Forward',
-    team: TEAMS.BOS.full,
+    team: 'Boston Celtics',
     teamAbbr: 'BOS',
     conference: 'Eastern',
     nationality: 'United States',
@@ -277,7 +1184,7 @@ export const players: Player[] = [
     lastName: 'Erving',
     pronunciation: 'JOO-lee-us UR-ving',
     position: 'Forward',
-    team: TEAMS.PHI.full,
+    team: 'Philadelphia 76ers',
     teamAbbr: 'PHI',
     conference: 'Eastern',
     nationality: 'United States',
@@ -312,7 +1219,7 @@ export const players: Player[] = [
     firstName: 'Kevin',
     lastName: 'Garnett',
     position: 'Forward',
-    team: TEAMS.MIN.full,
+    team: 'Minnesota Timberwolves',
     teamAbbr: 'MIN',
     conference: 'Western',
     nationality: 'United States',
@@ -347,7 +1254,7 @@ export const players: Player[] = [
     firstName: 'Chris',
     lastName: 'Webber',
     position: 'Forward',
-    team: TEAMS.SAC.full,
+    team: 'Sacramento Kings',
     teamAbbr: 'SAC',
     conference: 'Western',
     nationality: 'United States',
@@ -382,7 +1289,7 @@ export const players: Player[] = [
     firstName: 'Steve',
     lastName: 'Nash',
     position: 'Guard',
-    team: TEAMS.PHX.full,
+    team: 'Phoenix Suns',
     teamAbbr: 'PHX',
     conference: 'Western',
     nationality: 'Canada',
@@ -411,16 +1318,15 @@ export const players: Player[] = [
       { station: 'product', questions: [] },
     ],
   },
-
-  // --- ROOKIES (Day 1) ---
+  // --- PREVIOUS DAY 1 ROOKIES ---
   {
-    id: 'vj-edgecombe',
+    id: 'archived-vj-edgecombe',
     name: 'VJ EDGECOMBE',
     firstName: 'VJ',
     lastName: 'Edgecombe',
     pronunciation: 'VEE-JAY EDJ-kum',
     position: 'Guard',
-    team: TEAMS.BAY.full,
+    team: 'Baylor Bears',
     teamAbbr: 'BAY',
     conference: 'Western',
     nationality: 'Bahamas',
@@ -450,12 +1356,12 @@ export const players: Player[] = [
     ],
   },
   {
-    id: 'jeremiah-fears',
+    id: 'archived-jeremiah-fears',
     name: 'JEREMIAH FEARS',
     firstName: 'Jeremiah',
     lastName: 'Fears',
     position: 'Guard',
-    team: TEAMS.OU.full,
+    team: 'Oklahoma Sooners',
     teamAbbr: 'OU',
     conference: 'Western',
     nationality: 'United States',
@@ -485,12 +1391,12 @@ export const players: Player[] = [
     ],
   },
   {
-    id: 'tre-johnson',
+    id: 'archived-tre-johnson',
     name: 'TRE JOHNSON',
     firstName: 'Tre',
     lastName: 'Johnson',
     position: 'Guard',
-    team: TEAMS.TEX.full,
+    team: 'Texas Longhorns',
     teamAbbr: 'TEX',
     conference: 'Western',
     nationality: 'United States',
@@ -520,12 +1426,12 @@ export const players: Player[] = [
     ],
   },
   {
-    id: 'carter-bryant',
+    id: 'archived-carter-bryant',
     name: 'CARTER BRYANT',
     firstName: 'Carter',
     lastName: 'Bryant',
     position: 'Guard',
-    team: TEAMS.ARIZ.full,
+    team: 'Arizona Wildcats',
     teamAbbr: 'ARIZ',
     conference: 'Western',
     nationality: 'United States',
@@ -591,12 +1497,12 @@ export const players: Player[] = [
     ],
   },
   {
-    id: 'derik-queen',
+    id: 'archived-derik-queen',
     name: 'DERIK QUEEN',
     firstName: 'Derik',
     lastName: 'Queen',
     position: 'Center',
-    team: TEAMS.UMD.full,
+    team: 'Maryland Terrapins',
     teamAbbr: 'UMD',
     conference: 'Eastern',
     nationality: 'United States',
@@ -625,20 +1531,14 @@ export const players: Player[] = [
       { station: 'product', questions: [] },
     ],
   },
-
-  // ============================================
-  // FRIDAY, FEBRUARY 13 — DAY 2 (16 players)
-  // Remaining Rookies + Promising Prospects
-  // ============================================
-
-  // --- ROOKIES (continued) ---
+  // --- PREVIOUS DAY 2 PLAYERS ---
   {
-    id: 'cedric-coward',
+    id: 'archived-cedric-coward',
     name: 'CEDRIC COWARD',
     firstName: 'Cedric',
     lastName: 'Coward',
     position: 'Forward',
-    team: TEAMS.GONZ.full,
+    team: 'Gonzaga Bulldogs',
     teamAbbr: 'GONZ',
     conference: 'Western',
     nationality: 'United States',
@@ -703,15 +1603,13 @@ export const players: Player[] = [
       { station: 'product', questions: [] },
     ],
   },
-
-  // --- PROMISING PROSPECTS ---
   {
     id: 'darius-acuff-jr',
     name: 'DARIUS ACUFF JR.',
     firstName: 'Darius',
     lastName: 'Acuff Jr.',
     position: 'Guard',
-    team: TEAMS.TEX.full,
+    team: 'Texas Longhorns',
     teamAbbr: 'TEX',
     conference: 'Western',
     nationality: 'United States',
@@ -747,7 +1645,7 @@ export const players: Player[] = [
     lastName: 'Lendeborg',
     pronunciation: 'YAK-sell LEN-deh-borg',
     position: 'Forward',
-    team: TEAMS.ARK.full,
+    team: 'Arkansas Razorbacks',
     teamAbbr: 'ARK',
     conference: 'Western',
     nationality: 'Dominican Republic',
@@ -783,7 +1681,7 @@ export const players: Player[] = [
     lastName: 'Quaintance',
     pronunciation: 'JAY-den KWAYN-tance',
     position: 'Forward',
-    team: TEAMS.UK.full,
+    team: 'Kentucky Wildcats',
     teamAbbr: 'UK',
     conference: 'Eastern',
     nationality: 'United States',
@@ -855,7 +1753,7 @@ export const players: Player[] = [
     lastName: 'Thomas',
     pronunciation: 'meh-LEEK THOM-us',
     position: 'Guard',
-    team: TEAMS.AUB.full,
+    team: 'Auburn Tigers',
     teamAbbr: 'AUB',
     conference: 'Eastern',
     nationality: 'United States',
@@ -890,7 +1788,7 @@ export const players: Player[] = [
     firstName: 'Sarah',
     lastName: 'Strong',
     position: 'Forward',
-    team: TEAMS.UCONN.full,
+    team: 'UConn Huskies',
     teamAbbr: 'UCONN',
     conference: 'Eastern',
     nationality: 'United States',
@@ -926,7 +1824,7 @@ export const players: Player[] = [
     lastName: 'Fudd',
     pronunciation: 'AH-zee FUD',
     position: 'Guard',
-    team: TEAMS.UCONN.full,
+    team: 'UConn Huskies',
     teamAbbr: 'UCONN',
     conference: 'Eastern',
     nationality: 'United States',
@@ -961,7 +1859,7 @@ export const players: Player[] = [
     firstName: 'Olivia',
     lastName: 'Miles',
     position: 'Guard',
-    team: TEAMS.ND.full,
+    team: 'Notre Dame Fighting Irish',
     teamAbbr: 'ND',
     conference: 'Eastern',
     nationality: 'United States',
@@ -996,7 +1894,7 @@ export const players: Player[] = [
     firstName: 'Lauren',
     lastName: 'Betts',
     position: 'Center',
-    team: TEAMS.UCLA.full,
+    team: 'UCLA Bruins',
     teamAbbr: 'UCLA',
     conference: 'Western',
     nationality: 'United States',
@@ -1032,7 +1930,7 @@ export const players: Player[] = [
     lastName: 'Stokes',
     pronunciation: 'TY-ran STOHKS',
     position: 'Guard',
-    team: TEAMS.DUKE.full,
+    team: 'Duke Blue Devils',
     teamAbbr: 'DUKE',
     conference: 'Eastern',
     nationality: 'United States',
@@ -1067,7 +1965,7 @@ export const players: Player[] = [
     firstName: 'Jordan',
     lastName: 'Smith Jr.',
     position: 'Forward',
-    team: TEAMS.AUB.full,
+    team: 'Auburn Tigers',
     teamAbbr: 'AUB',
     conference: 'Eastern',
     nationality: 'United States',
@@ -1102,7 +2000,7 @@ export const players: Player[] = [
     firstName: 'Jason',
     lastName: 'Crowe Jr.',
     position: 'Guard',
-    team: TEAMS.UK.full,
+    team: 'Kentucky Wildcats',
     teamAbbr: 'UK',
     conference: 'Eastern',
     nationality: 'United States',
@@ -1173,7 +2071,7 @@ export const players: Player[] = [
     firstName: 'Christian',
     lastName: 'Collins',
     position: 'Forward',
-    team: TEAMS.DUKE.full,
+    team: 'Duke Blue Devils',
     teamAbbr: 'DUKE',
     conference: 'Eastern',
     nationality: 'United States',
@@ -1203,65 +2101,3 @@ export const players: Player[] = [
     ],
   },
 ];
-
-// ============================================
-// INTERVIEW QUESTIONS (TUNNEL STATION)
-// ============================================
-
-export const tunnelInterviewQuestions = {
-  partnership: {
-    title: 'PARTNERSHIP QUESTIONS',
-    questions: [
-      "What does the Panini x All-Star Weekend collaboration mean to you personally?",
-      "How does it feel knowing your card will be in collectors' hands this weekend?",
-      "What do you want fans to know about this moment in basketball?",
-      "Why is the trading card hobby important for connecting fans to athletes?",
-    ],
-  },
-  adVO: {
-    title: 'AD VO QUESTIONS (Clean, Quotable Lines)',
-    questions: [
-      'Finish this sentence: "All-Star Weekend is ___."',
-      "In one line: why should fans be collecting basketball cards right now?",
-      "What's your message to the next generation of basketball players?",
-      "One word for your mindset this season.",
-      "What does it mean to see yourself on a Panini card?",
-    ],
-  },
-  hybrid: {
-    title: 'HYBRID (Works for Both)',
-    questions: [
-      "What do you want a young fan to feel when they pull your card?",
-      "Why does basketball have the best athletes in the world?",
-      "What makes this All-Star Weekend special?",
-    ],
-  },
-};
-
-// ============================================
-// PRE-COMPUTED DATA
-// ============================================
-
-export const day1Players = players.filter(p => p.day === 1);
-export const day2Players = players.filter(p => p.day === 2);
-
-export const playerCounts = {
-  total: players.length,
-  day1: day1Players.length,
-  day2: day2Players.length,
-  embargoed: players.filter(p => p.embargoed).length,
-  clear: players.filter(p => !p.embargoed).length,
-  translatorNeeded: players.filter(p => p.translatorNeeded).length,
-} as const;
-
-// Player lookups
-export const playerById = new Map<string, Player>(players.map(p => [p.id, p]));
-export const playerByFirstName = new Map<string, Player>(players.map(p => [p.firstName.toLowerCase(), p]));
-
-export function getPlayerByFirstName(firstName: string): Player | undefined {
-  return playerByFirstName.get(firstName.toLowerCase());
-}
-
-export function getPlayerById(id: string): Player | undefined {
-  return playerById.get(id);
-}
