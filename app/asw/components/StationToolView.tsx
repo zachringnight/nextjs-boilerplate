@@ -76,7 +76,7 @@ function PlayerSlotCard({
             {player.firstName} {player.lastName}
           </p>
           <div className="flex items-center gap-3 text-sm text-gray-400">
-            <span className={`font-mono ${isCurrent ? 'text-amber-400 font-bold' : ''}`}>{player.scheduledTime}</span>
+            <span className={`font-mono ${isCurrent ? 'text-amber-400 font-bold' : ''}`}>{player.scheduledTime || 'TBD'}</span>
             <span>-</span>
             <span>#{player.jerseyNumber} {player.position}</span>
             <span>-</span>
@@ -227,7 +227,7 @@ export default function StationToolView({ largeText = false }: StationToolViewPr
             <Clock className="w-4 h-4" />
             <span className="font-mono font-bold">{formattedTime}</span>
           </div>
-          <p className="text-xs text-gray-500">PT (Los Angeles)</p>
+          <p className="text-xs text-gray-500">PT (San Francisco)</p>
         </div>
       </div>
 

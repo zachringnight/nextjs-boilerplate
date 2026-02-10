@@ -3,10 +3,12 @@ import { EVENT_TIMEZONE, EVENT_DATES, SLOT_DURATION_MINUTES } from './constants'
 
 /**
  * Parse a time string like "10:05 AM" into hours and minutes
+ * Returns null if timeStr is null or has an invalid format.
  */
-export function parseTime(timeStr: string): { hours: number; minutes: number } {
+export function parseTime(timeStr: string | null): { hours: number; minutes: number } | null {
+  if (!timeStr) return null;
   const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
-  if (!match) return { hours: 0, minutes: 0 };
+  if (!match) return null;
 
   let hours = parseInt(match[1], 10);
   const minutes = parseInt(match[2], 10);
@@ -60,7 +62,10 @@ export function isCurrentPlayer(player: Player, currentTime: Date, eventDay?: 1 
     return false;
   }
 
-  const { hours, minutes } = parseTime(player.scheduledTime);
+  const parsed = parseTime(player.scheduledTime);
+  if (!parsed) return false; // Skip players with TBD/null times
+
+  const { hours, minutes } = parsed;
   const slotStart = hours * 60 + minutes;
   const slotEnd = slotStart + SLOT_DURATION_MINUTES;
   const currentMinutes = getCurrentMinutesPT(currentTime);
@@ -72,7 +77,10 @@ export function isCurrentPlayer(player: Player, currentTime: Date, eventDay?: 1 
  * Check if a player is upcoming (within the next 30 minutes)
  */
 export function isUpcomingPlayer(player: Player, currentTime: Date): boolean {
-  const { hours, minutes } = parseTime(player.scheduledTime);
+  const parsed = parseTime(player.scheduledTime);
+  if (!parsed) return false; // Skip players with TBD/null times
+
+  const { hours, minutes } = parsed;
   const slotStart = hours * 60 + minutes;
   const currentMinutes = getCurrentMinutesPT(currentTime);
 
@@ -83,7 +91,10 @@ export function isUpcomingPlayer(player: Player, currentTime: Date): boolean {
  * Get time remaining in current player's slot
  */
 export function getTimeRemaining(player: Player, currentTime: Date): { minutes: number; seconds: number } {
-  const { hours, minutes } = parseTime(player.scheduledTime);
+  const parsed = parseTime(player.scheduledTime);
+  if (!parsed) return { minutes: 0, seconds: 0 }; // Return 0 for TBD/null times
+
+  const { hours, minutes } = parsed;
   const slotEndSeconds = (hours * 60 + minutes + SLOT_DURATION_MINUTES) * 60;
 
   const ptDate = toPT(currentTime);
@@ -106,7 +117,10 @@ export function getNextPlayer(players: Player[], currentTime: Date, eventDay: 1 
   const dayPlayers = players.filter(p => p.day === eventDay);
 
   for (const player of dayPlayers) {
-    const { hours, minutes } = parseTime(player.scheduledTime);
+    const parsed = parseTime(player.scheduledTime);
+    if (!parsed) continue; // Skip players with TBD/null times
+
+    const { hours, minutes } = parsed;
     const slotStart = hours * 60 + minutes;
     if (slotStart > currentMinutes) {
       return player;
@@ -129,7 +143,10 @@ export function getCompletedCount(players: Player[], currentTime: Date): number 
   const currentMinutes = getCurrentMinutesPT(currentTime);
 
   return players.filter(p => {
-    const { hours, minutes } = parseTime(p.scheduledTime);
+    const parsed = parseTime(p.scheduledTime);
+    if (!parsed) return false; // Skip players with TBD/null times
+
+    const { hours, minutes } = parsed;
     const slotEnd = hours * 60 + minutes + SLOT_DURATION_MINUTES;
     return slotEnd <= currentMinutes;
   }).length;
