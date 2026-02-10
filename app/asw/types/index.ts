@@ -110,3 +110,56 @@ export interface PlayerStationCompletion {
   completedBy?: string;
   notes?: string;
 }
+
+// =====================
+// CLIP MARKERS
+// =====================
+
+export type ClipCategory =
+  | 'highlight'
+  | 'interview'
+  | 'broll'
+  | 'reaction'
+  | 'signing'
+  | 'pack_rip'
+  | 'general'
+  | 'blooper'
+  | 'social';
+
+export type ClipStatus = 'marked' | 'reviewed' | 'exported' | 'archived';
+
+export type MediaType = 'video' | 'photo' | 'audio';
+
+export type ClipPriority = 'urgent' | 'high' | 'normal' | 'low';
+
+export type ClipSortField = 'timestamp' | 'rating' | 'category' | 'priority' | 'status';
+export type ClipSortDirection = 'asc' | 'desc';
+
+export interface ClipMarker {
+  id: string;
+  name?: string | null;
+  timestamp: string;
+  timecode?: string | null;
+  timecode_in?: string | null;
+  timecode_out?: string | null;
+  player_id?: string | null;
+  station_id?: string | null;
+  category: ClipCategory;
+  tags: string[];
+  notes?: string | null;
+  rating?: number | null;
+  media_type: MediaType;
+  camera?: string | null;
+  crew_member?: string | null;
+  status: ClipStatus;
+  priority: ClipPriority;
+  flagged: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ClipDefaults {
+  crew_member: string;
+  camera: string;
+  media_type: MediaType;
+}

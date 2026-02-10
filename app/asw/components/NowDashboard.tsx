@@ -4,7 +4,9 @@ import { useState, useEffect, useMemo } from 'react';
 import { players, day1Players, day2Players, playerCounts } from '../data/players';
 import type { Player } from '../types';
 import PlayerAvatar from './PlayerAvatar';
-import { ChevronRight, Volume2, Zap } from 'lucide-react';
+import { ChevronRight, Volume2, Zap, ArrowRight } from 'lucide-react';
+import { useASWStore } from '../store';
+import { hapticFeedback } from '../lib/utils';
 import {
   getEventDay,
   isCurrentPlayer,
@@ -80,22 +82,32 @@ function NextPlayerCard({ player, onPlayerClick }: { player: Player; onPlayerCli
 }
 
 function StationGrid() {
+  const setViewMode = useASWStore((s) => s.setViewMode);
+
   return (
     <div className="grid grid-cols-2 gap-4">
       {(['tunnel', 'product'] as const).map((key) => {
         const config = STATION_CONFIG[key];
         return (
-          <div key={key} className={`bg-[#141414] ${config.borderClass} border rounded-xl p-4`}>
+          <button
+            key={key}
+            onClick={() => {
+              hapticFeedback(30);
+              setViewMode('station');
+            }}
+            className={`bg-[#141414] ${config.borderClass} border rounded-xl p-4 text-left transition-all duration-200 hover:bg-[#1a1a1a] hover:shadow-lg hover:shadow-black/20 active:scale-[0.97] group`}
+          >
             <div className="flex items-center gap-3">
               <div className={`w-10 h-10 ${config.bgClass} rounded-lg flex items-center justify-center text-xl`}>
                 {config.emoji}
               </div>
-              <div>
+              <div className="flex-1">
                 <h3 className={`font-bold ${config.textClass}`}>{config.shortName}</h3>
                 <p className="text-xs text-gray-500">{config.description}</p>
               </div>
+              <ArrowRight className={`w-4 h-4 ${config.textClass} opacity-0 group-hover:opacity-100 transition-all duration-200 group-hover:translate-x-0.5`} />
             </div>
-          </div>
+          </button>
         );
       })}
     </div>
