@@ -12,6 +12,8 @@ jobs:
   cleanup:
     runs-on: ubuntu-latest
     if: github.event.inputs.confirm_deletion == 'DELETE'
+    permissions:
+      contents: write
     
     steps:
       - name: Checkout repository
