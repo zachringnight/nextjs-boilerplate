@@ -114,7 +114,7 @@ export default function GlobalSearch({ onPlayerSelect }: GlobalSearchProps) {
                       </p>
                     </div>
                     <div className="text-right">
-                      <span className="text-xs text-gray-600">{player.scheduledTime}</span>
+                      <span className="text-xs text-gray-600">{player.scheduledTime || 'TBD'}</span>
                       {player.embargoed && (
                         <span className="block text-xs text-red-400">EMBARGO</span>
                       )}

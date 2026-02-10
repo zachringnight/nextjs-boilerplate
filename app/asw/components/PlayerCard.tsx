@@ -41,7 +41,7 @@ export default function PlayerCard({ player, onClick }: PlayerCardProps) {
             <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${dayStyle.badge}`}>
               Day {player.day}
             </span>
-            <span className="text-xs text-gray-500">{player.scheduledTime}</span>
+            <span className="text-xs text-gray-500">{player.scheduledTime || 'TBD'}</span>
 
             {player.embargoed && (
               <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_COLORS.embargoed.bg} ${STATUS_COLORS.embargoed.text} flex items-center gap-1`}>

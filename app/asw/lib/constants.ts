@@ -6,16 +6,16 @@ export const SLOT_DURATION_MINUTES = 15;
 
 // Event dates (month is 0-indexed: February = 1)
 export const EVENT_DATES = {
-  day1: { year: 2026, month: 1, day: 12 },
-  day2: { year: 2026, month: 1, day: 13 },
+  day1: { year: 2026, month: 1, day: 13 },
+  day2: { year: 2026, month: 1, day: 14 },
 } as const;
 
 // Event metadata
 export const EVENT_INFO = {
   name: 'NBA All-Star Weekend 2026',
   subtitle: 'Panini Shoot',
-  location: 'Los Angeles Convention Center',
-  dateDisplay: 'Feb 12 & 13, 2026',
+  location: 'San Francisco',
+  dateDisplay: 'Feb 13 & 14, 2026',
   totalDays: 2,
 } as const;
 
@@ -28,9 +28,9 @@ export const DAY_STYLES = {
     badge: 'bg-blue-500/20 text-blue-400',
     text: 'text-blue-400',
     bg: 'bg-blue-500',
-    dayName: 'Thursday',
-    shortDay: 'Thu',
-    dateDisplay: 'Thursday, February 12',
+    dayName: 'Friday',
+    shortDay: 'Fri',
+    dateDisplay: 'Friday, February 13',
   },
   2: {
     border: 'border-violet-500/30',
@@ -39,9 +39,9 @@ export const DAY_STYLES = {
     badge: 'bg-violet-500/20 text-violet-400',
     text: 'text-violet-400',
     bg: 'bg-violet-500',
-    dayName: 'Friday',
-    shortDay: 'Fri',
-    dateDisplay: 'Friday, February 13',
+    dayName: 'Saturday',
+    shortDay: 'Sat',
+    dateDisplay: 'Saturday, February 14',
   },
 } as const;
 

@@ -71,7 +71,7 @@ function NextPlayerCard({ player, onPlayerClick }: { player: Player; onPlayerCli
             <span className="text-xs text-blue-400 font-medium">UP NEXT</span>
           </div>
           <p className="font-bold truncate">{player.firstName} {player.lastName}</p>
-          <p className="text-sm text-gray-400">{player.scheduledTime}</p>
+          <p className="text-sm text-gray-400">{player.scheduledTime || 'TBD'}</p>
         </div>
         <ChevronRight className="w-5 h-5 text-gray-600" />
       </div>
@@ -181,7 +181,7 @@ export default function NowDashboard({ onPlayerClick }: NowDashboardProps) {
       <div className="flex items-center justify-between">
         <div>
           <p className="font-medium text-white">{formattedDate}</p>
-          <p className="text-xs text-gray-500">PT (Los Angeles)</p>
+          <p className="text-xs text-gray-500">PT (San Francisco)</p>
         </div>
         <div className="text-right">
           <p className="font-mono text-2xl text-amber-400">{formattedTime}</p>
@@ -330,7 +330,7 @@ export default function NowDashboard({ onPlayerClick }: NowDashboardProps) {
           <div>
             <p className="text-sm text-amber-400 font-medium">TIME REMAINING</p>
             <p className={`text-sm ${dayColorClass}`}>
-              Day {currentPlayer.day} - {currentPlayer.scheduledTime}
+              Day {currentPlayer.day} - {currentPlayer.scheduledTime || 'TBD'}
             </p>
           </div>
           <div className="text-right">

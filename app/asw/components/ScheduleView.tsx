@@ -67,7 +67,7 @@ function DaySchedule({
                 <th className="text-left py-3 px-4 text-gray-500 font-medium">Player</th>
                 <th className="text-center py-3 px-4 text-gray-500 font-medium w-20">Team</th>
                 <th className="text-center py-3 px-4 text-gray-500 font-medium w-32">Status</th>
-                <th className="text-center py-3 px-4 text-gray-500 font-medium w-28">Notes</th>
+                <th className="text-center py-3 px-4 text-gray-500 font-medium w-40">Notes</th>
               </tr>
             </thead>
             <tbody>
@@ -99,7 +99,7 @@ function DaySchedule({
                           </span>
                         )}
                         <span className={`font-mono text-xs ${isCurrent ? 'text-amber-400 font-bold' : 'text-gray-300'}`}>
-                          {player.scheduledTime}
+                          {player.scheduledTime || 'TBD'}
                         </span>
                       </div>
                     </td>
@@ -132,11 +132,16 @@ function DaySchedule({
                       )}
                     </td>
                     <td className="text-center py-3 px-4">
-                      {player.translatorNeeded && (
-                        <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded ${STATUS_COLORS.translator.bg} ${STATUS_COLORS.translator.text}`}>
-                          <Languages className="w-3 h-3" /> Translator
-                        </span>
-                      )}
+                      <div className="flex flex-col gap-1 items-center">
+                        {player.translatorNeeded && (
+                          <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded ${STATUS_COLORS.translator.bg} ${STATUS_COLORS.translator.text}`}>
+                            <Languages className="w-3 h-3" /> Translator
+                          </span>
+                        )}
+                        {player.notes.length > 0 && (
+                          <span className="text-xs text-gray-400">{player.notes[0]}</span>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 );
@@ -202,7 +207,7 @@ export default function ScheduleView({ onPlayerClick }: ScheduleViewProps) {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Player Schedule</h2>
-          <p className="text-sm text-gray-500">15 min per player - 2 stations (Tunnel + Product)</p>
+          <p className="text-sm text-gray-500">Exclusive appearances + Signing only</p>
         </div>
         <div className="flex items-center gap-4">
           {currentPlayer && (
@@ -219,7 +224,7 @@ export default function ScheduleView({ onPlayerClick }: ScheduleViewProps) {
               <Clock className="w-4 h-4" />
               <span className="font-mono font-bold">{formattedTime}</span>
             </div>
-            <p className="text-xs text-gray-500">PT (Los Angeles)</p>
+            <p className="text-xs text-gray-500">PT (San Francisco)</p>
           </div>
         </div>
       </div>
@@ -248,7 +253,7 @@ export default function ScheduleView({ onPlayerClick }: ScheduleViewProps) {
       <DaySchedule day={2} dayPlayers={day2Players} onPlayerClick={onPlayerClick} currentTime={currentTime} isExpanded={expandedDays.has(2)} onToggle={() => toggleDay(2)} />
 
       <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-4 text-sm text-gray-500">
-        <strong className="text-gray-400">Note:</strong> Each player visits both stations (Tunnel + Product Photography). Tunnel station includes interview. Product is visual only.
+        <strong className="text-gray-400">Note:</strong> Check each player&apos;s format (Exclusive or Signing Only) and duration in the Notes column. TBD times will be confirmed closer to event.
       </div>
     </div>
   );

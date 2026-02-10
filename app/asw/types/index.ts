@@ -21,7 +21,7 @@ export interface Player {
   photo: string;
   jerseyNumber: number;
   day: 1 | 2;
-  scheduledTime: string;
+  scheduledTime: string | null;
   playerNumber: number;
   notes: string[];
   embargoed: boolean;
