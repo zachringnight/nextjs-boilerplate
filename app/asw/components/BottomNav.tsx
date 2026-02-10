@@ -29,6 +29,7 @@ export default function BottomNav() {
   const [moreOpen, setMoreOpen] = useState(false);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const moreButtonRef = useRef<HTMLButtonElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   // Handle keyboard navigation and focus management
   useEffect(() => {
@@ -49,7 +50,7 @@ export default function BottomNav() {
     const handleTab = (e: KeyboardEvent) => {
       if (e.key !== 'Tab') return;
 
-      const modal = closeButtonRef.current?.closest('.bg-\\[\\#1A1A1A\\]');
+      const modal = modalRef.current;
       if (!modal) return;
 
       const focusableElements = modal.querySelectorAll(
@@ -103,7 +104,7 @@ export default function BottomNav() {
             aria-hidden="true"
           />
           <div className="fixed bottom-20 left-0 right-0 z-50 px-4 pb-2" role="dialog" aria-modal="true" aria-label="More tools menu">
-            <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-2xl overflow-hidden shadow-2xl max-w-lg mx-auto">
+            <div ref={modalRef} className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-2xl overflow-hidden shadow-2xl max-w-lg mx-auto">
               <div className="flex items-center justify-between px-4 py-3 border-b border-[#2A2A2A]">
                 <span className="text-sm font-semibold text-[#9CA3AF]">More Tools</span>
                 <button
@@ -165,6 +166,7 @@ export default function BottomNav() {
                       router.push('/asw');
                     }}
                     className="relative flex flex-col items-center justify-center w-full h-full px-2 text-[#6B7280] hover:text-white transition-all"
+                    aria-label={`Navigate to ${item.label}`}
                   >
                     <Icon size={22} strokeWidth={1.75} />
                     <span className="text-[10px] mt-1 font-semibold tracking-wide">{item.label}</span>
