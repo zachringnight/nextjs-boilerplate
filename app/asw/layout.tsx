@@ -1,7 +1,12 @@
 import type { Metadata, Viewport } from 'next';
+import dynamic from 'next/dynamic';
 import Header from './components/Header';
 import BottomNav from './components/BottomNav';
+import ConnectionBanner from './components/ConnectionBanner';
+import AppErrorBoundary from './components/AppErrorBoundary';
 import './asw.css';
+
+const SupabaseProvider = dynamic(() => import('./components/SupabaseProvider'));
 
 export const metadata: Metadata = {
   title: {
@@ -37,10 +42,14 @@ export default function ASWLayout({
 }) {
   return (
     <div className="min-h-screen bg-[#0D0D0D] text-white">
+      <SupabaseProvider />
       <Header />
-      <main className="pb-20">
-        {children}
-      </main>
+      <ConnectionBanner />
+      <AppErrorBoundary>
+        <main className="pb-20">
+          {children}
+        </main>
+      </AppErrorBoundary>
       <BottomNav />
     </div>
   );
