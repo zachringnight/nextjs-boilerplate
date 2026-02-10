@@ -76,7 +76,7 @@ function PlayerSlotCard({
             {player.firstName} {player.lastName}
           </p>
           <div className="flex items-center gap-3 text-sm text-gray-400">
-            <span className={`font-mono ${isCurrent ? 'text-amber-400 font-bold' : ''}`}>{player.scheduledTime}</span>
+            <span className={`font-mono ${isCurrent ? 'text-amber-400 font-bold' : ''}`}>{player.scheduledTime || 'TBD'}</span>
             <span>-</span>
             <span>#{player.jerseyNumber} {player.position}</span>
             <span>-</span>

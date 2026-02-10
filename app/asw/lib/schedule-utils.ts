@@ -3,7 +3,7 @@ import { EVENT_TIMEZONE, EVENT_DATES, SLOT_DURATION_MINUTES } from './constants'
 
 /**
  * Parse a time string like "10:05 AM" into hours and minutes
- * Returns null for invalid or null time strings
+ * Accepts a time string or null. Returns null for invalid or null time strings.
  */
 export function parseTime(timeStr: string | null): { hours: number; minutes: number } | null {
   if (!timeStr) return null;

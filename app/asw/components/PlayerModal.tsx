@@ -63,7 +63,7 @@ export default function PlayerModal({ player, onClose, largeText = false }: Play
                 <p className="text-gray-400">
                   #{player.jerseyNumber} {player.position} &bull; {player.team}
                 </p>
-                <p className="text-sm text-gray-500 mt-1">{player.scheduledTime}</p>
+                <p className="text-sm text-gray-500 mt-1">{player.scheduledTime || 'TBD'}</p>
               </div>
             </div>
           </div>
