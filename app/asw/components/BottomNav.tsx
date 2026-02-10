@@ -28,8 +28,12 @@ export default function BottomNav() {
   const router = useRouter();
   const [moreOpen, setMoreOpen] = useState(false);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
-  const moreButtonRef = useRef<HTMLButtonElement>(null);
+  const moreButtonMainRef = useRef<HTMLButtonElement>(null);
+  const moreButtonSubRef = useRef<HTMLButtonElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
+
+  // Check if we're on a sub-page (not the main /asw page)
+  const isSubPage = pathname !== '/asw';
 
   // Handle keyboard navigation and focus management
   useEffect(() => {
@@ -42,7 +46,9 @@ export default function BottomNav() {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setMoreOpen(false);
-        moreButtonRef.current?.focus();
+        // Focus the appropriate More button based on current page
+        const buttonToFocus = isSubPage ? moreButtonSubRef : moreButtonMainRef;
+        buttonToFocus.current?.focus();
       }
     };
 
@@ -81,16 +87,15 @@ export default function BottomNav() {
       document.removeEventListener('keydown', handleEscape);
       document.removeEventListener('keydown', handleTab);
     };
-  }, [moreOpen]);
+  }, [moreOpen, isSubPage]);
 
   if (!mounted) return null;
 
-  // Check if we're on a sub-page (not the main /asw page)
-  const isSubPage = pathname !== '/asw';
-
   const handleCloseMenu = () => {
     setMoreOpen(false);
-    moreButtonRef.current?.focus();
+    // Focus the appropriate More button based on current page
+    const buttonToFocus = isSubPage ? moreButtonSubRef : moreButtonMainRef;
+    buttonToFocus.current?.focus();
   };
 
   return (
@@ -161,6 +166,7 @@ export default function BottomNav() {
                 return (
                   <button
                     key={item.mode}
+                    type="button"
                     onClick={() => {
                       setViewMode(item.mode);
                       router.push('/asw');
@@ -174,11 +180,14 @@ export default function BottomNav() {
                 );
               })}
               <button
-                ref={moreButtonRef}
+                ref={moreButtonSubRef}
+                type="button"
                 onClick={() => setMoreOpen(!moreOpen)}
                 className={`relative flex flex-col items-center justify-center w-full h-full px-2 transition-all ${
                   moreOpen ? 'text-[#FFD100]' : 'text-[#6B7280] hover:text-white'
                 }`}
+                aria-expanded={moreOpen}
+                aria-label="More tools menu"
               >
                 <MoreHorizontal size={22} strokeWidth={moreOpen ? 2.5 : 1.75} />
                 <span className="text-[10px] mt-1 font-semibold tracking-wide">More</span>
@@ -216,11 +225,14 @@ export default function BottomNav() {
                 );
               })}
               <button
-                ref={moreButtonRef}
+                ref={moreButtonMainRef}
+                type="button"
                 onClick={() => setMoreOpen(!moreOpen)}
                 className={`relative flex flex-col items-center justify-center w-full h-full px-2 transition-all ${
                   moreOpen ? 'text-[#FFD100]' : 'text-[#6B7280] hover:text-white active:text-white'
                 }`}
+                aria-expanded={moreOpen}
+                aria-label="More tools menu"
               >
                 <MoreHorizontal
                   size={22}
