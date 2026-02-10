@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { Zap, Calendar, Radio, User, MoreHorizontal, MessageSquare, ClipboardCheck, FileBox, X, ArrowLeft } from 'lucide-react';
 import { useASWStore } from '../store';
 import { useMounted } from '../hooks/useMounted';
@@ -25,7 +25,6 @@ export default function BottomNav() {
   const { viewMode, setViewMode } = useASWStore();
   const mounted = useMounted();
   const pathname = usePathname();
-  const router = useRouter();
   const [moreOpen, setMoreOpen] = useState(false);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const moreButtonMainRef = useRef<HTMLButtonElement>(null);
@@ -164,19 +163,19 @@ export default function BottomNav() {
               {navItems.slice(0, 3).map((item) => {
                 const Icon = item.icon;
                 return (
-                  <button
+                  <Link
                     key={item.mode}
-                    type="button"
-                    onClick={() => {
+                    href="/asw"
+                    onClick={(e) => {
+                      // Update view mode synchronously before navigation
                       setViewMode(item.mode);
-                      router.push('/asw');
                     }}
                     className="relative flex flex-col items-center justify-center w-full h-full px-2 text-[#6B7280] hover:text-white transition-all"
                     aria-label={`Navigate to ${item.label}`}
                   >
                     <Icon size={22} strokeWidth={1.75} />
                     <span className="text-[10px] mt-1 font-semibold tracking-wide">{item.label}</span>
-                  </button>
+                  </Link>
                 );
               })}
               <button
