@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Zap, Calendar, Radio, User, MoreHorizontal, MessageSquare, ClipboardCheck, FileBox, X, ArrowLeft } from 'lucide-react';
 import { useASWStore } from '../store';
 import { useMounted } from '../hooks/useMounted';
@@ -25,12 +25,72 @@ export default function BottomNav() {
   const { viewMode, setViewMode } = useASWStore();
   const mounted = useMounted();
   const pathname = usePathname();
+  const router = useRouter();
   const [moreOpen, setMoreOpen] = useState(false);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const moreButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Handle keyboard navigation and focus management
+  useEffect(() => {
+    if (!moreOpen) return;
+
+    // Focus the close button when menu opens
+    closeButtonRef.current?.focus();
+
+    // Handle Escape key to close menu
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setMoreOpen(false);
+        moreButtonRef.current?.focus();
+      }
+    };
+
+    // Trap focus within the menu
+    const handleTab = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+
+      const modal = closeButtonRef.current?.closest('.bg-\\[\\#1A1A1A\\]');
+      if (!modal) return;
+
+      const focusableElements = modal.querySelectorAll(
+        'button, a, [tabindex]:not([tabindex="-1"])'
+      );
+      const firstElement = focusableElements[0] as HTMLElement;
+      const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+
+      if (e.shiftKey) {
+        // Shift+Tab: if on first element, go to last
+        if (document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement?.focus();
+        }
+      } else {
+        // Tab: if on last element, go to first
+        if (document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement?.focus();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    document.addEventListener('keydown', handleTab);
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener('keydown', handleTab);
+    };
+  }, [moreOpen]);
 
   if (!mounted) return null;
 
   // Check if we're on a sub-page (not the main /asw page)
   const isSubPage = pathname !== '/asw';
+
+  const handleCloseMenu = () => {
+    setMoreOpen(false);
+    moreButtonRef.current?.focus();
+  };
 
   return (
     <>
@@ -39,15 +99,18 @@ export default function BottomNav() {
         <div className="fixed inset-0 z-50">
           <div
             className="fixed inset-0 bg-black/60 backdrop-blur-sm"
-            onClick={() => setMoreOpen(false)}
+            onClick={handleCloseMenu}
+            aria-hidden="true"
           />
-          <div className="fixed bottom-20 left-0 right-0 z-50 px-4 pb-2">
+          <div className="fixed bottom-20 left-0 right-0 z-50 px-4 pb-2" role="dialog" aria-modal="true" aria-label="More tools menu">
             <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-2xl overflow-hidden shadow-2xl max-w-lg mx-auto">
               <div className="flex items-center justify-between px-4 py-3 border-b border-[#2A2A2A]">
                 <span className="text-sm font-semibold text-[#9CA3AF]">More Tools</span>
                 <button
-                  onClick={() => setMoreOpen(false)}
+                  ref={closeButtonRef}
+                  onClick={handleCloseMenu}
                   className="text-[#6B7280] hover:text-white p-1"
+                  aria-label="Close menu"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -60,7 +123,7 @@ export default function BottomNav() {
                     <Link
                       key={item.href}
                       href={item.href}
-                      onClick={() => setMoreOpen(false)}
+                      onClick={handleCloseMenu}
                       className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
                         isActive
                           ? 'bg-[#FFD100]/10 text-[#FFD100]'
@@ -95,18 +158,21 @@ export default function BottomNav() {
               {navItems.slice(0, 3).map((item) => {
                 const Icon = item.icon;
                 return (
-                  <Link
+                  <button
                     key={item.mode}
-                    href="/asw"
-                    onClick={() => setViewMode(item.mode)}
+                    onClick={() => {
+                      setViewMode(item.mode);
+                      router.push('/asw');
+                    }}
                     className="relative flex flex-col items-center justify-center w-full h-full px-2 text-[#6B7280] hover:text-white transition-all"
                   >
                     <Icon size={22} strokeWidth={1.75} />
                     <span className="text-[10px] mt-1 font-semibold tracking-wide">{item.label}</span>
-                  </Link>
+                  </button>
                 );
               })}
               <button
+                ref={moreButtonRef}
                 onClick={() => setMoreOpen(!moreOpen)}
                 className={`relative flex flex-col items-center justify-center w-full h-full px-2 transition-all ${
                   moreOpen ? 'text-[#FFD100]' : 'text-[#6B7280] hover:text-white'
@@ -148,6 +214,7 @@ export default function BottomNav() {
                 );
               })}
               <button
+                ref={moreButtonRef}
                 onClick={() => setMoreOpen(!moreOpen)}
                 className={`relative flex flex-col items-center justify-center w-full h-full px-2 transition-all ${
                   moreOpen ? 'text-[#FFD100]' : 'text-[#6B7280] hover:text-white active:text-white'
