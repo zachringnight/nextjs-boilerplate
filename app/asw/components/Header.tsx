@@ -1,14 +1,15 @@
 'use client';
 
-import { Search, Type } from 'lucide-react';
+import { Search, Type, Bell, BellOff } from 'lucide-react';
 import { useASWStore } from '../store';
 import { formatTime, formatDateShort, getEventStatus, getEventDay } from '../lib/schedule-utils';
 import { EVENT_INFO } from '../lib/constants';
 import { useEffect, useState } from 'react';
 import { useMounted } from '../hooks/useMounted';
+import { requestNotificationPermission } from '../lib/utils';
 
 export default function Header() {
-  const { largeText, toggleLargeText, setSearchOpen } = useASWStore();
+  const { largeText, toggleLargeText, setSearchOpen, notificationsEnabled, setNotificationsEnabled } = useASWStore();
   const [currentTime, setCurrentTime] = useState<string>('');
   const [currentDate, setCurrentDate] = useState<string>('');
   const [statusMessage, setStatusMessage] = useState<string>('');
@@ -67,6 +68,23 @@ export default function Header() {
             aria-label="Search (Cmd+K)"
           >
             <Search size={20} className="text-[#9CA3AF]" />
+          </button>
+
+          <button
+            onClick={async () => {
+              if (!notificationsEnabled) {
+                await requestNotificationPermission();
+              }
+              setNotificationsEnabled(!notificationsEnabled);
+            }}
+            className={`p-2.5 rounded-xl transition-colors touch-target ${
+              notificationsEnabled
+                ? 'bg-[#22C55E] text-white'
+                : 'bg-[#1A1A1A] hover:bg-[#2A2A2A] text-[#9CA3AF]'
+            }`}
+            aria-label={notificationsEnabled ? 'Disable notifications' : 'Enable notifications'}
+          >
+            {notificationsEnabled ? <Bell size={20} /> : <BellOff size={20} />}
           </button>
 
           <button

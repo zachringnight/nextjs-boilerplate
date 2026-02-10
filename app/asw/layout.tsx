@@ -37,11 +37,26 @@ export default function ASWLayout({
 }) {
   return (
     <div className="min-h-screen bg-[#0D0D0D] text-white">
+      <ConnectionBannerWrapper />
       <Header />
       <main className="pb-20">
         {children}
       </main>
       <BottomNav />
+      <ClipAndNotificationProviders />
     </div>
   );
 }
+
+// Client-side wrappers for dynamic imports in server component layout
+import dynamic from 'next/dynamic';
+
+const ConnectionBannerWrapper = dynamic(
+  () => import('./components/ConnectionBanner'),
+  { ssr: false }
+);
+
+const ClipAndNotificationProviders = dynamic(
+  () => import('./components/ASWProviders'),
+  { ssr: false }
+);
