@@ -1,4 +1,4 @@
-import type { Player, PlayerQuestion } from '../types';
+import type { Player } from '../types';
 
 // Team abbreviation mappings
 const TEAMS: Record<string, { full: string; abbr: string }> = {
@@ -21,24 +21,39 @@ const TEAMS: Record<string, { full: string; abbr: string }> = {
   COR: { full: 'Coronado HS', abbr: 'COR' },
 };
 
-// Standard tunnel interview questions for all athletes
-const tunnelQuestions: string[] = [
-  // Partnership Questions
-  "What does the Panini x All-Star Weekend collaboration mean to you personally?",
-  "How does it feel knowing your card will be in collectors' hands this weekend?",
-  "What do you want fans to know about this moment in basketball?",
-  "Why is the trading card hobby important for connecting fans to athletes?",
-  // Ad VO Questions
-  'Finish this sentence: "All-Star Weekend is ___."',
-  "In one line: why should fans be collecting basketball cards right now?",
-  "What's your message to the next generation of basketball players?",
-  "One word for your mindset this season.",
-  "What does it mean to see yourself on a Panini card?",
-  // Hybrid Questions
-  "What do you want a young fan to feel when they pull your card?",
-  "Why does basketball have the best athletes in the world?",
-  "What makes this All-Star Weekend special?",
-];
+// Tunnel interview questions organized by category
+export const tunnelInterviewQuestions = {
+  partnership: {
+    title: 'PARTNERSHIP QUESTIONS',
+    questions: [
+      "What does the Panini x All-Star Weekend collaboration mean to you personally?",
+      "How does it feel knowing your card will be in collectors' hands this weekend?",
+      "What do you want fans to know about this moment in basketball?",
+      "Why is the trading card hobby important for connecting fans to athletes?",
+    ],
+  },
+  adVO: {
+    title: 'AD VO QUESTIONS (Clean, Quotable Lines)',
+    questions: [
+      'Finish this sentence: "All-Star Weekend is ___."',
+      "In one line: why should fans be collecting basketball cards right now?",
+      "What's your message to the next generation of basketball players?",
+      "One word for your mindset this season.",
+      "What does it mean to see yourself on a Panini card?",
+    ],
+  },
+  hybrid: {
+    title: 'HYBRID (Works for Both)',
+    questions: [
+      "What do you want a young fan to feel when they pull your card?",
+      "Why does basketball have the best athletes in the world?",
+      "What makes this All-Star Weekend special?",
+    ],
+  },
+} as const;
+
+// Flatten tunnel interview questions for player data
+const tunnelQuestions: string[] = Object.values(tunnelInterviewQuestions).flatMap(category => category.questions);
 
 export const players: Player[] = [
   // ============================================
@@ -59,7 +74,7 @@ export const players: Player[] = [
     photo: '/asw/players/easter.jpg',
     jerseyNumber: 0,
     day: 1,
-    scheduledTime: 'TBD',
+    scheduledTime: null,
     playerNumber: 1,
     notes: ['Exclusive - 120 min', 'Agent: Jerry Easter Sr', 'Rep: Caleb', 'Guests: Jerry (father), Trena (mother)'],
     embargoed: false,
@@ -270,7 +285,7 @@ export const players: Player[] = [
     photo: '/asw/players/spencer.jpg',
     jerseyNumber: 0,
     day: 1,
-    scheduledTime: 'TBD',
+    scheduledTime: null,
     playerNumber: 6,
     notes: ['Signing Only', 'Agent: Chase Lanier', 'Rep: Baile'],
     embargoed: false,
@@ -311,7 +326,7 @@ export const players: Player[] = [
     photo: '/asw/players/miller.jpg',
     jerseyNumber: 13,
     day: 1,
-    scheduledTime: 'TBD',
+    scheduledTime: null,
     playerNumber: 7,
     notes: ['Signing Only', 'Agent: Mike Miller (LIFT)', 'Rep: Caleb'],
     embargoed: false,
@@ -442,7 +457,7 @@ export const players: Player[] = [
     photo: '/asw/players/fears.jpg',
     jerseyNumber: 1,
     day: 2,
-    scheduledTime: 'TBD',
+    scheduledTime: null,
     playerNumber: 10,
     notes: ['Exclusive - 120 min', 'Agent: Marco Manlunas (LIFT)', 'Rep: Caleb', 'Guests: Pel SM Team (+4), Marco, CJ, Nas'],
     embargoed: false,
@@ -484,7 +499,7 @@ export const players: Player[] = [
     photo: '/asw/players/dorrough.jpg',
     jerseyNumber: 0,
     day: 2,
-    scheduledTime: 'TBD',
+    scheduledTime: null,
     playerNumber: 11,
     notes: ['Exclusive - 90 min', 'Agent: Torrie Evans', 'Rep: Caleb', 'Guest: Robert Kinnard'],
     embargoed: false,
@@ -656,7 +671,7 @@ export const players: Player[] = [
     photo: '/asw/players/clifford.jpg',
     jerseyNumber: 0,
     day: 2,
-    scheduledTime: 'TBD',
+    scheduledTime: null,
     playerNumber: 15,
     notes: ['Signing Only', 'Agent: Alex Tarshis (LIFE)', 'Rep: Caleb'],
     embargoed: false,
@@ -698,7 +713,7 @@ export const players: Player[] = [
     photo: '/asw/players/coward.jpg',
     jerseyNumber: 0,
     day: 2,
-    scheduledTime: 'TBD',
+    scheduledTime: null,
     playerNumber: 16,
     notes: ['60 min appearance', 'Agent: Alex Tarshis (LIFE)', 'Rep: Caleb'],
     embargoed: false,
@@ -739,7 +754,7 @@ export const players: Player[] = [
     photo: '/asw/players/mitchell.jpg',
     jerseyNumber: 0,
     day: 2,
-    scheduledTime: 'TBD',
+    scheduledTime: null,
     playerNumber: 17,
     notes: ['Signing Only', 'Agent: Alex Tarshis (LIFE)', 'Rep: Caleb'],
     embargoed: false,
@@ -781,7 +796,7 @@ export const players: Player[] = [
     photo: '/asw/players/martin.jpg',
     jerseyNumber: 0,
     day: 2,
-    scheduledTime: 'TBD',
+    scheduledTime: null,
     playerNumber: 18,
     notes: ['Signing Only', 'Agent: Alex Tarshis (LIFE)', 'Rep: Caleb'],
     embargoed: false,
@@ -822,7 +837,7 @@ export const players: Player[] = [
     photo: '/asw/players/masterp.jpg',
     jerseyNumber: 0,
     day: 2,
-    scheduledTime: 'TBD',
+    scheduledTime: null,
     playerNumber: 19,
     notes: ['Signing Only', 'Agent: Percy Miller', 'Rep: Karishma'],
     embargoed: false,
@@ -865,7 +880,7 @@ export const players: Player[] = [
     photo: '/asw/players/niederhauser.jpg',
     jerseyNumber: 0,
     day: 2,
-    scheduledTime: 'TBD',
+    scheduledTime: null,
     playerNumber: 20,
     notes: ['Signing Only', 'Agent: Jordan Sarason (Excel)', 'Rep: Caleb'],
     embargoed: false,
@@ -894,40 +909,6 @@ export const players: Player[] = [
     ],
   },
 ];
-
-// ============================================
-// INTERVIEW QUESTIONS (TUNNEL STATION)
-// ============================================
-
-export const tunnelInterviewQuestions = {
-  partnership: {
-    title: 'PARTNERSHIP QUESTIONS',
-    questions: [
-      "What does the Panini x All-Star Weekend collaboration mean to you personally?",
-      "How does it feel knowing your card will be in collectors' hands this weekend?",
-      "What do you want fans to know about this moment in basketball?",
-      "Why is the trading card hobby important for connecting fans to athletes?",
-    ],
-  },
-  adVO: {
-    title: 'AD VO QUESTIONS (Clean, Quotable Lines)',
-    questions: [
-      'Finish this sentence: "All-Star Weekend is ___."',
-      "In one line: why should fans be collecting basketball cards right now?",
-      "What's your message to the next generation of basketball players?",
-      "One word for your mindset this season.",
-      "What does it mean to see yourself on a Panini card?",
-    ],
-  },
-  hybrid: {
-    title: 'HYBRID (Works for Both)',
-    questions: [
-      "What do you want a young fan to feel when they pull your card?",
-      "Why does basketball have the best athletes in the world?",
-      "What makes this All-Star Weekend special?",
-    ],
-  },
-};
 
 // ============================================
 // PRE-COMPUTED DATA

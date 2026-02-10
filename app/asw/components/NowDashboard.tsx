@@ -181,7 +181,7 @@ export default function NowDashboard({ onPlayerClick }: NowDashboardProps) {
       <div className="flex items-center justify-between">
         <div>
           <p className="font-medium text-white">{formattedDate}</p>
-          <p className="text-xs text-gray-500">PT (Los Angeles)</p>
+          <p className="text-xs text-gray-500">PT (San Francisco)</p>
         </div>
         <div className="text-right">
           <p className="font-mono text-2xl text-amber-400">{formattedTime}</p>

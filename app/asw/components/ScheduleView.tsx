@@ -99,7 +99,7 @@ function DaySchedule({
                           </span>
                         )}
                         <span className={`font-mono text-xs ${isCurrent ? 'text-amber-400 font-bold' : 'text-gray-300'}`}>
-                          {player.scheduledTime}
+                          {player.scheduledTime || 'TBD'}
                         </span>
                       </div>
                     </td>
@@ -224,7 +224,7 @@ export default function ScheduleView({ onPlayerClick }: ScheduleViewProps) {
               <Clock className="w-4 h-4" />
               <span className="font-mono font-bold">{formattedTime}</span>
             </div>
-            <p className="text-xs text-gray-500">PT (Los Angeles)</p>
+            <p className="text-xs text-gray-500">PT (San Francisco)</p>
           </div>
         </div>
       </div>
