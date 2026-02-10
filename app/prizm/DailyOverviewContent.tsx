@@ -88,28 +88,28 @@ export default function DailyOverviewContent() {
       <Header title="Prizm Lounge" />
 
       {/* Event Info Bar */}
-      <div className="px-4 py-3 bg-[#1A1A1A] border-b border-[#2A2A2A]">
+      <div className="px-4 py-4 bg-gradient-to-r from-[#1A1A1A] to-[#141414] border-b border-[#2A2A2A]">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className={cn('font-bold text-white', largeText ? 'text-lg' : 'text-base')}>
+            <h2 className={cn('font-bold text-white tracking-tight', largeText ? 'text-lg' : 'text-base')}>
               Super Bowl LX Prizm Lounge
             </h2>
-            <div className={cn('text-[#9CA3AF] flex items-center gap-1.5', largeText ? 'text-sm' : 'text-xs')}>
-              <MapPin className="w-3 h-3" />
+            <div className={cn('text-[#9CA3AF] flex items-center gap-1.5 mt-0.5', largeText ? 'text-sm' : 'text-xs')}>
+              <MapPin className="w-3 h-3 text-[#FFD100]" />
               <span>San Francisco Bay Area</span>
-              <span className="text-[#4B5563]">|</span>
-              <span>Feb 5 — 7, 2026</span>
+              <span className="text-[#4B5563]">&middot;</span>
+              <span>Feb 5 &ndash; 7, 2026</span>
             </div>
           </div>
-          <span className={cn('px-3 py-1 rounded-full text-xs font-semibold', statusLabel.color)}>
+          <span className={cn('px-3 py-1.5 rounded-full text-xs font-bold tracking-wide shadow-sm', statusLabel.color)}>
             {statusLabel.text}
           </span>
         </div>
       </div>
 
       {/* Quick Links */}
-      <div className="px-4 py-3 bg-[#0D0D0D] border-b border-[#2A2A2A]">
-        <div className="grid grid-cols-4 gap-2">
+      <div className="px-4 py-4 bg-[#0D0D0D] border-b border-[#2A2A2A]">
+        <div className="grid grid-cols-4 gap-3">
           {[
             { href: '/prizm/schedule', icon: Calendar, label: 'Schedule', color: '#FFD100' },
             { href: '/prizm/players', icon: Users, label: 'Players', color: '#3B82F6' },
@@ -119,10 +119,12 @@ export default function DailyOverviewContent() {
             <Link
               key={href}
               href={href}
-              className="flex flex-col items-center gap-1.5 py-2.5 rounded-xl bg-[#1A1A1A] border border-[#2A2A2A] hover:border-[#FFD100]/30 transition-colors"
+              className="flex flex-col items-center gap-2 py-3 rounded-xl bg-[#1A1A1A] border border-[#2A2A2A] hover:border-[#FFD100]/30 hover:bg-[#1E1E1E] transition-all active:scale-[0.97] touch-target"
             >
-              <Icon className="w-5 h-5" style={{ color }} />
-              <span className="text-[11px] text-[#9CA3AF] font-medium">{label}</span>
+              <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${color}15` }}>
+                <Icon className="w-5 h-5" style={{ color }} />
+              </div>
+              <span className="text-xs text-[#9CA3AF] font-medium">{label}</span>
             </Link>
           ))}
         </div>
@@ -156,33 +158,39 @@ export default function DailyOverviewContent() {
       </div>
 
       {/* Day Progress */}
-      <div className="px-4 py-3 bg-[#1A1A1A] border-b border-[#2A2A2A]">
+      {/* Day Progress */}
+      <div className="px-4 py-4 bg-[#1A1A1A] border-b border-[#2A2A2A]">
         <div className="flex items-center justify-between mb-2">
           <span className={cn('text-[#9CA3AF]', largeText ? 'text-base' : 'text-sm')}>
-            {DAY_LABELS[selectedDate]} — {todayPlayers.length} player{todayPlayers.length !== 1 ? 's' : ''}
+            {DAY_LABELS[selectedDate]} &mdash; {todayPlayers.length} player{todayPlayers.length !== 1 ? 's' : ''}
           </span>
-          <span className={cn('text-white font-medium', largeText ? 'text-base' : 'text-sm')}>
-            {completedCount}/{todayPlayers.length} done
+          <span className={cn('text-white font-bold tabular-nums', largeText ? 'text-base' : 'text-sm')}>
+            {completedCount}/{todayPlayers.length} <span className="text-[#9CA3AF] font-normal">done</span>
           </span>
         </div>
-        <div className="h-2 bg-[#2A2A2A] rounded-full overflow-hidden">
+        <div className="h-2.5 bg-[#2A2A2A] rounded-full overflow-hidden">
           <div
-            className="h-full bg-[#FFD100] rounded-full transition-all duration-500"
-            style={{ width: todayPlayers.length > 0 ? `${(completedCount / todayPlayers.length) * 100}%` : '0%' }}
+            className="h-full rounded-full transition-all duration-700 ease-out"
+            style={{
+              width: todayPlayers.length > 0 ? `${(completedCount / todayPlayers.length) * 100}%` : '0%',
+              background: 'linear-gradient(90deg, #FFD100, #FFAA00)',
+            }}
           />
         </div>
       </div>
 
       {/* Up Next Module */}
       {nextPlayer && (
-        <div className="px-4 py-3 bg-[#FFD100]/5 border-b border-[#FFD100]/20">
-          <div className="flex items-center gap-3">
-            <Clock className="w-4 h-4 text-[#FFD100]" />
-            <span className={cn('text-[#FFD100] font-semibold', largeText ? 'text-base' : 'text-sm')}>Up Next</span>
+        <div className="px-4 py-4 bg-gradient-to-r from-[#FFD100]/8 to-[#FFD100]/3 border-b border-[#FFD100]/20 animate-appear">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-6 h-6 rounded-full bg-[#FFD100]/20 flex items-center justify-center">
+              <Clock className="w-3.5 h-3.5 text-[#FFD100]" />
+            </div>
+            <span className={cn('text-[#FFD100] font-bold uppercase tracking-wider', largeText ? 'text-sm' : 'text-xs')}>Up Next</span>
           </div>
           <Link
             href={`/prizm/players/${nextPlayer.player.id}`}
-            className="flex items-center gap-3 mt-2 group"
+            className="flex items-center gap-3 group"
           >
             <PlayerPhoto src={nextPlayer.player.photo} name={nextPlayer.player.name} size="sm" />
             <div className="flex-1 min-w-0">
@@ -190,25 +198,28 @@ export default function DailyOverviewContent() {
                 {nextPlayer.player.name}
               </span>
               <span className={cn('text-[#9CA3AF] block', largeText ? 'text-sm' : 'text-xs')}>
-                {nextPlayer.player.team} — Arrives {to12h(nextPlayer.arrival.arrivalTime)}
+                {nextPlayer.player.team} &mdash; Arrives {to12h(nextPlayer.arrival.arrivalTime)}
               </span>
             </div>
-            <ChevronRight size={16} className="text-[#4B5563] group-hover:text-[#FFD100] transition-colors" />
+            <ChevronRight size={18} className="text-[#FFD100]/50 group-hover:text-[#FFD100] transition-colors" />
           </Link>
         </div>
       )}
 
       {/* Player Arrivals Section */}
       <div className="p-4">
-        <h2 className={cn('font-semibold text-white mb-3 flex items-center gap-2', largeText ? 'text-xl' : 'text-lg')}>
+        <h2 className={cn('font-bold text-white mb-4 flex items-center gap-2 tracking-tight', largeText ? 'text-xl' : 'text-lg')}>
           <Users className="w-5 h-5 text-[#FFD100]" />
           Player Schedule
         </h2>
 
         {arrivals.length === 0 ? (
-          <div className="text-center py-8">
-            <Calendar className="w-12 h-12 mx-auto mb-3 text-[#6B7280] opacity-50" />
-            <p className={cn('text-[#6B7280]', largeText ? 'text-base' : 'text-sm')}>No players scheduled</p>
+          <div className="text-center py-12 px-6">
+            <div className="w-16 h-16 rounded-2xl bg-[#1A1A1A] border border-[#2A2A2A] flex items-center justify-center mx-auto mb-4">
+              <Calendar className="w-8 h-8 text-[#4B5563]" />
+            </div>
+            <p className={cn('text-white font-semibold mb-1', largeText ? 'text-lg' : 'text-base')}>No players scheduled</p>
+            <p className={cn('text-[#6B7280]', largeText ? 'text-sm' : 'text-xs')}>Select a different day above to view the schedule</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -236,8 +247,8 @@ export default function DailyOverviewContent() {
                   key={arrival.playerId}
                   href={`/prizm/players/${player.id}`}
                   className={cn(
-                    'block bg-[#1A1A1A] rounded-xl border overflow-hidden transition-all duration-200 hover:border-[#FFD100]/50 hover:bg-[#1E1E1E] group',
-                    isHere ? 'border-[#22c55e]' : isDone ? 'border-[#2A2A2A] opacity-60' : 'border-[#2A2A2A]'
+                    'block rounded-xl border overflow-hidden transition-all duration-200 hover:border-[#FFD100]/50 group active:scale-[0.99]',
+                    isHere ? 'border-[#22c55e] bg-[#22c55e]/5 glow-green' : isDone ? 'border-[#2A2A2A] bg-[#1A1A1A]/60 opacity-60' : 'border-[#2A2A2A] bg-[#1A1A1A] hover:bg-[#1E1E1E]'
                   )}
                 >
                   <div className="p-4 flex items-center gap-3">
@@ -254,10 +265,10 @@ export default function DailyOverviewContent() {
                         {player.name}
                       </span>
                       <div className={cn('text-[#9CA3AF] flex items-center gap-2 flex-wrap', largeText ? 'text-sm' : 'text-xs')}>
-                        <span>{player.team} — {player.position}</span>
+                        <span>{player.team} &mdash; {player.position}</span>
                         {arrival.signingOnly && (
-                          <span className="px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-400 text-[10px] font-medium">
-                            SIGNING ONLY
+                          <span className="px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-400 text-[10px] font-bold uppercase tracking-wider">
+                            Signing Only
                           </span>
                         )}
                       </div>
@@ -266,26 +277,27 @@ export default function DailyOverviewContent() {
                     {/* Arrival Time */}
                     <div className="text-right flex-shrink-0">
                       {arrival.status === 'tbd' ? (
-                        <span className="px-2 py-1 rounded bg-[#F59E0B]/20 text-[#F59E0B] text-xs font-medium">
+                        <span className="px-2.5 py-1 rounded-lg bg-[#F59E0B]/20 text-[#F59E0B] text-xs font-bold">
                           TBD
                         </span>
                       ) : (
                         <>
-                          <div className={cn('text-white font-medium', largeText ? 'text-base' : 'text-sm')}>
+                          <div className={cn('text-white font-semibold tabular-nums', largeText ? 'text-base' : 'text-sm')}>
                             {to12h(arrival.arrivalTime)}
                           </div>
-                          <div className={cn('text-[#6B7280]', largeText ? 'text-sm' : 'text-xs')}>
+                          <div className={cn('text-[#6B7280] tabular-nums', largeText ? 'text-sm' : 'text-xs')}>
                             to {to12h(arrival.departureTime)}
                           </div>
                         </>
                       )}
                       {isHere && (
-                        <span className="mt-1 inline-block px-2 py-0.5 rounded-full bg-[#22c55e] text-black text-[10px] font-bold animate-pulse">
+                        <span className="mt-1.5 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#22c55e] text-black text-[10px] font-bold">
+                          <span className="w-1.5 h-1.5 bg-black rounded-full animate-pulse" />
                           HERE
                         </span>
                       )}
                       {isDone && (
-                        <span className="text-[#22c55e] text-xs">Done</span>
+                        <span className="text-[#22c55e] text-xs font-medium">Done</span>
                       )}
                     </div>
 

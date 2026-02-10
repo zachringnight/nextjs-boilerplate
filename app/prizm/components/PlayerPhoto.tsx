@@ -13,7 +13,7 @@ interface PlayerPhotoProps {
 const sizeClasses = {
   sm: 'w-10 h-10 text-sm',
   md: 'w-14 h-14 text-xl',
-  lg: 'w-12 h-12 text-lg',
+  lg: 'w-16 h-16 text-2xl',
   xl: 'w-28 h-28 text-4xl',
 };
 

@@ -91,8 +91,8 @@ export default function ScheduleContent() {
         <button
           onClick={() => setShowPROnly(false)}
           className={cn(
-            'flex-1 py-2 rounded-lg text-sm font-medium transition-colors',
-            !showPROnly ? 'bg-[#FFD100] text-black' : 'bg-[#2A2A2A] text-[#9CA3AF] hover:bg-[#3A3A3A]'
+            'flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all touch-target',
+            !showPROnly ? 'bg-[#FFD100] text-black shadow-sm' : 'bg-[#2A2A2A] text-[#9CA3AF] hover:bg-[#3A3A3A]'
           )}
         >
           <Users className="w-4 h-4 inline mr-1.5" />
@@ -101,8 +101,8 @@ export default function ScheduleContent() {
         <button
           onClick={() => setShowPROnly(true)}
           className={cn(
-            'flex-1 py-2 rounded-lg text-sm font-medium transition-colors',
-            showPROnly ? 'bg-[#8B5CF6] text-white' : 'bg-[#2A2A2A] text-[#9CA3AF] hover:bg-[#3A3A3A]'
+            'flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all touch-target',
+            showPROnly ? 'bg-[#8B5CF6] text-white shadow-sm' : 'bg-[#2A2A2A] text-[#9CA3AF] hover:bg-[#3A3A3A]'
           )}
         >
           <Phone className="w-4 h-4 inline mr-1.5" />
@@ -111,12 +111,17 @@ export default function ScheduleContent() {
       </div>
 
       {/* Player List */}
-      <div className="p-4 space-y-2">
+      <div className="p-4 space-y-2.5">
         {displayList.length === 0 ? (
-          <div className="text-center py-12">
-            <Calendar className="w-12 h-12 mx-auto mb-3 text-[#6B7280] opacity-50" />
-            <p className={cn('text-[#9CA3AF]', largeText ? 'text-lg' : 'text-base')}>
+          <div className="text-center py-12 px-6">
+            <div className="w-16 h-16 rounded-2xl bg-[#1A1A1A] border border-[#2A2A2A] flex items-center justify-center mx-auto mb-4">
+              <Calendar className="w-8 h-8 text-[#4B5563]" />
+            </div>
+            <p className={cn('text-white font-semibold mb-1', largeText ? 'text-lg' : 'text-base')}>
               {showPROnly ? 'No PR interviews scheduled' : 'No players scheduled'}
+            </p>
+            <p className={cn('text-[#6B7280]', largeText ? 'text-sm' : 'text-xs')}>
+              {showPROnly ? 'Switch to All Players to see the full schedule' : 'Select a different day to view its schedule'}
             </p>
           </div>
         ) : (
@@ -144,8 +149,8 @@ export default function ScheduleContent() {
                 key={arrival.playerId}
                 href={`/prizm/players/${player.id}`}
                 className={cn(
-                  'block bg-[#1A1A1A] rounded-xl border overflow-hidden transition-all duration-200 hover:border-[#FFD100]/50 hover:bg-[#1E1E1E] group',
-                  isHere ? 'border-[#22c55e]' : isDone ? 'border-[#2A2A2A] opacity-60' : 'border-[#2A2A2A]'
+                  'block rounded-xl border overflow-hidden transition-all duration-200 hover:border-[#FFD100]/50 group active:scale-[0.99]',
+                  isHere ? 'border-[#22c55e] bg-[#22c55e]/5 glow-green' : isDone ? 'border-[#2A2A2A] bg-[#1A1A1A]/60 opacity-60' : 'border-[#2A2A2A] bg-[#1A1A1A] hover:bg-[#1E1E1E]'
                 )}
               >
                 <div className="p-4 flex items-center gap-3">
@@ -162,10 +167,10 @@ export default function ScheduleContent() {
                       {player.name}
                     </span>
                     <div className={cn('text-[#9CA3AF] flex items-center gap-2', largeText ? 'text-sm' : 'text-xs')}>
-                      <span>{player.team} — {player.position}</span>
+                      <span>{player.team} &mdash; {player.position}</span>
                       {arrival.signingOnly && (
-                        <span className="px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-400 text-[10px] font-medium">
-                          SIGNING ONLY
+                        <span className="px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-400 text-[10px] font-bold uppercase tracking-wider">
+                          Signing Only
                         </span>
                       )}
                     </div>
@@ -174,25 +179,26 @@ export default function ScheduleContent() {
                   {/* Time */}
                   <div className="text-right flex-shrink-0">
                     {arrival.status === 'tbd' ? (
-                      <span className="px-2 py-1 rounded bg-[#F59E0B]/20 text-[#F59E0B] text-xs font-medium">
+                      <span className="px-2.5 py-1 rounded-lg bg-[#F59E0B]/20 text-[#F59E0B] text-xs font-bold">
                         TBD
                       </span>
                     ) : (
                       <>
-                        <div className={cn('text-white font-medium', largeText ? 'text-base' : 'text-sm')}>
+                        <div className={cn('text-white font-semibold tabular-nums', largeText ? 'text-base' : 'text-sm')}>
                           {to12h(arrival.arrivalTime)}
                         </div>
-                        <div className={cn('text-[#6B7280]', largeText ? 'text-sm' : 'text-xs')}>
+                        <div className={cn('text-[#6B7280] tabular-nums', largeText ? 'text-sm' : 'text-xs')}>
                           to {to12h(arrival.departureTime)}
                         </div>
                       </>
                     )}
                     {isHere && (
-                      <span className="mt-1 inline-block px-2 py-0.5 rounded-full bg-[#22c55e] text-black text-[10px] font-bold animate-pulse">
+                      <span className="mt-1.5 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#22c55e] text-black text-[10px] font-bold">
+                        <span className="w-1.5 h-1.5 bg-black rounded-full animate-pulse" />
                         HERE
                       </span>
                     )}
-                    {isDone && <span className="text-[#22c55e] text-xs">Done</span>}
+                    {isDone && <span className="text-[#22c55e] text-xs font-medium">Done</span>}
                   </div>
 
                   <ChevronRight size={16} className="text-[#4B5563] group-hover:text-[#FFD100] transition-colors flex-shrink-0" />

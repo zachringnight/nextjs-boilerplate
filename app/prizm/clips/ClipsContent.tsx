@@ -729,11 +729,13 @@ export default function ClipsContent() {
       {/* Clips List */}
       <div className="p-4 space-y-3 pb-40">
         {filteredClips.length === 0 ? (
-          <div className="text-center py-12 text-[#9CA3AF]">
-            <Clapperboard className="w-12 h-12 mx-auto mb-3 opacity-50" />
+          <div className="text-center py-12 px-6">
+            <div className="w-16 h-16 rounded-2xl bg-[#1A1A1A] border border-[#2A2A2A] flex items-center justify-center mx-auto mb-4">
+              <Clapperboard className="w-8 h-8 text-[#4B5563]" />
+            </div>
             {clips.length === 0 ? (
               <>
-                <p className={cn('font-medium text-white', largeText ? 'text-lg' : 'text-base')}>
+                <p className={cn('font-semibold text-white mb-1', largeText ? 'text-lg' : 'text-base')}>
                   No clips marked yet
                 </p>
                 <p className="text-sm text-[#6B7280] mt-2 max-w-xs mx-auto">
@@ -747,8 +749,11 @@ export default function ClipsContent() {
               </>
             ) : (
               <>
-                <p className={largeText ? 'text-base' : 'text-sm'}>
+                <p className={cn('font-semibold text-white mb-1', largeText ? 'text-lg' : 'text-base')}>
                   No clips match your filters
+                </p>
+                <p className={cn('text-[#6B7280]', largeText ? 'text-sm' : 'text-xs')}>
+                  Try broadening your search or clearing filters
                 </p>
                 <button
                   onClick={() => {
@@ -758,7 +763,7 @@ export default function ClipsContent() {
                     setFilterFlagged(false);
                     setSearchQuery('');
                   }}
-                  className="mt-3 text-sm text-[#FFD100] hover:text-[#FFD100]/80"
+                  className="mt-3 text-sm text-[#FFD100] hover:text-[#FFD100]/80 font-medium"
                 >
                   Clear all filters
                 </button>

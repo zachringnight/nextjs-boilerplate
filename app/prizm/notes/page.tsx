@@ -53,6 +53,7 @@ export default function NotesPage() {
   const [filterStatus, setFilterStatus] = useState<NoteStatus | 'all'>('all');
   const [filterCategory, setFilterCategory] = useState<NoteCategory | 'all'>('all');
   const [expandedNote, setExpandedNote] = useState<string | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   // Form state
   const [content, setContent] = useState('');
@@ -173,10 +174,17 @@ export default function NotesPage() {
       {/* Notes List */}
       <div className="p-4 space-y-3">
         {filteredNotes.length === 0 ? (
-          <div className="text-center py-12 text-[#9CA3AF]">
-            <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-50" />
-            <p className={largeText ? 'text-base' : 'text-sm'}>
+          <div className="text-center py-12 px-6">
+            <div className="w-16 h-16 rounded-2xl bg-[#1A1A1A] border border-[#2A2A2A] flex items-center justify-center mx-auto mb-4">
+              <MessageSquare className="w-8 h-8 text-[#4B5563]" />
+            </div>
+            <p className={cn('text-white font-semibold mb-1', largeText ? 'text-lg' : 'text-base')}>
               {notes.length === 0 ? 'No notes yet' : 'No notes match filters'}
+            </p>
+            <p className={cn('text-[#6B7280]', largeText ? 'text-sm' : 'text-xs')}>
+              {notes.length === 0
+                ? 'Tap the + button to log an issue, note, or update'
+                : 'Try adjusting your filters to see more results'}
             </p>
           </div>
         ) : (
@@ -281,13 +289,32 @@ export default function NotesPage() {
                         )}
                       </>
                     )}
-                    <button
-                      onClick={() => deleteNote(note.id)}
-                      className="flex items-center gap-1 px-3 py-1.5 bg-red-500/20 text-red-400 rounded-lg text-sm hover:bg-red-500/30 ml-auto"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      Delete
-                    </button>
+                    {deleteConfirmId === note.id ? (
+                      <div className="flex items-center gap-2 ml-auto bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-1.5">
+                        <AlertTriangle className="w-4 h-4 text-red-400" />
+                        <span className="text-red-400 text-sm">Delete?</span>
+                        <button
+                          onClick={() => { deleteNote(note.id); setDeleteConfirmId(null); }}
+                          className="inline-flex items-center justify-center px-3 py-2 min-h-[44px] min-w-[44px] bg-red-500 text-white rounded text-sm font-medium hover:bg-red-600"
+                        >
+                          Yes
+                        </button>
+                        <button
+                          onClick={() => setDeleteConfirmId(null)}
+                          className="inline-flex items-center justify-center px-3 py-2 min-h-[44px] min-w-[44px] bg-[#2A2A2A] text-[#9CA3AF] rounded text-sm hover:bg-[#3A3A3A]"
+                        >
+                          No
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setDeleteConfirmId(note.id)}
+                        className="flex items-center gap-1 px-3 py-1.5 bg-red-500/20 text-red-400 rounded-lg text-sm hover:bg-red-500/30 ml-auto"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Delete
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
