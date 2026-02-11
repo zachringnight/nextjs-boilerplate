@@ -2,7 +2,7 @@ export type ViewMode = 'now' | 'schedule' | 'station' | 'players';
 export type Conference = 'Eastern' | 'Western';
 
 export interface PlayerQuestion {
-  station: 'tunnel' | 'product';
+  station: 'tunnel' | 'qa' | 'signing';
   questions: string[];
 }
 
@@ -41,14 +41,15 @@ export interface Player {
 // ASW STATIONS
 // =====================
 
-export type ASWStationId = 'tunnel' | 'product';
+export type ASWStationId = 'tunnel' | 'qa' | 'signing';
 
 export const ASW_STATIONS = [
   { id: 'tunnel', name: 'Tunnel', icon: '\uD83D\uDEB6', color: '#22c55e' },
-  { id: 'product', name: 'Product', icon: '\uD83D\uDCF8', color: '#f59e0b' },
+  { id: 'qa', name: 'Q&A', icon: '\uD83C\uDFA4', color: '#f59e0b' },
+  { id: 'signing', name: 'Signing', icon: '\u270D\uFE0F', color: '#8b5cf6' },
 ] as const;
 
-export const CHECKLIST_STATIONS: ASWStationId[] = ['tunnel', 'product'];
+export const CHECKLIST_STATIONS: ASWStationId[] = ['tunnel', 'qa', 'signing'];
 
 // =====================
 // NOTES / ISSUE LOGGER

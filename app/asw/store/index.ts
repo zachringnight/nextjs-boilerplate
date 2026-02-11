@@ -11,6 +11,7 @@ import type {
   ASWStationId,
   PlayerStationCompletion,
 } from '../types';
+import type { ASWClipMarker, ASWClipCategory, ASWClipDefaults } from '../types/clips';
 import { defaultDeliverables } from '../data/deliverables';
 import {
   syncNoteInsert,
@@ -26,8 +27,8 @@ import {
   syncResetCompletions,
 } from '../lib/db-sync';
 
-// ASW has 2 checklist stations
-const checklistStations: ASWStationId[] = ['tunnel', 'product'];
+// ASW has 3 checklist stations
+const checklistStations: ASWStationId[] = ['tunnel', 'qa', 'signing'];
 
 function deliverableToRecord(d: Deliverable) {
   return {
@@ -90,6 +91,23 @@ interface ASWState {
   getRemainingStationsForPlayer: (playerId: string) => ASWStationId[];
   resetPlayerStationChecklist: () => void;
   getStationCompletionCount: (stationId: ASWStationId) => number;
+
+  // Clip Markers
+  clips: ASWClipMarker[];
+  setClips: (clips: ASWClipMarker[]) => void;
+  addClip: (clip: ASWClipMarker) => void;
+  updateClip: (id: string, updates: Partial<ASWClipMarker>) => void;
+  deleteClip: (id: string) => void;
+  clipModalOpen: boolean;
+  setClipModalOpen: (open: boolean) => void;
+  editingClipId: string | null;
+  setEditingClipId: (id: string | null) => void;
+  quickMarkCategory: ASWClipCategory;
+  setQuickMarkCategory: (category: ASWClipCategory) => void;
+  clipDefaults: ASWClipDefaults;
+  setClipDefaults: (defaults: Partial<ASWClipDefaults>) => void;
+  getTodayClipCount: () => number;
+  getFlaggedCount: () => number;
 }
 
 export const useASWStore = create<ASWState>()(
@@ -370,6 +388,33 @@ export const useASWStore = create<ASWState>()(
           (c) => c.stationId === stationId && c.completed
         ).length;
       },
+
+      // Clip Markers
+      clips: [],
+      setClips: (clips) => set({ clips }),
+      addClip: (clip) => set((state) => ({ clips: [clip, ...state.clips] })),
+      updateClip: (id, updates) =>
+        set((state) => ({
+          clips: state.clips.map((c) =>
+            c.id === id ? { ...c, ...updates, updated_at: new Date().toISOString() } : c
+          ),
+        })),
+      deleteClip: (id) =>
+        set((state) => ({ clips: state.clips.filter((c) => c.id !== id) })),
+      clipModalOpen: false,
+      setClipModalOpen: (open) => set({ clipModalOpen: open }),
+      editingClipId: null,
+      setEditingClipId: (id) => set({ editingClipId: id }),
+      quickMarkCategory: 'highlight',
+      setQuickMarkCategory: (category) => set({ quickMarkCategory: category }),
+      clipDefaults: { crew_member: '', camera: '', media_type: 'video' },
+      setClipDefaults: (defaults) =>
+        set((state) => ({ clipDefaults: { ...state.clipDefaults, ...defaults } })),
+      getTodayClipCount: () => {
+        const today = new Date().toISOString().split('T')[0];
+        return get().clips.filter((c) => c.created_at.startsWith(today)).length;
+      },
+      getFlaggedCount: () => get().clips.filter((c) => c.flagged).length,
     }),
     {
       name: 'asw-storage',
@@ -379,6 +424,9 @@ export const useASWStore = create<ASWState>()(
       partialize: (state) => ({
         viewMode: state.viewMode,
         largeText: state.largeText,
+        clips: state.clips,
+        quickMarkCategory: state.quickMarkCategory,
+        clipDefaults: state.clipDefaults,
       }),
     }
   )

@@ -77,21 +77,46 @@ export const STATION_CONFIG = {
     description: 'Walk-in + Interview',
     hasInterview: true,
   },
-  product: {
-    id: 'product',
-    name: 'Product',
-    shortName: 'PRODUCT',
+  qa: {
+    id: 'qa',
+    name: 'Q&A',
+    shortName: 'Q&A',
     icon: '2',
-    emoji: '\uD83D\uDCF8',
+    emoji: '\uD83C\uDFA4',
     color: '#f59e0b',
     colorClass: 'amber',
     borderClass: 'border-amber-500/30',
     bgClass: 'bg-amber-500',
     textClass: 'text-amber-400',
-    description: 'Card Photography',
+    description: 'Interview + Card Photography',
+    hasInterview: true,
+  },
+  signing: {
+    id: 'signing',
+    name: 'Signing',
+    shortName: 'SIGNING',
+    icon: '3',
+    emoji: '\u270D\uFE0F',
+    color: '#8b5cf6',
+    colorClass: 'violet',
+    borderClass: 'border-violet-500/30',
+    bgClass: 'bg-violet-500',
+    textClass: 'text-violet-400',
+    description: 'Autograph Session',
     hasInterview: false,
   },
 } as const;
+
+// ASW Tier styles for badges
+export const ASW_TIER_STYLES: Record<number, { bg: string; text: string; label: string; fullLabel: string }> = {
+  1: { bg: 'bg-[#FFD100]/20', text: 'text-[#FFD100]', label: 'T1', fullLabel: 'Tier 1 — Priority' },
+  1.5: { bg: 'bg-[#FFD100]/15', text: 'text-[#FFD100]/80', label: 'T1.5', fullLabel: 'Tier 1.5' },
+  2: { bg: 'bg-blue-500/20', text: 'text-blue-400', label: 'T2', fullLabel: 'Tier 2' },
+  2.5: { bg: 'bg-blue-500/15', text: 'text-blue-400/80', label: 'T2.5', fullLabel: 'Tier 2.5' },
+  3: { bg: 'bg-[#9CA3AF]/20', text: 'text-[#9CA3AF]', label: 'T3', fullLabel: 'Tier 3' },
+  3.5: { bg: 'bg-[#9CA3AF]/15', text: 'text-[#9CA3AF]/80', label: 'T3.5', fullLabel: 'Tier 3.5' },
+  4: { bg: 'bg-[#4B5563]/20', text: 'text-[#6B7280]', label: 'T4', fullLabel: 'Tier 4 — Developmental' },
+};
 
 // Status colors
 export const STATUS_COLORS = {

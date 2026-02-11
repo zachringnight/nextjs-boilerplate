@@ -98,7 +98,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'What does your first "college card" moment feel like?',
           'What family keepsakes do you treasure most?',
@@ -146,7 +146,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'What photo do you want on your flagship Spurs rookie card?',
           'What does your "rookie card moment" look like?',
@@ -192,7 +192,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'If you could curate one Lisa Leslie insert set, what themes would it have?',
           'How would you tell the story of early WNBA through trading cards?',
@@ -239,7 +239,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'What does "toughness" look like on a card? (photo selection, captions, parallels)',
           "What moment from your Commissioner's Cup run deserves to be on a card?",
@@ -286,7 +286,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'What does your "rookie debut" card look like?',
           'What parallels would you chase as a collector?',
@@ -333,7 +333,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'What shot would you put on your signature card?',
           'Shooter-focused insert concepts: heat-check moments, "from the logo" theme?',
@@ -379,7 +379,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'What\'s your "best shooter card photo" — which moment captures it?',
           'Favorite Heat-era teammate cards?',
@@ -426,7 +426,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'What does your "Thunder first card" have to include?',
           'Duke-to-NBA collector journey — what did you collect growing up?',
@@ -473,7 +473,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'What should your first pre-pro card capture? (HS fit, signature move, personal logo)',
           'What number did you choose and why?',
@@ -525,7 +525,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'What does a "New Orleans identity card" look like — colors, vibes?',
           'What would you want in a rookie insert?',
@@ -572,7 +572,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'What do you want on your first "early-career card"?',
           'What\'s your autograph style — have you been working on it?',
@@ -619,7 +619,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'What does a "scorer\'s card" look like? Heat-check parallels?',
           'What game do you want captured as a card insert set?',
@@ -666,7 +666,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'What should your rookie card photo show — power or finesse?',
           '"Big-man inserts": blocks, poster finishes — which moment?',
@@ -714,7 +714,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'What Chicago city imagery do you want in a Bulls insert card?',
           'Which play defines you: pull-up 3, coast-to-coast, or weakside block?',
@@ -764,7 +764,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'What stat are you most proud of?',
           'What insert theme fits a "connector wing"?',
@@ -810,7 +810,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'Your "perfect from 3" game — does that deserve its own insert?',
           'What do you want collectors to remember from your first season?',
@@ -856,7 +856,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'How do you tell the Belgium-to-NBA journey on a card back?',
           'What flag or country cues would you want in card parallels?',
@@ -903,7 +903,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'What\'s your favorite "tournament run" memory to capture as a card moment?',
           'Which teammate would you want on a dual auto?',
@@ -949,7 +949,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'What would a "culture-builder" card set look like?',
           'How would you blend music and entrepreneurship into collectible storytelling?',
@@ -996,7 +996,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'How do you tell the Switzerland-to-NBA story on card backs?',
           'What do international collectors ask you for?',
@@ -1076,7 +1076,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1111,7 +1111,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1147,7 +1147,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1182,7 +1182,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1217,7 +1217,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1252,7 +1252,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1288,7 +1288,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1323,7 +1323,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1358,7 +1358,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1393,7 +1393,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   // --- PREVIOUS DAY 1 ROOKIES ---
@@ -1430,7 +1430,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1465,7 +1465,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1500,7 +1500,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1535,7 +1535,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1571,7 +1571,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1606,7 +1606,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   // --- PREVIOUS DAY 2 PLAYERS ---
@@ -1642,7 +1642,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1678,7 +1678,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1713,7 +1713,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1749,7 +1749,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1785,7 +1785,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1821,7 +1821,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1857,7 +1857,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1892,7 +1892,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1928,7 +1928,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1963,7 +1963,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1998,7 +1998,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -2034,7 +2034,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -2069,7 +2069,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -2104,7 +2104,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -2140,7 +2140,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -2175,7 +2175,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
 ];

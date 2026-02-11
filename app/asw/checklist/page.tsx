@@ -105,7 +105,7 @@ export default function ChecklistPage() {
               Station Checklist
             </h1>
             <p className={`text-zinc-400 mt-1 ${largeText ? 'text-base' : 'text-sm'}`}>
-              Track player progress through Tunnel & Product stations
+              Track player progress through Tunnel, Q&A & Signing stations
             </p>
           </div>
           <button

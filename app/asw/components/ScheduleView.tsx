@@ -3,9 +3,9 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { players, day1Players, day2Players, playerCounts } from '../data/players';
 import type { Player } from '../types';
-import { Clock, Zap, ChevronDown, ChevronUp, AlertTriangle, Languages } from 'lucide-react';
+import { Clock, Zap, ChevronDown, ChevronUp, AlertTriangle, Languages, Crown, PenLine } from 'lucide-react';
 import { isCurrentPlayer, isUpcomingPlayer, formatTime, findCurrentPlayer } from '../lib/schedule-utils';
-import { UPDATE_INTERVALS, DAY_STYLES, STATUS_COLORS } from '../lib/constants';
+import { UPDATE_INTERVALS, DAY_STYLES, STATUS_COLORS, ASW_TIER_STYLES } from '../lib/constants';
 import { useMounted } from '../hooks/useMounted';
 import { Skeleton } from './Skeleton';
 
@@ -112,6 +112,17 @@ function DaySchedule({
                         <span className={`font-medium ${isCurrent ? 'text-amber-400' : 'text-white'}`}>
                           {player.firstName} {player.lastName}
                         </span>
+                        {player.tier && ASW_TIER_STYLES[player.tier] && (
+                          <span className={`px-1 py-0.5 rounded text-[9px] font-bold ${ASW_TIER_STYLES[player.tier].bg} ${ASW_TIER_STYLES[player.tier].text}`}>
+                            {ASW_TIER_STYLES[player.tier].label}
+                          </span>
+                        )}
+                        {player.exclusive && (
+                          <Crown className="w-3 h-3 text-[#FFD100] flex-shrink-0" />
+                        )}
+                        {player.signingOnly && (
+                          <PenLine className="w-3 h-3 text-violet-400 flex-shrink-0" />
+                        )}
                       </button>
                       {player.pronunciation && (
                         <p className="text-xs text-gray-500 italic ml-7">{player.pronunciation}</p>
@@ -224,7 +235,7 @@ export default function ScheduleView({ onPlayerClick }: ScheduleViewProps) {
               <Clock className="w-4 h-4" />
               <span className="font-mono font-bold">{formattedTime}</span>
             </div>
-            <p className="text-xs text-gray-500">PT (San Francisco)</p>
+            <p className="text-xs text-gray-500">PT (Los Angeles)</p>
           </div>
         </div>
       </div>

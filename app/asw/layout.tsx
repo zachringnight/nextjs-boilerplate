@@ -7,6 +7,7 @@ import AppErrorBoundary from './components/AppErrorBoundary';
 import './asw.css';
 
 const SupabaseProvider = dynamic(() => import('./components/SupabaseProvider'));
+const ClipProvider = dynamic(() => import('./components/ClipProvider'));
 
 export const metadata: Metadata = {
   title: {
@@ -43,6 +44,7 @@ export default function ASWLayout({
   return (
     <div className="min-h-screen bg-[#0D0D0D] text-white">
       <SupabaseProvider />
+      <ClipProvider />
       <Header />
       <ConnectionBanner />
       <AppErrorBoundary>
