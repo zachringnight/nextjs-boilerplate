@@ -81,31 +81,61 @@ export async function flushSyncQueue(): Promise<number> {
 // Raw Supabase operations
 // =============================================
 
+// Convert camelCase ClipMarker to snake_case for Supabase
+function toDbClip(clipData: Partial<ClipMarker>): Record<string, unknown> {
+  return {
+    id: clipData.id,
+    name: clipData.name || null,
+    timestamp: clipData.timestamp || new Date().toISOString(),
+    category: clipData.category || 'general',
+    media_type: clipData.mediaType || 'video',
+    status: clipData.status || 'marked',
+    priority: clipData.priority || 'normal',
+    flagged: clipData.flagged || false,
+    tags: clipData.tags || [],
+    notes: clipData.notes || null,
+    player_id: clipData.playerId || null,
+    station_id: clipData.stationId || null,
+    timecode: clipData.timecode || null,
+    timecode_in: clipData.timecodeIn || null,
+    timecode_out: clipData.timecodeOut || null,
+    camera: clipData.camera || null,
+    crew_member: clipData.crewMember || null,
+    rating: clipData.rating || null,
+  };
+}
+
+// Convert updates object (camelCase) to snake_case for Supabase
+function toDbUpdates(updates: Partial<ClipMarker>): Record<string, unknown> {
+  const dbUpdates: Record<string, unknown> = { updated_at: new Date().toISOString() };
+  
+  if (updates.name !== undefined) dbUpdates.name = updates.name;
+  if (updates.timestamp !== undefined) dbUpdates.timestamp = updates.timestamp;
+  if (updates.category !== undefined) dbUpdates.category = updates.category;
+  if (updates.mediaType !== undefined) dbUpdates.media_type = updates.mediaType;
+  if (updates.status !== undefined) dbUpdates.status = updates.status;
+  if (updates.priority !== undefined) dbUpdates.priority = updates.priority;
+  if (updates.flagged !== undefined) dbUpdates.flagged = updates.flagged;
+  if (updates.tags !== undefined) dbUpdates.tags = updates.tags;
+  if (updates.notes !== undefined) dbUpdates.notes = updates.notes;
+  if (updates.playerId !== undefined) dbUpdates.player_id = updates.playerId;
+  if (updates.stationId !== undefined) dbUpdates.station_id = updates.stationId;
+  if (updates.timecode !== undefined) dbUpdates.timecode = updates.timecode;
+  if (updates.timecodeIn !== undefined) dbUpdates.timecode_in = updates.timecodeIn;
+  if (updates.timecodeOut !== undefined) dbUpdates.timecode_out = updates.timecodeOut;
+  if (updates.camera !== undefined) dbUpdates.camera = updates.camera;
+  if (updates.crewMember !== undefined) dbUpdates.crew_member = updates.crewMember;
+  if (updates.rating !== undefined) dbUpdates.rating = updates.rating;
+  
+  return dbUpdates;
+}
+
 async function doInsert(clipData: Partial<ClipMarker>): Promise<boolean> {
   const supabase = getSupabase();
   if (!supabase) return false;
 
   try {
-    const { error } = await supabase.from('clip_markers').insert({
-      id: clipData.id,
-      name: clipData.name || null,
-      timestamp: clipData.timestamp || new Date().toISOString(),
-      category: clipData.category || 'general',
-      media_type: clipData.media_type || 'video',
-      status: clipData.status || 'marked',
-      priority: clipData.priority || 'normal',
-      flagged: clipData.flagged || false,
-      tags: clipData.tags || [],
-      notes: clipData.notes || null,
-      player_id: clipData.player_id || null,
-      station_id: clipData.station_id || null,
-      timecode: clipData.timecode || null,
-      timecode_in: clipData.timecode_in || null,
-      timecode_out: clipData.timecode_out || null,
-      camera: clipData.camera || null,
-      crew_member: clipData.crew_member || null,
-      rating: clipData.rating || null,
-    });
+    const { error } = await supabase.from('clip_markers').insert(toDbClip(clipData));
     if (error) throw error;
     return true;
   } catch (err) {
@@ -121,7 +151,7 @@ async function doUpdate(id: string, updates: Partial<ClipMarker>): Promise<boole
   try {
     const { error } = await supabase
       .from('clip_markers')
-      .update({ ...updates, updated_at: new Date().toISOString() })
+      .update(toDbUpdates(updates))
       .eq('id', id);
     if (error) throw error;
     return true;
@@ -155,7 +185,7 @@ async function doBulkUpdate(ids: string[], updates: Partial<ClipMarker>): Promis
   try {
     const { error } = await supabase
       .from('clip_markers')
-      .update({ ...updates, updated_at: new Date().toISOString() })
+      .update(toDbUpdates(updates))
       .in('id', ids);
     if (error) throw error;
     return true;

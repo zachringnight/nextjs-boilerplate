@@ -6,8 +6,6 @@ import { players } from '../data/players';
 import { isCurrentPlayer, getEventDay, getTimeRemaining } from '../lib/schedule-utils';
 import { isPushSupported, requestNotificationPermission, hapticFeedback } from '../lib/utils';
 
-const FIVE_MINUTES = 5 * 60 * 1000;
-const ONE_MINUTE = 60 * 1000;
 const CHECK_INTERVAL = 30 * 1000;
 
 interface NotificationState {

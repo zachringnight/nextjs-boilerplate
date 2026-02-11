@@ -11,6 +11,7 @@ import {
   type DeliverableRecord,
   type CompletionRecord,
 } from '../lib/db-sync';
+import { flushSyncQueue } from '../lib/clip-sync';
 import type {
   Note,
   NoteCategory,
@@ -105,9 +106,11 @@ export default function SupabaseProvider() {
 
   // Initial load and online/offline handling
   useEffect(() => {
-    const handleOnline = () => {
+    const handleOnline = async () => {
       onlineRef.current = true;
       supabaseAvailableRef.current = null;
+      // Flush any pending clip sync operations when coming back online
+      await flushSyncQueue();
       loadAllData();
     };
     const handleOffline = () => {
@@ -122,6 +125,8 @@ export default function SupabaseProvider() {
     if (isInitialLoad.current) {
       isInitialLoad.current = false;
       loadAllData();
+      // Also flush any pending operations on initial load
+      flushSyncQueue();
     }
 
     return () => {

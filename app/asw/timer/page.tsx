@@ -13,8 +13,6 @@ import {
   Clock,
   Plus,
   Minus,
-  Volume2,
-  VolumeX,
   ArrowLeft,
 } from 'lucide-react';
 import { cn, hapticFeedback } from '../lib/utils';
@@ -43,7 +41,6 @@ export default function TimerPage() {
   const [time, setTime] = useState(15 * 60);
   const [initialTime, setInitialTime] = useState(15 * 60);
   const [isRunning, setIsRunning] = useState(false);
-  const [soundEnabled, setSoundEnabled] = useState(true);
   const [alertEnabled, setAlertEnabled] = useState(true);
   const [hasAlerted, setHasAlerted] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -316,26 +313,15 @@ export default function TimerPage() {
             )}
           </button>
 
-          <div className="flex flex-col gap-2">
-            <button
-              onClick={() => setSoundEnabled(!soundEnabled)}
-              className={cn(
-                'w-12 h-12 rounded-full flex items-center justify-center transition-colors active:scale-95',
-                soundEnabled ? 'bg-[#FFD100]/20 text-[#FFD100]' : 'bg-[#2A2A2A] text-[#6B7280]'
-              )}
-            >
-              {soundEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
-            </button>
-            <button
-              onClick={() => setAlertEnabled(!alertEnabled)}
-              className={cn(
-                'w-12 h-12 rounded-full flex items-center justify-center transition-colors active:scale-95',
-                alertEnabled ? 'bg-[#FFD100]/20 text-[#FFD100]' : 'bg-[#2A2A2A] text-[#6B7280]'
-              )}
-            >
-              {alertEnabled ? <Bell className="w-5 h-5" /> : <BellOff className="w-5 h-5" />}
-            </button>
-          </div>
+          <button
+            onClick={() => setAlertEnabled(!alertEnabled)}
+            className={cn(
+              'w-16 h-16 rounded-full flex items-center justify-center transition-colors active:scale-95',
+              alertEnabled ? 'bg-[#FFD100]/20 text-[#FFD100]' : 'bg-[#2A2A2A] text-[#6B7280]'
+            )}
+          >
+            {alertEnabled ? <Bell className="w-5 h-5" /> : <BellOff className="w-5 h-5" />}
+          </button>
         </div>
 
         {/* Preset Timers */}

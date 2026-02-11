@@ -140,26 +140,26 @@ export interface ClipMarker {
   name?: string | null;
   timestamp: string;
   timecode?: string | null;
-  timecode_in?: string | null;
-  timecode_out?: string | null;
-  player_id?: string | null;
-  station_id?: string | null;
+  timecodeIn?: string | null;
+  timecodeOut?: string | null;
+  playerId?: string | null;
+  stationId?: string | null;
   category: ClipCategory;
   tags: string[];
   notes?: string | null;
   rating?: number | null;
-  media_type: MediaType;
+  mediaType: MediaType;
   camera?: string | null;
-  crew_member?: string | null;
+  crewMember?: string | null;
   status: ClipStatus;
   priority: ClipPriority;
   flagged: boolean;
-  created_at: string;
-  updated_at: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface ClipDefaults {
-  crew_member: string;
+  crewMember: string;
   camera: string;
-  media_type: MediaType;
+  mediaType: MediaType;
 }

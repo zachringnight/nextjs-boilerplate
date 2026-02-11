@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import { cn, hapticFeedback } from '../lib/utils';
 import { CATEGORY_CONFIG, PRIORITY_CONFIG } from '../lib/clip-constants';
-import { syncClipInsert, syncClipDelete } from '../lib/clip-sync';
+import { ACTIVE_PLAYER_UPDATE_INTERVAL } from '../lib/constants';
 
 // Map station IDs to likely clip categories
 const STATION_CATEGORY_MAP: Partial<Record<ASWStationId, ClipCategory>> = {
@@ -55,21 +55,32 @@ export default function QuickClipButton() {
 
   const isClipsPage = pathname === '/asw/clips';
 
-  const [defaultCrew, setDefaultCrew] = useState(clipDefaults.crew_member);
+  const [defaultCrew, setDefaultCrew] = useState(clipDefaults.crewMember);
   const [defaultCamera, setDefaultCamera] = useState(clipDefaults.camera);
 
   useEffect(() => {
-    setDefaultCrew(clipDefaults.crew_member);
+    setDefaultCrew(clipDefaults.crewMember);
     setDefaultCamera(clipDefaults.camera);
   }, [clipDefaults]);
 
+  // Track current time so active player updates as rotations change
+  const [currentTime, setCurrentTime] = useState<Date>(() => new Date());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, ACTIVE_PLAYER_UPDATE_INTERVAL);
+
+    return () => clearInterval(interval);
+  }, []);
+
   // Get currently active player
   const activePlayer = useMemo(() => {
-    const now = new Date();
+    const now = currentTime;
     const eventDay = getEventDay(now);
     if (!eventDay) return null;
     return players.find(p => isCurrentPlayer(p, now, eventDay)) || null;
-  }, []);
+  }, [currentTime]);
 
   // Recent clips (last 3)
   const recentClips = useMemo(() => {
@@ -81,8 +92,8 @@ export default function QuickClipButton() {
         category: clip.category,
         categoryLabel: cat?.label || clip.category,
         categoryColor: cat?.color || '#9CA3AF',
-        stationName: clip.station_id || undefined,
-        playerName: clip.player_id ? players.find(p => p.id === clip.player_id)?.name : undefined,
+        stationName: clip.stationId || undefined,
+        playerName: clip.playerId ? players.find(p => p.id === clip.playerId)?.name : undefined,
         flagged: clip.flagged,
         priority: clip.priority,
         time: time.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
@@ -110,12 +121,11 @@ export default function QuickClipButton() {
 
     const clipData = {
       category,
-      station_id: stationId,
-      player_id: activePlayer?.id || null,
+      stationId: stationId,
+      playerId: activePlayer?.id || null,
       priority: quickPriority,
     };
     addClip(clipData);
-    syncClipInsert(clipData);
 
     showFeedback({
       station: station?.name || stationId,
@@ -130,7 +140,6 @@ export default function QuickClipButton() {
   const quickMark = useCallback(() => {
     const clipData = { category: quickMarkCategory, priority: quickPriority };
     addClip(clipData);
-    syncClipInsert(clipData);
 
     showFeedback({
       category: CATEGORY_CONFIG[quickMarkCategory].label,
@@ -143,7 +152,6 @@ export default function QuickClipButton() {
   const markWithCategory = useCallback((category: ClipCategory) => {
     const clipData = { category, priority: quickPriority };
     addClip(clipData);
-    syncClipInsert(clipData);
     setQuickMarkCategory(category);
 
     showFeedback({
@@ -156,7 +164,7 @@ export default function QuickClipButton() {
   // Save defaults
   const saveDefaults = useCallback(() => {
     setClipDefaults({
-      crew_member: defaultCrew.trim(),
+      crewMember: defaultCrew.trim(),
       camera: defaultCamera.trim(),
     });
     hapticFeedback([30]);
@@ -428,7 +436,6 @@ export default function QuickClipButton() {
                             onClick={(e) => {
                               e.stopPropagation();
                               deleteClip(clip.id);
-                              syncClipDelete(clip.id);
                               setDeleteConfirmId(null);
                             }}
                             className="px-1.5 py-0.5 bg-red-500 text-white rounded text-[10px] hover:bg-red-600"
