@@ -411,7 +411,7 @@ export const useASWStore = create<ASWState>()(
       clips: [],
       clipModalOpen: false,
       quickMarkCategory: 'highlight',
-      clipDefaults: { crew_member: '', camera: '', media_type: 'video' },
+      clipDefaults: { crewMember: '', camera: '', mediaType: 'video' },
       addClip: (clipData) => {
         const now = new Date().toISOString();
         const defaults = get().clipDefaults;
@@ -420,22 +420,22 @@ export const useASWStore = create<ASWState>()(
           name: clipData.name || null,
           timestamp: now,
           timecode: clipData.timecode || null,
-          timecode_in: clipData.timecode_in || null,
-          timecode_out: clipData.timecode_out || null,
-          player_id: clipData.player_id || null,
-          station_id: clipData.station_id || null,
+          timecodeIn: clipData.timecodeIn || null,
+          timecodeOut: clipData.timecodeOut || null,
+          playerId: clipData.playerId || null,
+          stationId: clipData.stationId || null,
           category: clipData.category || 'general',
           tags: clipData.tags || [],
           notes: clipData.notes || null,
           rating: clipData.rating || null,
-          media_type: clipData.media_type || defaults.media_type || 'video',
+          mediaType: clipData.mediaType || defaults.mediaType || 'video',
           camera: clipData.camera || defaults.camera || null,
-          crew_member: clipData.crew_member || defaults.crew_member || null,
+          crewMember: clipData.crewMember || defaults.crewMember || null,
           status: 'marked',
           priority: clipData.priority || 'normal',
           flagged: clipData.flagged || false,
-          created_at: now,
-          updated_at: now,
+          createdAt: now,
+          updatedAt: now,
         };
         set((state) => {
           const updated = [newClip, ...state.clips];
@@ -468,7 +468,7 @@ export const useASWStore = create<ASWState>()(
         set((state) => ({
           clips: state.clips.map((c) =>
             c.id === id
-              ? { ...c, flagged: newFlagged, updated_at: new Date().toISOString() }
+              ? { ...c, flagged: newFlagged, updatedAt: new Date().toISOString() }
               : c
           ),
         }));

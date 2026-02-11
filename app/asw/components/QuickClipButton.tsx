@@ -54,11 +54,11 @@ export default function QuickClipButton() {
 
   const isClipsPage = pathname === '/asw/clips';
 
-  const [defaultCrew, setDefaultCrew] = useState(clipDefaults.crew_member);
+  const [defaultCrew, setDefaultCrew] = useState(clipDefaults.crewMember);
   const [defaultCamera, setDefaultCamera] = useState(clipDefaults.camera);
 
   useEffect(() => {
-    setDefaultCrew(clipDefaults.crew_member);
+    setDefaultCrew(clipDefaults.crewMember);
     setDefaultCamera(clipDefaults.camera);
   }, [clipDefaults]);
 
@@ -91,8 +91,8 @@ export default function QuickClipButton() {
         category: clip.category,
         categoryLabel: cat?.label || clip.category,
         categoryColor: cat?.color || '#9CA3AF',
-        stationName: clip.station_id || undefined,
-        playerName: clip.player_id ? players.find(p => p.id === clip.player_id)?.name : undefined,
+        stationName: clip.stationId || undefined,
+        playerName: clip.playerId ? players.find(p => p.id === clip.playerId)?.name : undefined,
         flagged: clip.flagged,
         priority: clip.priority,
         time: time.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
@@ -120,8 +120,8 @@ export default function QuickClipButton() {
 
     const clipData = {
       category,
-      station_id: stationId,
-      player_id: activePlayer?.id || null,
+      stationId: stationId,
+      playerId: activePlayer?.id || null,
       priority: quickPriority,
     };
     addClip(clipData);
@@ -163,7 +163,7 @@ export default function QuickClipButton() {
   // Save defaults
   const saveDefaults = useCallback(() => {
     setClipDefaults({
-      crew_member: defaultCrew.trim(),
+      crewMember: defaultCrew.trim(),
       camera: defaultCamera.trim(),
     });
     hapticFeedback([30]);

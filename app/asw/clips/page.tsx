@@ -113,7 +113,7 @@ export default function ClipsPage() {
               const catConfig = CATEGORY_CONFIG[clip.category];
               const prioConfig = PRIORITY_CONFIG[clip.priority];
               const CatIcon = catConfig.icon;
-              const player = clip.player_id ? players.find(p => p.id === clip.player_id) : null;
+              const player = clip.playerId ? players.find(p => p.id === clip.playerId) : null;
               const time = new Date(clip.timestamp);
 
               return (
@@ -148,7 +148,7 @@ export default function ClipsPage() {
                       <div className="flex items-center gap-2 text-xs text-[#6B7280]">
                         <span>{time.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</span>
                         {player && <span>&bull; {player.name}</span>}
-                        {clip.station_id && <span>&bull; {clip.station_id}</span>}
+                        {clip.stationId && <span>&bull; {clip.stationId}</span>}
                       </div>
                       {clip.notes && (
                         <p className="text-xs text-[#9CA3AF] mt-1 line-clamp-2">{clip.notes}</p>
