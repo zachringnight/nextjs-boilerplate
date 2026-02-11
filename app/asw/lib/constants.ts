@@ -4,6 +4,9 @@ import type { ViewMode } from '../types';
 export const EVENT_TIMEZONE = 'America/Los_Angeles';
 export const SLOT_DURATION_MINUTES = 15;
 
+// Clip marker configuration
+export const ACTIVE_PLAYER_UPDATE_INTERVAL = 15000; // 15 seconds
+
 // Event dates (month is 0-indexed: February = 1)
 export const EVENT_DATES = {
   day1: { year: 2026, month: 1, day: 13 },

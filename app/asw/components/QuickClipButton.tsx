@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { cn, hapticFeedback } from '../lib/utils';
 import { CATEGORY_CONFIG, PRIORITY_CONFIG } from '../lib/clip-constants';
+import { ACTIVE_PLAYER_UPDATE_INTERVAL } from '../lib/constants';
 
 // Map station IDs to likely clip categories
 const STATION_CATEGORY_MAP: Partial<Record<ASWStationId, ClipCategory>> = {
@@ -68,7 +69,7 @@ export default function QuickClipButton() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date());
-    }, 15000);
+    }, ACTIVE_PLAYER_UPDATE_INTERVAL);
 
     return () => clearInterval(interval);
   }, []);
