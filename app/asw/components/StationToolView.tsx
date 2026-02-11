@@ -10,9 +10,11 @@ import { isCurrentPlayer, isUpcomingPlayer, formatTime } from '../lib/schedule-u
 import { UPDATE_INTERVALS, DAY_STYLES, STATION_CONFIG, STATUS_COLORS } from '../lib/constants';
 import { useMounted } from '../hooks/useMounted';
 import { Skeleton } from './Skeleton';
+import type { ASWStationId } from '../types';
 
 interface StationToolViewProps {
   largeText?: boolean;
+  selectedStation?: ASWStationId | null;
 }
 
 function PlayerSlotCard({
@@ -133,7 +135,7 @@ function PlayerSlotCard({
   );
 }
 
-export default function StationToolView({ largeText = false }: StationToolViewProps) {
+export default function StationToolView({ largeText = false, selectedStation = null }: StationToolViewProps) {
   const [expandedPlayers, setExpandedPlayers] = useState<Set<string>>(new Set());
   const [currentTime, setCurrentTime] = useState(new Date());
   const [activeDay, setActiveDay] = useState<1 | 2 | 'all'>('all');
@@ -215,12 +217,27 @@ export default function StationToolView({ largeText = false }: StationToolViewPr
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-3">
-            <span className={`w-8 h-8 ${STATION_CONFIG.tunnel.bgClass} rounded-lg flex items-center justify-center text-white`}>
-              {STATION_CONFIG.tunnel.emoji}
-            </span>
-            Tunnel Station Tool
+            {selectedStation && STATION_CONFIG[selectedStation] ? (
+              <>
+                <span className={`w-8 h-8 ${STATION_CONFIG[selectedStation].bgClass} rounded-lg flex items-center justify-center text-white`}>
+                  {STATION_CONFIG[selectedStation].emoji}
+                </span>
+                {STATION_CONFIG[selectedStation].name} Station Tool
+              </>
+            ) : (
+              <>
+                <span className={`w-8 h-8 ${STATION_CONFIG.tunnel.bgClass} rounded-lg flex items-center justify-center text-white`}>
+                  {STATION_CONFIG.tunnel.emoji}
+                </span>
+                Station Tool
+              </>
+            )}
           </h2>
-          <p className="text-sm text-gray-500 mt-1">View all players with interview questions and background</p>
+          <p className="text-sm text-gray-500 mt-1">
+            {selectedStation && STATION_CONFIG[selectedStation] 
+              ? STATION_CONFIG[selectedStation].description 
+              : 'View all players with interview questions and background'}
+          </p>
         </div>
         <div className="text-right">
           <div className="flex items-center gap-2 text-amber-400">

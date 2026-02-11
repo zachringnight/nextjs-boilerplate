@@ -22,7 +22,6 @@ import {
 } from 'lucide-react';
 import { cn, hapticFeedback } from '../lib/utils';
 import { CATEGORY_CONFIG, PRIORITY_CONFIG } from '../lib/clip-constants';
-import { syncClipInsert, syncClipDelete } from '../lib/clip-sync';
 
 // Map station IDs to likely clip categories
 const STATION_CATEGORY_MAP: Partial<Record<ASWStationId, ClipCategory>> = {
@@ -63,13 +62,24 @@ export default function QuickClipButton() {
     setDefaultCamera(clipDefaults.camera);
   }, [clipDefaults]);
 
+  // Track current time so active player updates as rotations change
+  const [currentTime, setCurrentTime] = useState<Date>(() => new Date());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 15000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   // Get currently active player
   const activePlayer = useMemo(() => {
-    const now = new Date();
+    const now = currentTime;
     const eventDay = getEventDay(now);
     if (!eventDay) return null;
     return players.find(p => isCurrentPlayer(p, now, eventDay)) || null;
-  }, []);
+  }, [currentTime]);
 
   // Recent clips (last 3)
   const recentClips = useMemo(() => {
@@ -115,7 +125,6 @@ export default function QuickClipButton() {
       priority: quickPriority,
     };
     addClip(clipData);
-    syncClipInsert(clipData);
 
     showFeedback({
       station: station?.name || stationId,
@@ -130,7 +139,6 @@ export default function QuickClipButton() {
   const quickMark = useCallback(() => {
     const clipData = { category: quickMarkCategory, priority: quickPriority };
     addClip(clipData);
-    syncClipInsert(clipData);
 
     showFeedback({
       category: CATEGORY_CONFIG[quickMarkCategory].label,
@@ -143,7 +151,6 @@ export default function QuickClipButton() {
   const markWithCategory = useCallback((category: ClipCategory) => {
     const clipData = { category, priority: quickPriority };
     addClip(clipData);
-    syncClipInsert(clipData);
     setQuickMarkCategory(category);
 
     showFeedback({
@@ -428,7 +435,6 @@ export default function QuickClipButton() {
                             onClick={(e) => {
                               e.stopPropagation();
                               deleteClip(clip.id);
-                              syncClipDelete(clip.id);
                               setDeleteConfirmId(null);
                             }}
                             className="px-1.5 py-0.5 bg-red-500 text-white rounded text-[10px] hover:bg-red-600"

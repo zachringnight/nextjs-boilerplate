@@ -83,6 +83,7 @@ function NextPlayerCard({ player, onPlayerClick }: { player: Player; onPlayerCli
 
 function StationGrid() {
   const setViewMode = useASWStore((s) => s.setViewMode);
+  const setSelectedStation = useASWStore((s) => s.setSelectedStation);
 
   return (
     <div className="grid grid-cols-2 gap-4">
@@ -93,6 +94,7 @@ function StationGrid() {
             key={key}
             onClick={() => {
               hapticFeedback(30);
+              setSelectedStation(key);
               setViewMode('station');
             }}
             className={`bg-[#141414] ${config.borderClass} border rounded-xl p-4 text-left transition-all duration-200 hover:bg-[#1a1a1a] hover:shadow-lg hover:shadow-black/20 active:scale-[0.97] group`}

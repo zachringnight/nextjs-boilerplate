@@ -8,7 +8,6 @@ import {
   Clapperboard,
   Trash2,
   Flag,
-  Filter,
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { CATEGORY_CONFIG, PRIORITY_CONFIG } from '../lib/clip-constants';

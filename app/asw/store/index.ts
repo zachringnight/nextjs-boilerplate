@@ -58,6 +58,8 @@ interface ASWState {
   // UI state
   viewMode: ViewMode;
   setViewMode: (mode: ViewMode) => void;
+  selectedStation: ASWStationId | null;
+  setSelectedStation: (station: ASWStationId | null) => void;
   largeText: boolean;
   toggleLargeText: () => void;
   searchOpen: boolean;
@@ -128,6 +130,8 @@ export const useASWStore = create<ASWState>()(
       // UI state
       viewMode: 'now',
       setViewMode: (mode) => set({ viewMode: mode }),
+      selectedStation: null,
+      setSelectedStation: (station) => set({ selectedStation: station }),
       largeText: false,
       toggleLargeText: () => set((state) => ({ largeText: !state.largeText })),
       searchOpen: false,
