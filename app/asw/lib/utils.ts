@@ -25,3 +25,61 @@ export function generateId(): string {
  * Check if we're in a browser environment
  */
 export const isBrowser = typeof window !== 'undefined';
+
+/**
+ * Check if the device supports vibration
+ */
+export const supportsVibration = isBrowser && 'vibrate' in navigator;
+
+/**
+ * Trigger haptic feedback if supported
+ */
+export function hapticFeedback(pattern: number | number[] = 50): void {
+  if (supportsVibration) {
+    navigator.vibrate(pattern);
+  }
+}
+
+/**
+ * Check if push notifications are supported
+ */
+export function isPushSupported(): boolean {
+  return isBrowser && 'PushManager' in window && 'Notification' in window;
+}
+
+/**
+ * Request notification permission
+ */
+export async function requestNotificationPermission(): Promise<NotificationPermission> {
+  if (!('Notification' in window)) {
+    return 'denied';
+  }
+
+  if (Notification.permission === 'granted') {
+    return 'granted';
+  }
+
+  if (Notification.permission !== 'denied') {
+    return await Notification.requestPermission();
+  }
+
+  return Notification.permission;
+}
+
+/**
+ * Show a browser notification
+ */
+export function showNotification(
+  title: string,
+  options?: NotificationOptions
+): Notification | null {
+  if (!isBrowser || Notification.permission !== 'granted') {
+    return null;
+  }
+
+  return new Notification(title, {
+    icon: '/prizm/icons/icon.svg',
+    badge: '/prizm/icons/icon.svg',
+    ...options,
+  });
+}

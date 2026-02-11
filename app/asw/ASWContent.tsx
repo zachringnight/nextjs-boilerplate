@@ -18,7 +18,7 @@ const StationToolView = dynamic(() => import('./components/StationToolView'));
 const NowDashboard = dynamic(() => import('./components/NowDashboard'));
 
 export default function ASWContent() {
-  const { viewMode, largeText, activeDay, setActiveDay, showEmbargoedOnly, setShowEmbargoedOnly } = useASWStore();
+  const { viewMode, largeText, activeDay, setActiveDay, showEmbargoedOnly, setShowEmbargoedOnly, selectedStation } = useASWStore();
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const mounted = useMounted();
@@ -110,7 +110,7 @@ export default function ASWContent() {
           <ScheduleView onPlayerClick={handlePlayerClick} />
         )}
         {viewMode === 'station' && (
-          <StationToolView largeText={largeText} />
+          <StationToolView largeText={largeText} selectedStation={selectedStation} />
         )}
         {viewMode === 'players' && (
           <>

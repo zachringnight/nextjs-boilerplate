@@ -1,0 +1,22 @@
+{
+  "name": "Panini NBA ASW Production Hub",
+  "short_name": "ASW Hub",
+  "description": "Production coordination for Panini America NBA All-Star Weekend 2026",
+  "start_url": "/asw",
+  "scope": "/asw",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0D0D0D",
+  "theme_color": "#0D0D0D",
+  "icons": [
+    {
+      "src": "/prizm/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "sports"],
+  "lang": "en-US",
+  "dir": "ltr"
+}
