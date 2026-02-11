@@ -29,6 +29,12 @@ export interface Player {
   bio: string[];
   talkingPoints: string[];
   questions: PlayerQuestion[];
+  tier?: number; // Jeff's tier (1, 1.5, 2, 2.5, 3, 3.5, 4)
+  tierReason?: string; // Jeff's reasoning for tier assignment
+  contentNotes?: string; // Deliverable/content plan from Jeff
+  league?: string; // e.g. 'NBA', 'WNBA', 'COLLEGE', 'HS'
+  exclusive?: boolean; // Exclusive Panini appearance
+  signingOnly?: boolean; // Signing only, no full rotation
 }
 
 // =====================
