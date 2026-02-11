@@ -3,6 +3,8 @@
 // Re-export database types
 export * from './database';
 
+export type PlayerTier = 1 | 2 | 3 | 4;
+
 export interface Player {
   id: string;
   name: string;
@@ -13,6 +15,8 @@ export interface Player {
   stats: string[];
   cardHistory: string[];
   moments: string[];
+  tier?: PlayerTier; // Jeff's tier: 1 = top priority, 4 = developmental
+  jeffNotes?: string; // Jeff's production notes
   signingOnly?: boolean; // Player only does signing, no rotation
   questions?: {
     signing?: QuestionPrompt[];

@@ -26,6 +26,8 @@ import {
 } from 'lucide-react';
 import { cn } from './lib/utils';
 
+import type { PlayerTier } from './types';
+
 // Format 24h time to 12h AM/PM
 const to12h = (time: string) => {
   const [h, m] = time.split(':').map(Number);
@@ -33,6 +35,24 @@ const to12h = (time: string) => {
   const hour = h % 12 || 12;
   return `${hour}:${String(m).padStart(2, '0')} ${suffix}`;
 };
+
+// Tier badge styling
+const TIER_STYLES: Record<number, { bg: string; text: string; label: string }> = {
+  1: { bg: 'bg-[#FFD100]/20', text: 'text-[#FFD100]', label: 'T1' },
+  2: { bg: 'bg-blue-500/20', text: 'text-blue-400', label: 'T2' },
+  3: { bg: 'bg-[#9CA3AF]/20', text: 'text-[#9CA3AF]', label: 'T3' },
+  4: { bg: 'bg-[#4B5563]/20', text: 'text-[#6B7280]', label: 'T4' },
+};
+
+function TierBadge({ tier }: { tier?: PlayerTier }) {
+  if (!tier) return null;
+  const style = TIER_STYLES[tier];
+  return (
+    <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${style.bg} ${style.text}`}>
+      {style.label}
+    </span>
+  );
+}
 
 const STATUS_LABELS: Record<string, { text: string; color: string }> = {
   'pre-show': { text: 'Upcoming', color: 'bg-[#F59E0B] text-black' },
@@ -256,14 +276,17 @@ export default function DailyOverviewContent() {
 
                     {/* Player Info */}
                     <div className="flex-1 min-w-0">
-                      <span
-                        className={cn(
-                          'font-semibold text-white group-hover:text-[#FFD100] transition-colors truncate block',
-                          largeText ? 'text-base' : 'text-sm'
-                        )}
-                      >
-                        {player.name}
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <span
+                          className={cn(
+                            'font-semibold text-white group-hover:text-[#FFD100] transition-colors truncate',
+                            largeText ? 'text-base' : 'text-sm'
+                          )}
+                        >
+                          {player.name}
+                        </span>
+                        <TierBadge tier={player.tier} />
+                      </div>
                       <div className={cn('text-[#9CA3AF] flex items-center gap-2 flex-wrap', largeText ? 'text-sm' : 'text-xs')}>
                         <span>{player.team} &mdash; {player.position}</span>
                         {arrival.signingOnly && (

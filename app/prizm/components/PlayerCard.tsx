@@ -6,6 +6,13 @@ import { Player, ScheduleSlot } from '../types';
 import { useAppStore } from '../store';
 import PlayerPhoto from './PlayerPhoto';
 
+const TIER_STYLES: Record<number, { bg: string; text: string; label: string }> = {
+  1: { bg: 'bg-[#FFD100]/20', text: 'text-[#FFD100]', label: 'T1' },
+  2: { bg: 'bg-blue-500/20', text: 'text-blue-400', label: 'T2' },
+  3: { bg: 'bg-[#9CA3AF]/20', text: 'text-[#9CA3AF]', label: 'T3' },
+  4: { bg: 'bg-[#4B5563]/20', text: 'text-[#6B7280]', label: 'T4' },
+};
+
 interface PlayerCardProps {
   player: Player;
   nextSlot?: ScheduleSlot | null;
@@ -14,6 +21,7 @@ interface PlayerCardProps {
 
 export default function PlayerCard({ player, nextSlot, showNextAppearance = true }: PlayerCardProps) {
   const { largeText } = useAppStore();
+  const tierStyle = player.tier ? TIER_STYLES[player.tier] : null;
 
   return (
     <Link href={`/prizm/players/${player.id}`} className="group block">
@@ -23,9 +31,16 @@ export default function PlayerCard({ player, nextSlot, showNextAppearance = true
 
           {/* Player Info */}
           <div className="flex-1 min-w-0">
-            <p className={`font-semibold text-white truncate group-hover:text-[#FFD100] transition-colors ${largeText ? 'text-lg' : 'text-base'}`}>
-              {player.name}
-            </p>
+            <div className="flex items-center gap-1.5">
+              <p className={`font-semibold text-white truncate group-hover:text-[#FFD100] transition-colors ${largeText ? 'text-lg' : 'text-base'}`}>
+                {player.name}
+              </p>
+              {tierStyle && (
+                <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider flex-shrink-0 ${tierStyle.bg} ${tierStyle.text}`}>
+                  {tierStyle.label}
+                </span>
+              )}
+            </div>
             <p className={`text-[#9CA3AF] truncate ${largeText ? 'text-base' : 'text-sm'}`}>
               {player.team}
             </p>

@@ -13,10 +13,26 @@ export const EVENT_DATES = {
 // Event metadata
 export const EVENT_INFO = {
   name: 'NBA All-Star Weekend 2026',
-  subtitle: 'Panini Shoot',
-  location: 'San Francisco',
+  subtitle: 'Prizm Lounge',
+  location: 'Los Angeles',
   dateDisplay: 'Feb 13 & 14, 2026',
   totalDays: 2,
+  venue: {
+    name: 'Terrace at LA LIVE',
+    address: '800 W Olympic Blvd A150',
+    city: 'Los Angeles',
+    state: 'CA',
+    zip: '90015',
+    fullAddress: '800 W Olympic Blvd A150, Los Angeles, CA 90015',
+  },
+  hours: {
+    day1: { open: '12:00 PM', close: '8:00 PM' },
+    day2: { open: '10:00 AM', close: '7:00 PM' },
+  },
+  rsvp: {
+    name: 'Gena Terranova',
+    email: 'gterranova@paniniamerica.net',
+  },
 } as const;
 
 // Day styling configurations

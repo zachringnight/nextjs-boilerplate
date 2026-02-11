@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { players, day1Players, day2Players, playerCounts } from '../data/players';
 import type { Player } from '../types';
 import PlayerAvatar from './PlayerAvatar';
-import { ChevronRight, Volume2, Zap } from 'lucide-react';
+import { ChevronRight, Volume2, Zap, MapPin, Clock, Mail } from 'lucide-react';
 import {
   getEventDay,
   isCurrentPlayer,
@@ -181,7 +181,7 @@ export default function NowDashboard({ onPlayerClick }: NowDashboardProps) {
       <div className="flex items-center justify-between">
         <div>
           <p className="font-medium text-white">{formattedDate}</p>
-          <p className="text-xs text-gray-500">PT (San Francisco)</p>
+          <p className="text-xs text-gray-500">PT (Los Angeles)</p>
         </div>
         <div className="text-right">
           <p className="font-mono text-2xl text-amber-400">{formattedTime}</p>
@@ -216,6 +216,32 @@ export default function NowDashboard({ onPlayerClick }: NowDashboardProps) {
             </div>
           </div>
         </div>
+        {/* Venue Details */}
+        <div className="bg-[#141414] border border-[#2a2a2a] rounded-xl p-4 space-y-3">
+          <h3 className="text-sm font-bold text-[#FFD100] uppercase tracking-wider">Venue</h3>
+          <div className="flex items-start gap-3">
+            <MapPin className="w-4 h-4 text-[#FFD100] mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="font-medium text-white">{EVENT_INFO.venue.name}</p>
+              <p className="text-sm text-gray-400">{EVENT_INFO.venue.fullAddress}</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <Clock className="w-4 h-4 text-[#FFD100] mt-0.5 flex-shrink-0" />
+            <div className="text-sm text-gray-400">
+              <p>Fri, Feb 13: {EVENT_INFO.hours.day1.open} &ndash; {EVENT_INFO.hours.day1.close}</p>
+              <p>Sat, Feb 14: {EVENT_INFO.hours.day2.open} &ndash; {EVENT_INFO.hours.day2.close}</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <Mail className="w-4 h-4 text-[#FFD100] mt-0.5 flex-shrink-0" />
+            <div className="text-sm text-gray-400">
+              <p>RSVP: {EVENT_INFO.rsvp.name}</p>
+              <p className="text-[#FFD100]">{EVENT_INFO.rsvp.email}</p>
+            </div>
+          </div>
+        </div>
+
         <div className="grid grid-cols-2 gap-4">
           {([1, 2] as const).map((day) => (
             <div key={day} className={`bg-[#141414] ${DAY_STYLES[day].border} border rounded-xl p-4`}>

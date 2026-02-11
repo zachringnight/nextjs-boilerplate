@@ -42,7 +42,7 @@ export default function Header() {
       <div className="flex items-center justify-between px-4 py-3">
         <div className="flex flex-col">
           <h1 className={`font-bold text-white tracking-tight ${largeText ? 'text-2xl' : 'text-xl'}`}>
-            <span className="text-[#FFD100]">PANINI</span> NBA ASW
+            <span className="text-[#FFD100]">PANINI</span> Prizm Lounge
           </h1>
           <div className={`flex items-center gap-2 text-[#9CA3AF] ${largeText ? 'text-base' : 'text-sm'}`}>
             {mounted && (
