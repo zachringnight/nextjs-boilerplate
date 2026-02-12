@@ -5,6 +5,7 @@ import { players, day1Players, day2Players, playerCounts } from '../data/players
 import type { Player } from '../types';
 import PlayerAvatar from './PlayerAvatar';
 import { ChevronRight, Volume2, Zap, MapPin, Clock, Mail, Crown, PenLine } from 'lucide-react';
+import { useASWStore } from '../store';
 import {
   getEventDay,
   isCurrentPlayer,
@@ -109,12 +110,22 @@ function NextPlayerCard({ player, onPlayerClick }: { player: Player; onPlayerCli
 }
 
 function StationGrid() {
+  const setViewMode = useASWStore((s) => s.setViewMode);
+  const setSelectedStation = useASWStore((s) => s.setSelectedStation);
+
   return (
     <div className="grid grid-cols-3 gap-3">
       {(['tunnel', 'qa', 'signing'] as const).map((key) => {
         const config = STATION_CONFIG[key];
         return (
-          <div key={key} className={`bg-[#141414] ${config.borderClass} border rounded-xl p-3`}>
+          <button
+            key={key}
+            onClick={() => {
+              setSelectedStation(key);
+              setViewMode('station');
+            }}
+            className={`bg-[#141414] ${config.borderClass} border rounded-xl p-3 text-left transition-all hover:bg-[#1a1a1a] active:scale-[0.97]`}
+          >
             <div className="flex flex-col items-center gap-2 text-center">
               <div className={`w-10 h-10 ${config.bgClass} rounded-lg flex items-center justify-center text-xl`}>
                 {config.emoji}
@@ -124,7 +135,7 @@ function StationGrid() {
                 <p className="text-[10px] text-gray-500">{config.description}</p>
               </div>
             </div>
-          </div>
+          </button>
         );
       })}
     </div>

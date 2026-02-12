@@ -5,7 +5,7 @@ import { players, day1Players, day2Players } from '../data/players';
 import type { Player } from '../types';
 import PlayerAvatar from './PlayerAvatar';
 import InterviewQuestions from './InterviewQuestions';
-import { ChevronDown, ChevronUp, Volume2, Clock, Zap, AlertTriangle, Languages, Crown, PenLine } from 'lucide-react';
+import { ChevronDown, ChevronUp, Volume2, Clock, Zap, AlertTriangle, Languages, Crown, PenLine, MessageCircle } from 'lucide-react';
 import { isCurrentPlayer, isUpcomingPlayer, formatTime } from '../lib/schedule-utils';
 import { UPDATE_INTERVALS, DAY_STYLES, STATION_CONFIG, STATUS_COLORS, ASW_TIER_STYLES } from '../lib/constants';
 import { useMounted } from '../hooks/useMounted';
@@ -17,18 +17,60 @@ interface StationToolViewProps {
   selectedStation?: ASWStationId | null;
 }
 
+function StationQuestions({ player, station, largeText }: { player: Player; station: ASWStationId; largeText: boolean }) {
+  const config = STATION_CONFIG[station];
+  const stationQs = player.questions?.find(q => q.station === station);
+
+  if (!stationQs || stationQs.questions.length === 0) {
+    return (
+      <div className="text-center py-4">
+        <MessageCircle className="w-8 h-8 text-[#2A2A2A] mx-auto mb-2" />
+        <p className="text-sm text-gray-500">No {config.name} questions for this player</p>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <h4 className={`text-sm font-bold ${config.textClass} flex items-center gap-2 mb-3`}>
+        <span className={`w-6 h-6 ${config.bgClass} rounded flex items-center justify-center text-white text-xs`}>
+          {config.emoji}
+        </span>
+        {config.shortName} QUESTIONS
+      </h4>
+      <ul className={largeText ? 'space-y-4' : 'space-y-3'}>
+        {stationQs.questions.map((question, index) => (
+          <li key={index} className="flex items-start gap-3">
+            <span
+              className={`${largeText ? 'w-7 h-7 text-sm' : 'w-6 h-6 text-xs'} rounded-lg flex items-center justify-center font-bold text-white flex-shrink-0`}
+              style={{ backgroundColor: config.color }}
+            >
+              {index + 1}
+            </span>
+            <span className={`text-gray-100 leading-relaxed ${largeText ? 'text-lg' : 'text-base'}`}>
+              {question}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function PlayerSlotCard({
   player,
   isExpanded,
   onToggle,
   currentTime,
   largeText,
+  selectedStation,
 }: {
   player: Player;
   isExpanded: boolean;
   onToggle: () => void;
   currentTime: Date;
   largeText: boolean;
+  selectedStation: ASWStationId | null;
 }) {
   const isCurrent = isCurrentPlayer(player, currentTime);
   const isUpcoming = !isCurrent && isUpcomingPlayer(player, currentTime);
@@ -142,7 +184,11 @@ function PlayerSlotCard({
           </div>
 
           <div className="p-4">
-            <InterviewQuestions largeText={largeText} />
+            {selectedStation ? (
+              <StationQuestions player={player} station={selectedStation} largeText={largeText} />
+            ) : (
+              <InterviewQuestions largeText={largeText} />
+            )}
           </div>
         </div>
       )}
@@ -151,6 +197,7 @@ function PlayerSlotCard({
 }
 
 export default function StationToolView({ largeText = false, selectedStation = null }: StationToolViewProps) {
+  const stationConfig = selectedStation ? STATION_CONFIG[selectedStation] : STATION_CONFIG.tunnel;
   const [expandedPlayers, setExpandedPlayers] = useState<Set<string>>(new Set());
   const [currentTime, setCurrentTime] = useState(new Date());
   const [activeDay, setActiveDay] = useState<1 | 2 | 'all'>('all');
@@ -285,13 +332,13 @@ export default function StationToolView({ largeText = false, selectedStation = n
         ))}
       </div>
 
-      <div className={`bg-[#141414] ${STATION_CONFIG.tunnel.borderClass} border rounded-xl p-4 flex items-center justify-between`}>
+      <div className={`bg-[#141414] ${stationConfig.borderClass} border rounded-xl p-4 flex items-center justify-between`}>
         <div>
-          <h3 className={`font-bold ${STATION_CONFIG.tunnel.textClass} flex items-center gap-2`}>
-            <span>{STATION_CONFIG.tunnel.emoji}</span>
-            TUNNEL STATION
+          <h3 className={`font-bold ${stationConfig.textClass} flex items-center gap-2`}>
+            <span>{stationConfig.emoji}</span>
+            {stationConfig.shortName} STATION
           </h3>
-          <p className="text-sm text-gray-500">{filteredPlayers.length} players - 15 min each - {STATION_CONFIG.tunnel.description}</p>
+          <p className="text-sm text-gray-500">{filteredPlayers.length} players - 15 min each - {stationConfig.description}</p>
         </div>
         <div className="flex gap-2">
           {currentPlayerIndex >= 0 && (
@@ -321,13 +368,14 @@ export default function StationToolView({ largeText = false, selectedStation = n
               onToggle={() => togglePlayer(player.id)}
               currentTime={currentTime}
               largeText={largeText}
+              selectedStation={selectedStation}
             />
           </div>
         ))}
       </div>
 
       <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-4 text-sm text-gray-500">
-        <strong className="text-gray-400">Tip:</strong> Tap any player card to expand their full profile, background, and interview questions. Signing station is autographs only (no interview needed).
+        <strong className="text-gray-400">Tip:</strong> Tap any player card to expand their profile, background, and {selectedStation ? `${stationConfig.name} questions` : 'interview questions'}.
       </div>
     </div>
   );
