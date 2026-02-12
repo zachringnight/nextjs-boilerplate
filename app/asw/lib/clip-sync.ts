@@ -58,7 +58,7 @@ export async function flushASWClipSyncQueue(): Promise<void> {
 
       switch (op.type) {
         case 'insert': {
-          const res = await supabase.from('asw_clip_markers').insert(op.clip);
+          const res = await supabase.from('asw_clip_markers').upsert(op.clip);
           error = res.error;
           break;
         }
@@ -104,7 +104,7 @@ export async function syncASWClipInsert(clip: Partial<ASWClipMarker>): Promise<b
   }
 
   try {
-    const { error } = await supabase.from('asw_clip_markers').insert(clip);
+    const { error } = await supabase.from('asw_clip_markers').upsert(clip);
     if (error) throw error;
     return true;
   } catch (err) {

@@ -5,13 +5,7 @@ import { ChevronRight } from 'lucide-react';
 import { Player, ScheduleSlot } from '../types';
 import { useAppStore } from '../store';
 import PlayerPhoto from './PlayerPhoto';
-
-const TIER_STYLES: Record<number, { bg: string; text: string; label: string }> = {
-  1: { bg: 'bg-[#FFD100]/20', text: 'text-[#FFD100]', label: 'T1' },
-  2: { bg: 'bg-blue-500/20', text: 'text-blue-400', label: 'T2' },
-  3: { bg: 'bg-[#9CA3AF]/20', text: 'text-[#9CA3AF]', label: 'T3' },
-  4: { bg: 'bg-[#4B5563]/20', text: 'text-[#6B7280]', label: 'T4' },
-};
+import { TIER_STYLES } from '../lib/constants';
 
 interface PlayerCardProps {
   player: Player;
