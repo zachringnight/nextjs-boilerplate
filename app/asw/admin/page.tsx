@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { players } from '../data/players';
 import { ArrowLeft, Save, X, Pencil, Settings, RotateCcw } from 'lucide-react';
@@ -38,7 +38,7 @@ function saveOverrides(overrides: Record<string, PlayerOverride>) {
 const TIER_OPTIONS = [1, 1.5, 2, 2.5, 3, 3.5, 4];
 
 export default function AdminPage() {
-  const [overrides, setOverrides] = useState<Record<string, PlayerOverride>>({});
+  const [overrides, setOverrides] = useState<Record<string, PlayerOverride>>(loadOverrides);
   const [activeDay, setActiveDay] = useState<1 | 2>(1);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
@@ -50,11 +50,6 @@ export default function AdminPage() {
   const [formSigningOnly, setFormSigningOnly] = useState(false);
   const [formExclusive, setFormExclusive] = useState(false);
   const [formNote, setFormNote] = useState('');
-
-  // Load overrides from localStorage
-  useEffect(() => {
-    setOverrides(loadOverrides());
-  }, []);
 
   const dayPlayers = useMemo(() => {
     return players.filter((p) => {
