@@ -77,7 +77,7 @@ export const STATION_CONFIG = {
     borderClass: 'border-green-500/30',
     bgClass: 'bg-green-500',
     textClass: 'text-green-400',
-    description: 'Walk-in + Interview',
+    description: 'Hype Clips',
     hasInterview: true,
   },
   qa: {
@@ -91,7 +91,7 @@ export const STATION_CONFIG = {
     borderClass: 'border-amber-500/30',
     bgClass: 'bg-amber-500',
     textClass: 'text-amber-400',
-    description: 'Interview + Card Photography',
+    description: 'Social Q&A',
     hasInterview: true,
   },
   signing: {
@@ -105,7 +105,7 @@ export const STATION_CONFIG = {
     borderClass: 'border-violet-500/30',
     bgClass: 'bg-violet-500',
     textClass: 'text-violet-400',
-    description: 'Autograph Session',
+    description: 'Autographs + Product Clips',
     hasInterview: false,
   },
 } as const;
