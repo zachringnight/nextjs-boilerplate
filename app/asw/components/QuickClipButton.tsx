@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
 import { useMounted } from '../hooks/useMounted';
 import { useASWStore } from '../store';
@@ -47,9 +47,7 @@ export default function QuickClipButton() {
 
   const recentClips = useMemo(() => clips.slice(0, 5), [clips]);
 
-  if (!mounted || isClipsPage) return null;
-
-  const handleQuickMark = async (category: ASWClipCategory) => {
+  const handleQuickMark = useCallback(async (category: ASWClipCategory) => {
     const now = new Date();
     const clip = {
       id: `clip-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
@@ -74,7 +72,9 @@ export default function QuickClipButton() {
     setShowSuccess(true);
     setTimeout(() => setShowSuccess(false), 1500);
     setQuickMarkCategory(category);
-  };
+  }, [clipDefaults, quickPriority, addClip, setSuccessInfo, setShowSuccess, setQuickMarkCategory]);
+
+  if (!mounted || isClipsPage) return null;
 
   const handleDeleteClip = async (clipId: string) => {
     deleteClip(clipId);
