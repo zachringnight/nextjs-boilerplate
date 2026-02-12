@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useASWStore } from '../store';
 import { getPlayerById } from '../data/players';
-import type { ASWClipCategory, ASWClipPriority, ASWClipStatus } from '../types/clips';
+import type { ASWClipCategory, ASWClipStatus } from '../types/clips';
 import { ASW_CATEGORY_CONFIG, ASW_STATUS_CONFIG, ASW_PRIORITY_CONFIG } from '../lib/clip-constants';
 import { syncASWClipUpdate, syncASWClipDelete } from '../lib/clip-sync';
 import {
@@ -14,7 +14,6 @@ import {
   Pencil,
   Trash2,
   Check,
-  Filter,
   Star,
 } from 'lucide-react';
 
@@ -35,7 +34,6 @@ export default function ClipsPage() {
 
   const [filterCategory, setFilterCategory] = useState<ASWClipCategory | 'all'>('all');
   const [filterStatus, setFilterStatus] = useState<ASWClipStatus | 'all'>('all');
-  const [filterPriority, setFilterPriority] = useState<ASWClipPriority | 'all'>('all');
   const [showFlaggedOnly, setShowFlaggedOnly] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
@@ -43,11 +41,10 @@ export default function ClipsPage() {
     return clips.filter((clip) => {
       if (filterCategory !== 'all' && clip.category !== filterCategory) return false;
       if (filterStatus !== 'all' && clip.status !== filterStatus) return false;
-      if (filterPriority !== 'all' && clip.priority !== filterPriority) return false;
       if (showFlaggedOnly && !clip.flagged) return false;
       return true;
     });
-  }, [clips, filterCategory, filterStatus, filterPriority, showFlaggedOnly]);
+  }, [clips, filterCategory, filterStatus, showFlaggedOnly]);
 
   const handleDeleteClip = (id: string) => {
     deleteClip(id);
@@ -163,7 +160,6 @@ export default function ClipsPage() {
         ) : (
           filteredClips.map((clip) => {
             const catConfig = ASW_CATEGORY_CONFIG[clip.category];
-            const statusConfig = ASW_STATUS_CONFIG[clip.status];
             const priorityConfig = ASW_PRIORITY_CONFIG[clip.priority];
             const CatIcon = catConfig.icon;
             const player = clip.player_id ? getPlayerById(clip.player_id) : null;

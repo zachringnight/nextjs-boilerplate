@@ -424,7 +424,6 @@ export const useASWStore = create<ASWState>()(
       partialize: (state) => ({
         viewMode: state.viewMode,
         largeText: state.largeText,
-        clips: state.clips,
         quickMarkCategory: state.quickMarkCategory,
         clipDefaults: state.clipDefaults,
       }),

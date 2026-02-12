@@ -9,10 +9,8 @@ import { ASW_CATEGORY_CONFIG, ASW_PRIORITY_CONFIG } from '../lib/clip-constants'
 import { syncASWClipInsert, syncASWClipDelete } from '../lib/clip-sync';
 import {
   Clapperboard,
-  ChevronUp,
   X,
   Check,
-  Zap,
   Pencil,
   Trash2,
   Flag,
@@ -29,7 +27,6 @@ export default function QuickClipButton() {
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const {
     clips,
-    quickMarkCategory,
     clipDefaults,
     setQuickMarkCategory,
     addClip,
@@ -37,13 +34,11 @@ export default function QuickClipButton() {
     setClipModalOpen,
     setEditingClipId,
     getTodayClipCount,
-    getFlaggedCount,
   } = useASWStore();
 
   const isClipsPage = pathname === '/asw/clips';
 
-  const todayCount = useMemo(() => getTodayClipCount(), [clips]);
-  const flaggedCount = useMemo(() => getFlaggedCount(), [clips]);
+  const todayCount = useMemo(() => getTodayClipCount(), [clips, getTodayClipCount]);
 
   const recentClips = useMemo(() => clips.slice(0, 5), [clips]);
 

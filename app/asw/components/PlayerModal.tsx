@@ -1,6 +1,6 @@
 'use client';
 
-import { X, Volume2, AlertTriangle, Languages, Crown, PenLine, Star, Trophy } from 'lucide-react';
+import { X, Volume2, AlertTriangle, Languages, Crown, PenLine } from 'lucide-react';
 import type { Player } from '../types';
 import PlayerAvatar from './PlayerAvatar';
 import InterviewQuestions from './InterviewQuestions';

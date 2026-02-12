@@ -27,6 +27,7 @@ import {
 import { cn } from './lib/utils';
 
 import type { PlayerTier } from './types';
+import { TIER_STYLES } from './lib/constants';
 
 // Format 24h time to 12h AM/PM
 const to12h = (time: string) => {
@@ -34,14 +35,6 @@ const to12h = (time: string) => {
   const suffix = h >= 12 ? 'PM' : 'AM';
   const hour = h % 12 || 12;
   return `${hour}:${String(m).padStart(2, '0')} ${suffix}`;
-};
-
-// Tier badge styling
-const TIER_STYLES: Record<number, { bg: string; text: string; label: string }> = {
-  1: { bg: 'bg-[#FFD100]/20', text: 'text-[#FFD100]', label: 'T1' },
-  2: { bg: 'bg-blue-500/20', text: 'text-blue-400', label: 'T2' },
-  3: { bg: 'bg-[#9CA3AF]/20', text: 'text-[#9CA3AF]', label: 'T3' },
-  4: { bg: 'bg-[#4B5563]/20', text: 'text-[#6B7280]', label: 'T4' },
 };
 
 function TierBadge({ tier }: { tier?: PlayerTier }) {
