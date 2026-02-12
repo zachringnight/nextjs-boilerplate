@@ -11,7 +11,7 @@ import {
   type DeliverableRecord,
   type CompletionRecord,
 } from '../lib/db-sync';
-import { flushSyncQueue } from '../lib/clip-sync';
+import { flushASWClipSyncQueue as flushSyncQueue } from '../lib/clip-sync';
 import type {
   Note,
   NoteCategory,

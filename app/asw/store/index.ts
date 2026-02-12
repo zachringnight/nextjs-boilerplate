@@ -61,6 +61,14 @@ interface ASWState {
   setActiveDay: (day: number | null) => void;
   showEmbargoedOnly: boolean;
   setShowEmbargoedOnly: (show: boolean) => void;
+  selectedStation: ASWStationId | null;
+  setSelectedStation: (station: ASWStationId | null) => void;
+
+  // Notifications
+  notificationsEnabled: boolean;
+  setNotificationsEnabled: (enabled: boolean) => void;
+  notificationSound: boolean;
+  setNotificationSound: (enabled: boolean) => void;
 
   // Notes / Issue Logger
   notes: Note[];
@@ -126,6 +134,14 @@ export const useASWStore = create<ASWState>()(
       setActiveDay: (day) => set({ activeDay: day }),
       showEmbargoedOnly: false,
       setShowEmbargoedOnly: (show) => set({ showEmbargoedOnly: show }),
+      selectedStation: null,
+      setSelectedStation: (station) => set({ selectedStation: station }),
+
+      // Notifications
+      notificationsEnabled: true,
+      setNotificationsEnabled: (enabled) => set({ notificationsEnabled: enabled }),
+      notificationSound: true,
+      setNotificationSound: (enabled) => set({ notificationSound: enabled }),
 
       // Notes / Issue Logger
       notes: [],

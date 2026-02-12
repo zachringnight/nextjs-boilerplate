@@ -379,7 +379,7 @@ export default function TimerPage() {
               Station Defaults
             </h3>
             <div className="flex flex-wrap gap-2">
-              {(['tunnel', 'product'] as const).map((key) => {
+              {(['tunnel', 'qa', 'signing'] as const).map((key) => {
                 const config = STATION_CONFIG[key];
                 return (
                   <button
