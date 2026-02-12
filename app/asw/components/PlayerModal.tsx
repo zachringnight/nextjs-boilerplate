@@ -1,10 +1,10 @@
 'use client';
 
-import { X, Volume2, AlertTriangle, Languages } from 'lucide-react';
+import { X, Volume2, AlertTriangle, Languages, Crown, PenLine, Star, Trophy } from 'lucide-react';
 import type { Player } from '../types';
 import PlayerAvatar from './PlayerAvatar';
 import InterviewQuestions from './InterviewQuestions';
-import { DAY_STYLES, STATION_CONFIG } from '../lib/constants';
+import { DAY_STYLES, STATION_CONFIG, ASW_TIER_STYLES } from '../lib/constants';
 
 interface PlayerModalProps {
   player: Player;
@@ -38,6 +38,28 @@ export default function PlayerModal({ player, onClose, largeText = false }: Play
                   <span className={`text-xs px-2 py-1 rounded-full border ${dayStyle.badge} ${dayStyle.border}`}>
                     Day {player.day}
                   </span>
+                  {player.tier && ASW_TIER_STYLES[player.tier] && (
+                    <span className={`text-xs px-2 py-1 rounded-full font-bold ${ASW_TIER_STYLES[player.tier].bg} ${ASW_TIER_STYLES[player.tier].text}`}>
+                      {ASW_TIER_STYLES[player.tier].label}
+                    </span>
+                  )}
+                  {player.league && (
+                    <span className="text-xs px-2 py-1 rounded-full bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 font-medium">
+                      {player.league}
+                    </span>
+                  )}
+                  {player.exclusive && (
+                    <span className="text-xs px-2 py-1 rounded-full bg-[#FFD100]/20 text-[#FFD100] border border-[#FFD100]/30 flex items-center gap-1 font-medium">
+                      <Crown className="w-3 h-3" />
+                      EXCLUSIVE
+                    </span>
+                  )}
+                  {player.signingOnly && (
+                    <span className="text-xs px-2 py-1 rounded-full bg-violet-500/20 text-violet-400 border border-violet-500/30 flex items-center gap-1 font-medium">
+                      <PenLine className="w-3 h-3" />
+                      SIGNING ONLY
+                    </span>
+                  )}
                   {player.embargoed && (
                     <span className="text-xs px-2 py-1 rounded-full bg-red-500/20 text-red-400 border border-red-500/30 flex items-center gap-1">
                       <AlertTriangle className="w-3 h-3" />
@@ -98,27 +120,57 @@ export default function PlayerModal({ player, onClose, largeText = false }: Play
 
           {/* Station Info */}
           <div className="px-6 py-4 border-b border-[#2a2a2a] bg-[#0f0f0f]">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-3 flex-1">
+            <div className="flex items-center gap-4 flex-wrap">
+              <div className="flex items-center gap-3 flex-1 min-w-[140px]">
                 <div className={`w-10 h-10 ${STATION_CONFIG.tunnel.bgClass} rounded-lg flex items-center justify-center text-xl`}>
                   {STATION_CONFIG.tunnel.emoji}
                 </div>
                 <div>
-                  <h3 className={`font-bold ${STATION_CONFIG.tunnel.textClass}`}>TUNNEL STATION</h3>
-                  <p className="text-xs text-gray-500">Walk-in/hero footage + interview</p>
+                  <h3 className={`font-bold ${STATION_CONFIG.tunnel.textClass}`}>TUNNEL</h3>
+                  <p className="text-xs text-gray-500">Walk-in + Interview</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 flex-1">
-                <div className={`w-10 h-10 ${STATION_CONFIG.product.bgClass} rounded-lg flex items-center justify-center text-xl`}>
-                  {STATION_CONFIG.product.emoji}
+              <div className="flex items-center gap-3 flex-1 min-w-[140px]">
+                <div className={`w-10 h-10 ${STATION_CONFIG.qa.bgClass} rounded-lg flex items-center justify-center text-xl`}>
+                  {STATION_CONFIG.qa.emoji}
                 </div>
                 <div>
-                  <h3 className={`font-bold ${STATION_CONFIG.product.textClass}`}>PRODUCT STATION</h3>
-                  <p className="text-xs text-gray-500">Card photography (no interview)</p>
+                  <h3 className={`font-bold ${STATION_CONFIG.qa.textClass}`}>Q&A</h3>
+                  <p className="text-xs text-gray-500">Interview + Card Photography</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 flex-1 min-w-[140px]">
+                <div className={`w-10 h-10 ${STATION_CONFIG.signing.bgClass} rounded-lg flex items-center justify-center text-xl`}>
+                  {STATION_CONFIG.signing.emoji}
+                </div>
+                <div>
+                  <h3 className={`font-bold ${STATION_CONFIG.signing.textClass}`}>SIGNING</h3>
+                  <p className="text-xs text-gray-500">Autograph Session</p>
                 </div>
               </div>
             </div>
           </div>
+
+          {/* Production Notes */}
+          {(player.tier || player.tierReason || player.contentNotes) && (
+            <div className="px-6 py-4 border-b border-[#2a2a2a]">
+              <h3 className="text-xs font-semibold text-[#FFD100] tracking-wide mb-2">PRODUCTION NOTES</h3>
+              {player.tier && ASW_TIER_STYLES[player.tier] && (
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-sm text-gray-400">Tier:</span>
+                  <span className={`px-2 py-0.5 rounded font-bold text-sm ${ASW_TIER_STYLES[player.tier].bg} ${ASW_TIER_STYLES[player.tier].text}`}>
+                    {ASW_TIER_STYLES[player.tier].fullLabel}
+                  </span>
+                </div>
+              )}
+              {player.tierReason && (
+                <p className="text-sm text-gray-400 mb-1"><strong className="text-gray-300">Reason:</strong> {player.tierReason}</p>
+              )}
+              {player.contentNotes && (
+                <p className="text-sm text-gray-400"><strong className="text-gray-300">Content Plan:</strong> {player.contentNotes}</p>
+              )}
+            </div>
+          )}
 
           {/* Interview Questions */}
           <div className={`p-6 ${largeText ? 'py-8' : ''}`}>
@@ -128,7 +180,7 @@ export default function PlayerModal({ player, onClose, largeText = false }: Play
           {/* Footer */}
           <div className="px-6 pb-6">
             <div className="bg-[#141414] border border-[#2a2a2a] rounded-lg p-3 text-xs text-gray-500">
-              <strong className="text-gray-400">15 min per station.</strong> Flex questions based on athlete comfort. Product station is visual only (no interview).
+              <strong className="text-gray-400">15 min per station.</strong> Flex questions based on athlete comfort. Signing station is autographs only (no interview).
             </div>
           </div>
         </div>

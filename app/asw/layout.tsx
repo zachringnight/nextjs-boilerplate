@@ -7,8 +7,7 @@ import AppErrorBoundary from './components/AppErrorBoundary';
 import './asw.css';
 
 const SupabaseProvider = dynamic(() => import('./components/SupabaseProvider'));
-const NotificationProvider = dynamic(() => import('./components/NotificationProvider'));
-const QuickClipButton = dynamic(() => import('./components/QuickClipButton'));
+const ClipProvider = dynamic(() => import('./components/ClipProvider'));
 
 export const metadata: Metadata = {
   title: {
@@ -45,7 +44,7 @@ export default function ASWLayout({
   return (
     <div className="min-h-screen bg-[#0D0D0D] text-white">
       <SupabaseProvider />
-      <NotificationProvider />
+      <ClipProvider />
       <Header />
       <ConnectionBanner />
       <AppErrorBoundary>
@@ -53,7 +52,6 @@ export default function ASWLayout({
           {children}
         </main>
       </AppErrorBoundary>
-      <QuickClipButton />
       <BottomNav />
     </div>
   );

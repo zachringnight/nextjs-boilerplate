@@ -5,9 +5,9 @@ import { players, day1Players, day2Players } from '../data/players';
 import type { Player } from '../types';
 import PlayerAvatar from './PlayerAvatar';
 import InterviewQuestions from './InterviewQuestions';
-import { ChevronDown, ChevronUp, Volume2, Clock, Zap, AlertTriangle, Languages } from 'lucide-react';
+import { ChevronDown, ChevronUp, Volume2, Clock, Zap, AlertTriangle, Languages, Crown, PenLine } from 'lucide-react';
 import { isCurrentPlayer, isUpcomingPlayer, formatTime } from '../lib/schedule-utils';
-import { UPDATE_INTERVALS, DAY_STYLES, STATION_CONFIG, STATUS_COLORS } from '../lib/constants';
+import { UPDATE_INTERVALS, DAY_STYLES, STATION_CONFIG, STATUS_COLORS, ASW_TIER_STYLES } from '../lib/constants';
 import { useMounted } from '../hooks/useMounted';
 import { Skeleton } from './Skeleton';
 import type { ASWStationId } from '../types';
@@ -71,6 +71,21 @@ function PlayerSlotCard({
             {player.translatorNeeded && (
               <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded ${STATUS_COLORS.translator.bg} ${STATUS_COLORS.translator.text}`}>
                 <Languages className="w-3 h-3" /> Translator
+              </span>
+            )}
+            {player.tier && ASW_TIER_STYLES[player.tier] && (
+              <span className={`text-xs px-1.5 py-0.5 rounded font-bold ${ASW_TIER_STYLES[player.tier].bg} ${ASW_TIER_STYLES[player.tier].text}`}>
+                {ASW_TIER_STYLES[player.tier].label}
+              </span>
+            )}
+            {player.exclusive && (
+              <span className="inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded font-bold bg-[#FFD100]/20 text-[#FFD100]">
+                <Crown className="w-2.5 h-2.5" /> EXCL
+              </span>
+            )}
+            {player.signingOnly && (
+              <span className="inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded font-bold bg-violet-500/20 text-violet-400">
+                <PenLine className="w-2.5 h-2.5" /> SIGNING
               </span>
             )}
           </div>
@@ -244,7 +259,7 @@ export default function StationToolView({ largeText = false, selectedStation = n
             <Clock className="w-4 h-4" />
             <span className="font-mono font-bold">{formattedTime}</span>
           </div>
-          <p className="text-xs text-gray-500">PT (San Francisco)</p>
+          <p className="text-xs text-gray-500">PT (Los Angeles)</p>
         </div>
       </div>
 
@@ -312,7 +327,7 @@ export default function StationToolView({ largeText = false, selectedStation = n
       </div>
 
       <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-4 text-sm text-gray-500">
-        <strong className="text-gray-400">Tip:</strong> Tap any player card to expand their full profile, background, and interview questions. Product station is visual only (no interview needed).
+        <strong className="text-gray-400">Tip:</strong> Tap any player card to expand their full profile, background, and interview questions. Signing station is autographs only (no interview needed).
       </div>
     </div>
   );

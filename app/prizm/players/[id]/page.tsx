@@ -9,7 +9,14 @@ import { stations, checklistStations } from '../../data/stations';
 import { useAppStore } from '../../store';
 import { StationId } from '../../types';
 import PlayerPhoto from '../../components/PlayerPhoto';
-import { ArrowLeft, Calendar, Award, CreditCard, Star, ClipboardCheck, Phone } from 'lucide-react';
+import { ArrowLeft, Calendar, Award, CreditCard, Star, ClipboardCheck, Phone, MessageSquare } from 'lucide-react';
+
+const TIER_STYLES: Record<number, { bg: string; text: string; label: string; fullLabel: string }> = {
+  1: { bg: 'bg-[#FFD100]/20', text: 'text-[#FFD100]', label: 'T1', fullLabel: 'Tier 1 — Priority' },
+  2: { bg: 'bg-blue-500/20', text: 'text-blue-400', label: 'T2', fullLabel: 'Tier 2' },
+  3: { bg: 'bg-[#9CA3AF]/20', text: 'text-[#9CA3AF]', label: 'T3', fullLabel: 'Tier 3' },
+  4: { bg: 'bg-[#4B5563]/20', text: 'text-[#6B7280]', label: 'T4', fullLabel: 'Tier 4 — Developmental' },
+};
 import { cn } from '../../lib/utils';
 
 interface PageProps {
@@ -95,9 +102,16 @@ export default function PlayerDetailPage({ params }: PageProps) {
 
             {/* Player Info */}
             <div className="pb-2">
-              <h1 className={`font-bold text-white ${largeText ? 'text-3xl' : 'text-2xl'}`}>
-                {player.name}
-              </h1>
+              <div className="flex items-center gap-2">
+                <h1 className={`font-bold text-white ${largeText ? 'text-3xl' : 'text-2xl'}`}>
+                  {player.name}
+                </h1>
+                {player.tier && (
+                  <span className={`px-2 py-0.5 rounded text-xs font-bold ${TIER_STYLES[player.tier].bg} ${TIER_STYLES[player.tier].text}`}>
+                    {TIER_STYLES[player.tier].label}
+                  </span>
+                )}
+              </div>
               <p className={`text-[#FFD100] ${largeText ? 'text-lg' : 'text-base'}`}>
                 {player.position}
               </p>
@@ -242,6 +256,29 @@ export default function PlayerDetailPage({ params }: PageProps) {
             })}
           </div>
         </section>
+
+        {/* Tier & Jeff's Notes */}
+        {(player.tier || player.jeffNotes) && (
+          <section className="bg-[#1A1A1A] rounded-xl border border-[#2A2A2A] p-4 animate-[fadeIn_0.4s_ease-out_0.12s_both]">
+            <h2 className={cn('font-semibold text-white flex items-center gap-2 mb-3', largeText ? 'text-xl' : 'text-lg')}>
+              <MessageSquare size={20} className="text-[#FFD100]" />
+              Production Notes
+            </h2>
+            {player.tier && (
+              <div className={cn('flex items-center gap-2 mb-2', largeText ? 'text-base' : 'text-sm')}>
+                <span className="text-[#9CA3AF]">Tier:</span>
+                <span className={`px-2 py-0.5 rounded font-bold ${TIER_STYLES[player.tier].bg} ${TIER_STYLES[player.tier].text}`}>
+                  {TIER_STYLES[player.tier].fullLabel}
+                </span>
+              </div>
+            )}
+            {player.jeffNotes && (
+              <p className={cn('text-[#9CA3AF] leading-relaxed', largeText ? 'text-base' : 'text-sm')}>
+                {player.jeffNotes}
+              </p>
+            )}
+          </section>
+        )}
 
         {/* Bio */}
         <section className="bg-[#1A1A1A] rounded-xl border border-[#2A2A2A] p-4 animate-[fadeIn_0.4s_ease-out_0.15s_both]">

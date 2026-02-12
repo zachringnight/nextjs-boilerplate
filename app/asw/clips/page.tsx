@@ -3,181 +3,291 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useASWStore } from '../store';
+import { getPlayerById } from '../data/players';
+import type { ASWClipCategory, ASWClipPriority, ASWClipStatus } from '../types/clips';
+import { ASW_CATEGORY_CONFIG, ASW_STATUS_CONFIG, ASW_PRIORITY_CONFIG } from '../lib/clip-constants';
+import { syncASWClipUpdate, syncASWClipDelete } from '../lib/clip-sync';
 import {
   ArrowLeft,
-  Clapperboard,
-  Trash2,
+  Film,
   Flag,
+  Pencil,
+  Trash2,
+  Check,
+  Filter,
+  Star,
 } from 'lucide-react';
-import { cn } from '../lib/utils';
-import { CATEGORY_CONFIG, PRIORITY_CONFIG } from '../lib/clip-constants';
-import { players } from '../data/players';
-import type { ClipCategory } from '../types';
+
+const STATION_NAMES: Record<string, string> = {
+  tunnel: 'Tunnel',
+  qa: 'Q&A',
+  signing: 'Signing',
+};
 
 export default function ClipsPage() {
-  const { clips, deleteClip, toggleClipFlag, largeText } = useASWStore();
-  const [filterCategory, setFilterCategory] = useState<ClipCategory | 'all'>('all');
+  const {
+    clips,
+    deleteClip,
+    updateClip,
+    setEditingClipId,
+    setClipModalOpen,
+  } = useASWStore();
+
+  const [filterCategory, setFilterCategory] = useState<ASWClipCategory | 'all'>('all');
+  const [filterStatus, setFilterStatus] = useState<ASWClipStatus | 'all'>('all');
+  const [filterPriority, setFilterPriority] = useState<ASWClipPriority | 'all'>('all');
   const [showFlaggedOnly, setShowFlaggedOnly] = useState(false);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   const filteredClips = useMemo(() => {
-    let result = clips;
-    if (filterCategory !== 'all') {
-      result = result.filter(c => c.category === filterCategory);
-    }
-    if (showFlaggedOnly) {
-      result = result.filter(c => c.flagged);
-    }
-    return result;
-  }, [clips, filterCategory, showFlaggedOnly]);
+    return clips.filter((clip) => {
+      if (filterCategory !== 'all' && clip.category !== filterCategory) return false;
+      if (filterStatus !== 'all' && clip.status !== filterStatus) return false;
+      if (filterPriority !== 'all' && clip.priority !== filterPriority) return false;
+      if (showFlaggedOnly && !clip.flagged) return false;
+      return true;
+    });
+  }, [clips, filterCategory, filterStatus, filterPriority, showFlaggedOnly]);
 
-  const todayCount = clips.filter(
-    c => new Date(c.timestamp).toDateString() === new Date().toDateString()
-  ).length;
+  const handleDeleteClip = (id: string) => {
+    deleteClip(id);
+    syncASWClipDelete(id);
+    setDeleteConfirmId(null);
+  };
+
+  const handleStatusChange = (id: string, status: ASWClipStatus) => {
+    updateClip(id, { status });
+    syncASWClipUpdate(id, { status, updated_at: new Date().toISOString() });
+  };
+
+  const handleToggleFlag = (id: string, currentFlagged: boolean) => {
+    updateClip(id, { flagged: !currentFlagged });
+    syncASWClipUpdate(id, { flagged: !currentFlagged, updated_at: new Date().toISOString() });
+  };
+
+  const openEditModal = (clipId: string) => {
+    setEditingClipId(clipId);
+    setClipModalOpen(true);
+  };
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen bg-[#0D0D0D] pb-24">
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 pt-2 pb-4">
-        <Link
-          href="/asw"
-          className="p-2 rounded-lg bg-[#1A1A1A] hover:bg-[#2A2A2A] transition-colors"
-        >
-          <ArrowLeft className="w-5 h-5 text-[#9CA3AF]" />
-        </Link>
-        <div className="flex-1">
-          <h1 className={cn('font-bold text-white', largeText ? 'text-2xl' : 'text-xl')}>
-            Clip Markers
-          </h1>
-          <p className="text-xs text-[#9CA3AF]">{todayCount} clips today &bull; {clips.length} total</p>
-        </div>
-      </div>
-
-      <div className="px-4 space-y-4">
-        {/* Filters */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2">
-          <button
-            onClick={() => setFilterCategory('all')}
-            className={cn(
-              'px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors',
-              filterCategory === 'all'
-                ? 'bg-[#FFD100] text-black'
-                : 'bg-[#1A1A1A] text-[#9CA3AF] hover:text-white'
-            )}
-          >
-            All ({clips.length})
-          </button>
-          {Object.entries(CATEGORY_CONFIG).map(([key, config]) => {
-            const count = clips.filter(c => c.category === key).length;
-            if (count === 0) return null;
-            return (
-              <button
-                key={key}
-                onClick={() => setFilterCategory(key as ClipCategory)}
-                className={cn(
-                  'px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors',
-                  filterCategory === key
-                    ? 'text-black'
-                    : 'bg-[#1A1A1A] text-[#9CA3AF] hover:text-white'
-                )}
-                style={filterCategory === key ? { backgroundColor: config.color } : undefined}
-              >
-                {config.label} ({count})
-              </button>
-            );
-          })}
+      <div className="sticky top-0 z-40 bg-[#0D0D0D]/95 backdrop-blur-sm border-b border-[#2A2A2A] px-4 py-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Link href="/asw" className="text-[#9CA3AF] hover:text-white transition-colors">
+              <ArrowLeft size={20} />
+            </Link>
+            <div className="flex items-center gap-2">
+              <Film size={20} className="text-purple-400" />
+              <h1 className="text-lg font-bold text-white">Clip Markers</h1>
+              <span className="text-sm text-[#9CA3AF]">({clips.length})</span>
+            </div>
+          </div>
           <button
             onClick={() => setShowFlaggedOnly(!showFlaggedOnly)}
-            className={cn(
-              'px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors flex items-center gap-1',
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors ${
               showFlaggedOnly
-                ? 'bg-[#FFD100]/20 text-[#FFD100]'
-                : 'bg-[#1A1A1A] text-[#9CA3AF] hover:text-white'
-            )}
+                ? 'bg-[#EF4444]/20 text-[#EF4444]'
+                : 'bg-[#2A2A2A] text-[#9CA3AF] hover:text-white'
+            }`}
           >
-            <Flag className="w-3 h-3" />
+            <Flag size={14} />
             Flagged
           </button>
         </div>
+      </div>
 
-        {/* Clip List */}
+      {/* Filters */}
+      <div className="px-4 py-3 space-y-2 border-b border-[#2A2A2A]">
+        <div className="flex gap-1.5 overflow-x-auto pb-1">
+          <button
+            onClick={() => setFilterCategory('all')}
+            className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
+              filterCategory === 'all' ? 'bg-[#FFD100] text-black' : 'bg-[#2A2A2A] text-[#9CA3AF]'
+            }`}
+          >
+            All
+          </button>
+          {(Object.entries(ASW_CATEGORY_CONFIG) as [ASWClipCategory, typeof ASW_CATEGORY_CONFIG[ASWClipCategory]][]).map(
+            ([key, config]) => (
+              <button
+                key={key}
+                onClick={() => setFilterCategory(key)}
+                className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
+                  filterCategory === key ? 'text-black' : 'bg-[#2A2A2A] text-[#9CA3AF]'
+                }`}
+                style={filterCategory === key ? { backgroundColor: config.color } : undefined}
+              >
+                {config.label}
+              </button>
+            )
+          )}
+        </div>
+        <div className="flex gap-1.5 overflow-x-auto pb-1">
+          <button
+            onClick={() => setFilterStatus('all')}
+            className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
+              filterStatus === 'all' ? 'bg-[#FFD100] text-black' : 'bg-[#2A2A2A] text-[#9CA3AF]'
+            }`}
+          >
+            Any Status
+          </button>
+          {(Object.entries(ASW_STATUS_CONFIG) as [ASWClipStatus, typeof ASW_STATUS_CONFIG[ASWClipStatus]][]).map(
+            ([key, config]) => (
+              <button
+                key={key}
+                onClick={() => setFilterStatus(key)}
+                className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
+                  filterStatus === key ? 'text-black' : 'bg-[#2A2A2A] text-[#9CA3AF]'
+                }`}
+                style={filterStatus === key ? { backgroundColor: config.color } : undefined}
+              >
+                {config.label}
+              </button>
+            )
+          )}
+        </div>
+      </div>
+
+      {/* Clips List */}
+      <div className="p-4 space-y-3">
         {filteredClips.length === 0 ? (
           <div className="text-center py-16">
-            <Clapperboard className="w-12 h-12 text-[#2A2A2A] mx-auto mb-3" />
-            <p className="text-[#6B7280]">
-              {clips.length === 0 ? 'No clips yet. Use the clip button to mark moments.' : 'No clips match this filter.'}
+            <Film className="w-12 h-12 text-[#4B5563] mx-auto mb-3" />
+            <p className="text-[#9CA3AF]">
+              {clips.length === 0 ? 'No clips yet. Use the clip button to start marking.' : 'No clips match your filters.'}
             </p>
           </div>
         ) : (
-          <div className="space-y-2">
-            {filteredClips.map(clip => {
-              const catConfig = CATEGORY_CONFIG[clip.category];
-              const prioConfig = PRIORITY_CONFIG[clip.priority];
-              const CatIcon = catConfig.icon;
-              const player = clip.playerId ? players.find(p => p.id === clip.playerId) : null;
-              const time = new Date(clip.timestamp);
+          filteredClips.map((clip) => {
+            const catConfig = ASW_CATEGORY_CONFIG[clip.category];
+            const statusConfig = ASW_STATUS_CONFIG[clip.status];
+            const priorityConfig = ASW_PRIORITY_CONFIG[clip.priority];
+            const CatIcon = catConfig.icon;
+            const player = clip.player_id ? getPlayerById(clip.player_id) : null;
+            const stationName = clip.station_id ? STATION_NAMES[clip.station_id] : null;
+            const time = new Date(clip.timestamp).toLocaleTimeString('en-US', {
+              hour: 'numeric',
+              minute: '2-digit',
+              hour12: true,
+            });
+            const date = new Date(clip.timestamp).toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
+            });
 
-              return (
-                <div
-                  key={clip.id}
-                  className={cn(
-                    'bg-[#141414] border rounded-xl p-4 transition-all',
-                    clip.flagged ? 'border-[#FFD100]/50' : 'border-[#2A2A2A]'
-                  )}
-                >
-                  <div className="flex items-start gap-3">
-                    <div
-                      className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
-                      style={{ backgroundColor: `${catConfig.color}20` }}
+            return (
+              <div
+                key={clip.id}
+                className={`bg-[#1A1A1A] rounded-xl border p-4 ${
+                  clip.flagged ? 'border-[#EF4444]/50' : 'border-[#2A2A2A]'
+                }`}
+              >
+                {/* Top row */}
+                <div className="flex items-start gap-3">
+                  <div
+                    className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: `${catConfig.color}20` }}
+                  >
+                    <CatIcon className="w-5 h-5" style={{ color: catConfig.color }} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="font-medium text-white text-sm truncate">
+                        {clip.name || catConfig.label}
+                      </p>
+                      {clip.flagged && <Flag className="w-3 h-3 text-[#EF4444] flex-shrink-0" />}
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-[#9CA3AF] flex-wrap">
+                      <span>{date} {time}</span>
+                      {player && <span className="text-white">{player.firstName} {player.lastName}</span>}
+                      {stationName && <span className="text-[#FFD100]">{stationName}</span>}
+                      {clip.timecode && <span className="font-mono">{clip.timecode}</span>}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => handleToggleFlag(clip.id, clip.flagged)}
+                      className={`p-1.5 rounded-lg transition-colors ${
+                        clip.flagged ? 'text-[#EF4444]' : 'text-[#4B5563] hover:text-[#EF4444]'
+                      }`}
                     >
-                      <CatIcon className="w-5 h-5" style={{ color: catConfig.color }} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <span className="text-sm font-medium text-white">
-                          {clip.name || catConfig.label}
-                        </span>
-                        {clip.priority !== 'normal' && (
-                          <span
-                            className="text-[10px] px-1.5 py-0.5 rounded font-medium"
-                            style={{ backgroundColor: `${prioConfig.color}20`, color: prioConfig.color }}
-                          >
-                            {prioConfig.label}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2 text-xs text-[#6B7280]">
-                        <span>{time.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</span>
-                        {player && <span>&bull; {player.name}</span>}
-                        {clip.stationId && <span>&bull; {clip.stationId}</span>}
-                      </div>
-                      {clip.notes && (
-                        <p className="text-xs text-[#9CA3AF] mt-1 line-clamp-2">{clip.notes}</p>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-1 flex-shrink-0">
+                      <Flag className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => openEditModal(clip.id)}
+                      className="p-1.5 text-[#9CA3AF] hover:text-white rounded-lg transition-colors"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                    {deleteConfirmId === clip.id ? (
                       <button
-                        onClick={() => toggleClipFlag(clip.id)}
-                        className={cn(
-                          'p-1.5 rounded-lg transition-colors',
-                          clip.flagged
-                            ? 'text-[#FFD100] bg-[#FFD100]/10'
-                            : 'text-[#6B7280] hover:text-[#FFD100]'
-                        )}
+                        onClick={() => handleDeleteClip(clip.id)}
+                        className="p-1.5 text-[#EF4444] rounded-lg"
                       >
-                        <Flag className="w-4 h-4" />
+                        <Check className="w-4 h-4" />
                       </button>
+                    ) : (
                       <button
-                        onClick={() => deleteClip(clip.id)}
-                        className="p-1.5 rounded-lg text-[#6B7280] hover:text-red-400 transition-colors"
+                        onClick={() => setDeleteConfirmId(clip.id)}
+                        className="p-1.5 text-[#9CA3AF] hover:text-[#EF4444] rounded-lg transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
-                    </div>
+                    )}
                   </div>
                 </div>
-              );
-            })}
-          </div>
+
+                {/* Notes */}
+                {clip.notes && (
+                  <p className="mt-2 text-xs text-[#9CA3AF] line-clamp-2">{clip.notes}</p>
+                )}
+
+                {/* Bottom badges row */}
+                <div className="flex items-center gap-1.5 mt-3 flex-wrap">
+                  {/* Status selector */}
+                  <div className="flex gap-0.5">
+                    {(Object.entries(ASW_STATUS_CONFIG) as [ASWClipStatus, typeof ASW_STATUS_CONFIG[ASWClipStatus]][]).map(
+                      ([key, config]) => (
+                        <button
+                          key={key}
+                          onClick={() => handleStatusChange(clip.id, key)}
+                          className={`px-2 py-0.5 rounded text-[10px] font-medium transition-colors ${
+                            clip.status === key ? 'text-black' : 'text-[#6B7280] bg-[#2A2A2A]'
+                          }`}
+                          style={clip.status === key ? { backgroundColor: config.color } : undefined}
+                        >
+                          {config.label}
+                        </button>
+                      )
+                    )}
+                  </div>
+                  {/* Priority badge */}
+                  <span
+                    className="px-2 py-0.5 rounded text-[10px] font-medium"
+                    style={{ backgroundColor: `${priorityConfig.color}20`, color: priorityConfig.color }}
+                  >
+                    {priorityConfig.label}
+                  </span>
+                  {/* Rating */}
+                  {clip.rating && clip.rating > 0 && (
+                    <span className="flex items-center gap-0.5 text-[10px] text-[#FFD100]">
+                      <Star className="w-3 h-3 fill-[#FFD100]" />
+                      {clip.rating}
+                    </span>
+                  )}
+                  {/* Tags */}
+                  {clip.tags.map((tag) => (
+                    <span key={tag} className="px-2 py-0.5 bg-[#2A2A2A] text-[#9CA3AF] text-[10px] rounded">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            );
+          })
         )}
       </div>
     </div>

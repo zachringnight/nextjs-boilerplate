@@ -4,9 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { players, day1Players, day2Players, playerCounts } from '../data/players';
 import type { Player } from '../types';
 import PlayerAvatar from './PlayerAvatar';
-import { ChevronRight, Volume2, Zap, ArrowRight } from 'lucide-react';
-import { useASWStore } from '../store';
-import { hapticFeedback } from '../lib/utils';
+import { ChevronRight, Volume2, Zap, MapPin, Clock, Mail, Crown, PenLine } from 'lucide-react';
 import {
   getEventDay,
   isCurrentPlayer,
@@ -17,7 +15,7 @@ import {
   formatTime,
   formatDate,
 } from '../lib/schedule-utils';
-import { UPDATE_INTERVALS, DAY_STYLES, EVENT_DATES, EVENT_INFO, STATION_CONFIG, STATUS_COLORS } from '../lib/constants';
+import { UPDATE_INTERVALS, DAY_STYLES, EVENT_DATES, EVENT_INFO, STATION_CONFIG, STATUS_COLORS, ASW_TIER_STYLES } from '../lib/constants';
 import { useMounted } from '../hooks/useMounted';
 import { Skeleton } from './Skeleton';
 
@@ -32,6 +30,24 @@ function CurrentPlayerCard({ player, onPlayerClick }: { player: Player; onPlayer
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1 flex-wrap">
             <span className="text-3xl">{player.flag}</span>
+            {player.tier && ASW_TIER_STYLES[player.tier] && (
+              <span className={`text-xs px-2 py-0.5 rounded font-bold ${ASW_TIER_STYLES[player.tier].bg} ${ASW_TIER_STYLES[player.tier].text}`}>
+                {ASW_TIER_STYLES[player.tier].label}
+              </span>
+            )}
+            {player.league && (
+              <span className="text-xs px-1.5 py-0.5 rounded font-bold bg-cyan-500/20 text-cyan-400">{player.league}</span>
+            )}
+            {player.exclusive && (
+              <span className="text-xs px-2 py-0.5 rounded font-bold bg-[#FFD100]/20 text-[#FFD100] flex items-center gap-0.5">
+                <Crown className="w-3 h-3" /> EXCL
+              </span>
+            )}
+            {player.signingOnly && (
+              <span className="text-xs px-2 py-0.5 rounded font-bold bg-violet-500/20 text-violet-400 flex items-center gap-0.5">
+                <PenLine className="w-3 h-3" /> SIGNING
+              </span>
+            )}
             {player.embargoed && (
               <span className={`text-xs px-2 py-0.5 rounded ${STATUS_COLORS.embargoed.bg} ${STATUS_COLORS.embargoed.text}`}>EMBARGO</span>
             )}
@@ -68,9 +84,20 @@ function NextPlayerCard({ player, onPlayerClick }: { player: Player; onPlayerCli
       <div className="flex items-center gap-3">
         <PlayerAvatar player={player} size="md" />
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center gap-1.5 mb-1 flex-wrap">
             <span className="text-lg">{player.flag}</span>
             <span className="text-xs text-blue-400 font-medium">UP NEXT</span>
+            {player.tier && ASW_TIER_STYLES[player.tier] && (
+              <span className={`px-1 py-0.5 rounded text-[9px] font-bold ${ASW_TIER_STYLES[player.tier].bg} ${ASW_TIER_STYLES[player.tier].text}`}>
+                {ASW_TIER_STYLES[player.tier].label}
+              </span>
+            )}
+            {player.exclusive && (
+              <Crown className="w-3 h-3 text-[#FFD100]" />
+            )}
+            {player.signingOnly && (
+              <PenLine className="w-3 h-3 text-violet-400" />
+            )}
           </div>
           <p className="font-bold truncate">{player.firstName} {player.lastName}</p>
           <p className="text-sm text-gray-400">{player.scheduledTime || 'TBD'}</p>
@@ -82,34 +109,22 @@ function NextPlayerCard({ player, onPlayerClick }: { player: Player; onPlayerCli
 }
 
 function StationGrid() {
-  const setViewMode = useASWStore((s) => s.setViewMode);
-  const setSelectedStation = useASWStore((s) => s.setSelectedStation);
-
   return (
-    <div className="grid grid-cols-2 gap-4">
-      {(['tunnel', 'product'] as const).map((key) => {
+    <div className="grid grid-cols-3 gap-3">
+      {(['tunnel', 'qa', 'signing'] as const).map((key) => {
         const config = STATION_CONFIG[key];
         return (
-          <button
-            key={key}
-            onClick={() => {
-              hapticFeedback(30);
-              setSelectedStation(key);
-              setViewMode('station');
-            }}
-            className={`bg-[#141414] ${config.borderClass} border rounded-xl p-4 text-left transition-all duration-200 hover:bg-[#1a1a1a] hover:shadow-lg hover:shadow-black/20 active:scale-[0.97] group`}
-          >
-            <div className="flex items-center gap-3">
+          <div key={key} className={`bg-[#141414] ${config.borderClass} border rounded-xl p-3`}>
+            <div className="flex flex-col items-center gap-2 text-center">
               <div className={`w-10 h-10 ${config.bgClass} rounded-lg flex items-center justify-center text-xl`}>
                 {config.emoji}
               </div>
-              <div className="flex-1">
-                <h3 className={`font-bold ${config.textClass}`}>{config.shortName}</h3>
-                <p className="text-xs text-gray-500">{config.description}</p>
+              <div>
+                <h3 className={`font-bold text-sm ${config.textClass}`}>{config.shortName}</h3>
+                <p className="text-[10px] text-gray-500">{config.description}</p>
               </div>
-              <ArrowRight className={`w-4 h-4 ${config.textClass} opacity-0 group-hover:opacity-100 transition-all duration-200 group-hover:translate-x-0.5`} />
             </div>
-          </button>
+          </div>
         );
       })}
     </div>
@@ -195,7 +210,7 @@ export default function NowDashboard({ onPlayerClick }: NowDashboardProps) {
       <div className="flex items-center justify-between">
         <div>
           <p className="font-medium text-white">{formattedDate}</p>
-          <p className="text-xs text-gray-500">PT (San Francisco)</p>
+          <p className="text-xs text-gray-500">PT (Los Angeles)</p>
         </div>
         <div className="text-right">
           <p className="font-mono text-2xl text-amber-400">{formattedTime}</p>
@@ -230,6 +245,32 @@ export default function NowDashboard({ onPlayerClick }: NowDashboardProps) {
             </div>
           </div>
         </div>
+        {/* Venue Details */}
+        <div className="bg-[#141414] border border-[#2a2a2a] rounded-xl p-4 space-y-3">
+          <h3 className="text-sm font-bold text-[#FFD100] uppercase tracking-wider">Venue</h3>
+          <div className="flex items-start gap-3">
+            <MapPin className="w-4 h-4 text-[#FFD100] mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="font-medium text-white">{EVENT_INFO.venue.name}</p>
+              <p className="text-sm text-gray-400">{EVENT_INFO.venue.fullAddress}</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <Clock className="w-4 h-4 text-[#FFD100] mt-0.5 flex-shrink-0" />
+            <div className="text-sm text-gray-400">
+              <p>Fri, Feb 13: {EVENT_INFO.hours.day1.open} &ndash; {EVENT_INFO.hours.day1.close}</p>
+              <p>Sat, Feb 14: {EVENT_INFO.hours.day2.open} &ndash; {EVENT_INFO.hours.day2.close}</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <Mail className="w-4 h-4 text-[#FFD100] mt-0.5 flex-shrink-0" />
+            <div className="text-sm text-gray-400">
+              <p>RSVP: {EVENT_INFO.rsvp.name}</p>
+              <p className="text-[#FFD100]">{EVENT_INFO.rsvp.email}</p>
+            </div>
+          </div>
+        </div>
+
         <div className="grid grid-cols-2 gap-4">
           {([1, 2] as const).map((day) => (
             <div key={day} className={`bg-[#141414] ${DAY_STYLES[day].border} border rounded-xl p-4`}>
@@ -253,7 +294,7 @@ export default function NowDashboard({ onPlayerClick }: NowDashboardProps) {
               <p className="text-xs text-gray-500">Total Players</p>
             </div>
             <div>
-              <p className="text-2xl font-bold text-white">2</p>
+              <p className="text-2xl font-bold text-white">3</p>
               <p className="text-xs text-gray-500">Stations</p>
             </div>
             <div>

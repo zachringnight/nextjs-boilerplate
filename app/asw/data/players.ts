@@ -76,6 +76,11 @@ export const players: Player[] = [
     day: 1,
     scheduledTime: null,
     playerNumber: 1,
+    tier: 2.5,
+    tierReason: 'Averaging 5ppg as USC freshman, not a top draft prospect but has 140K IG, exclusive, appearance',
+    contentNotes: 'Carousel or video for him to post *can be photo only* - he posted last year',
+    league: 'COLLEGE',
+    exclusive: true,
     notes: ['Exclusive - 120 min', 'Agent: Jerry Easter Sr', 'Rep: Caleb', 'Guests: Jerry (father), Trena (mother)'],
     embargoed: false,
     translatorNeeded: false,
@@ -93,7 +98,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'What does your first "college card" moment feel like?',
           'What family keepsakes do you treasure most?',
@@ -119,6 +124,11 @@ export const players: Player[] = [
     day: 1,
     scheduledTime: '12:00 PM',
     playerNumber: 2,
+    tier: 1.5,
+    tierReason: 'Rookie, Exclusive, in dunk contest',
+    contentNotes: 'Panini posted carousel, card photos for future use, product video for future use',
+    league: 'NBA',
+    exclusive: true,
     notes: ['Exclusive - 90 min', 'Agent: Alex Snyder', 'Rep: Baile'],
     embargoed: false,
     translatorNeeded: false,
@@ -136,7 +146,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'What photo do you want on your flagship Spurs rookie card?',
           'What does your "rookie card moment" look like?',
@@ -161,6 +171,10 @@ export const players: Player[] = [
     day: 1,
     scheduledTime: '12:00 PM',
     playerNumber: 3,
+    tier: 2,
+    tierReason: 'W legend, has appearance',
+    contentNotes: 'Panini posted carousel, potential future use W content',
+    league: 'WNBA',
     notes: ['60 min appearance', 'Agent: Allison Galer', 'Rep: Baile'],
     embargoed: false,
     translatorNeeded: false,
@@ -178,7 +192,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'If you could curate one Lisa Leslie insert set, what themes would it have?',
           'How would you tell the story of early WNBA through trading cards?',
@@ -203,6 +217,11 @@ export const players: Player[] = [
     day: 1,
     scheduledTime: '12:30 PM',
     playerNumber: 4,
+    tier: 2.5,
+    tierReason: 'Popular W - "signing only" but may be down',
+    contentNotes: 'Panini posted carousel if we get enough, potential future use W content',
+    league: 'WNBA',
+    signingOnly: true,
     notes: ['Signing Only', 'Agent: Rishi Daulet', 'Rep: Karishma'],
     embargoed: false,
     translatorNeeded: false,
@@ -220,7 +239,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'What does "toughness" look like on a card? (photo selection, captions, parallels)',
           "What moment from your Commissioner's Cup run deserves to be on a card?",
@@ -245,7 +264,12 @@ export const players: Player[] = [
     day: 1,
     scheduledTime: '1:30 PM',
     playerNumber: 5,
-    notes: ['Exclusive - 90 min', 'Agent: Anthony Ricks', 'Rep: Baile'],
+    tier: 1,
+    tierReason: 'Top rookie, exclusive, on donruss cover',
+    contentNotes: 'Panini posted carousel, card photos for future use, product video for future use',
+    league: 'NBA',
+    exclusive: true,
+    notes: ['Exclusive - 90 min', 'Agent: Anthony Ricks', 'Rep: Baile', 'Dual w/Tre Johnson, J.Fears & Cedric C.'],
     embargoed: false,
     translatorNeeded: false,
     bio: [
@@ -262,7 +286,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'What does your "rookie debut" card look like?',
           'What parallels would you chase as a collector?',
@@ -287,6 +311,11 @@ export const players: Player[] = [
     day: 1,
     scheduledTime: null,
     playerNumber: 6,
+    tier: 3.5,
+    tierReason: 'Solid 2nd year role player, "signing only"',
+    contentNotes: 'Signing photos/footage - no immediate deliverables',
+    league: 'NBA',
+    signingOnly: true,
     notes: ['Signing Only', 'Agent: Chase Lanier', 'Rep: Baile'],
     embargoed: false,
     translatorNeeded: false,
@@ -304,7 +333,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'What shot would you put on your signature card?',
           'Shooter-focused insert concepts: heat-check moments, "from the logo" theme?',
@@ -328,6 +357,11 @@ export const players: Player[] = [
     day: 1,
     scheduledTime: null,
     playerNumber: 7,
+    tier: 4,
+    tierReason: 'Retired NBA, "signing only"',
+    contentNotes: 'Signing photos/footage - no immediate deliverables',
+    league: 'NBA',
+    signingOnly: true,
     notes: ['Signing Only', 'Agent: Mike Miller (LIFT)', 'Rep: Caleb'],
     embargoed: false,
     translatorNeeded: false,
@@ -345,7 +379,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'What\'s your "best shooter card photo" — which moment captures it?',
           'Favorite Heat-era teammate cards?',
@@ -370,6 +404,11 @@ export const players: Player[] = [
     day: 1,
     scheduledTime: '5:00 PM',
     playerNumber: 8,
+    tier: 1.5,
+    tierReason: 'Solid 2nd year, exclusive, has appearance',
+    contentNotes: 'Panini posted carousel, card photos for future use, product video for future use',
+    league: 'NBA',
+    exclusive: true,
     notes: ['Exclusive - 60 min', 'Agent: Nailah Waterfield (Excel)', 'Rep: Caleb', 'Guest: Nailah Waterfield'],
     embargoed: false,
     translatorNeeded: false,
@@ -387,7 +426,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'What does your "Thunder first card" have to include?',
           'Duke-to-NBA collector journey — what did you collect growing up?',
@@ -412,6 +451,11 @@ export const players: Player[] = [
     day: 1,
     scheduledTime: '12:00 PM',
     playerNumber: 9,
+    tier: 2.5,
+    tierReason: '5th ranked HS jr., 14K IG, exclusive, appearance',
+    contentNotes: 'Carousel or video for him to post *can be photo only*',
+    league: 'HS',
+    exclusive: true,
     notes: ['Exclusive - 90 min', 'Agent: Rod & Markita Hampton', 'Rep: Baile', 'Guests: Rod (father), Markita (mother)'],
     embargoed: false,
     translatorNeeded: false,
@@ -429,7 +473,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'What should your first pre-pro card capture? (HS fit, signature move, personal logo)',
           'What number did you choose and why?',
@@ -459,7 +503,12 @@ export const players: Player[] = [
     day: 2,
     scheduledTime: null,
     playerNumber: 10,
-    notes: ['Exclusive - 120 min', 'Agent: Marco Manlunas (LIFT)', 'Rep: Caleb', 'Guests: Pel SM Team (+4), Marco, CJ, Nas'],
+    tier: 1,
+    tierReason: 'Good rookie, exclusive, on donruss cover',
+    contentNotes: 'Panini posted carousel, card photos for future use, product video for future use',
+    league: 'NBA',
+    exclusive: true,
+    notes: ['Exclusive - 120 min', 'Agent: Marco Manlunas (LIFT)', 'Rep: Caleb', 'Guests: Pel SM Team (+4), Marco, CJ, Nas', 'Dual w/Tre Johnson, VJ & Deriq Q.'],
     embargoed: false,
     translatorNeeded: false,
     bio: [
@@ -476,7 +525,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'What does a "New Orleans identity card" look like — colors, vibes?',
           'What would you want in a rookie insert?',
@@ -501,7 +550,12 @@ export const players: Player[] = [
     day: 2,
     scheduledTime: null,
     playerNumber: 11,
-    notes: ['Exclusive - 90 min', 'Agent: Torrie Evans', 'Rep: Caleb', 'Guest: Robert Kinnard'],
+    tier: 3,
+    tierReason: 'Top 50 HS sophomore, 2K instagram followers, exclusive, appearance',
+    contentNotes: 'Carousel or video for him to post *can be photo only*',
+    league: 'HS',
+    exclusive: true,
+    notes: ['Exclusive - 90 min', 'Agent: Torrie Evans', 'Rep: Caleb', 'Guest: Robert Kinnard (agent)'],
     embargoed: false,
     translatorNeeded: false,
     bio: [
@@ -518,7 +572,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'What do you want on your first "early-career card"?',
           'What\'s your autograph style — have you been working on it?',
@@ -543,7 +597,12 @@ export const players: Player[] = [
     day: 2,
     scheduledTime: '10:45 AM',
     playerNumber: 12,
-    notes: ['Exclusive - 90 min', 'Agent: Elise Tanzberger', 'Rep: Baile'],
+    tier: 1,
+    tierReason: 'Good rookie, exclusive, on donruss cover',
+    contentNotes: 'Panini posted carousel, card photos for future use, product video for future use',
+    league: 'NBA',
+    exclusive: true,
+    notes: ['Exclusive - 90 min', 'Agent: Elise Tanzberger', 'Rep: Baile', 'Dual w/VJ & w/J. Fears'],
     embargoed: false,
     translatorNeeded: false,
     bio: [
@@ -560,7 +619,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'What does a "scorer\'s card" look like? Heat-check parallels?',
           'What game do you want captured as a card insert set?',
@@ -585,7 +644,12 @@ export const players: Player[] = [
     day: 2,
     scheduledTime: '12:00 PM',
     playerNumber: 13,
-    notes: ['Signing Only', 'Agent: Ashanti Ruben', 'Rep: Baile'],
+    tier: 2.5,
+    tierReason: 'Good rookie, non exclusive, "signing only"',
+    contentNotes: 'Panini posted carousel if we get enough, card photos for future use',
+    league: 'NBA',
+    signingOnly: true,
+    notes: ['Signing Only', 'Agent: Ashanti Ruben', 'Rep: Baile', 'Dual w/J. Fears'],
     embargoed: false,
     translatorNeeded: false,
     bio: [
@@ -602,7 +666,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'What should your rookie card photo show — power or finesse?',
           '"Big-man inserts": blocks, poster finishes — which moment?',
@@ -628,6 +692,11 @@ export const players: Player[] = [
     day: 2,
     scheduledTime: '12:30 PM',
     playerNumber: 14,
+    tier: 1.5,
+    tierReason: 'Solid 2nd year, exclusive, has appearance',
+    contentNotes: 'Panini posted carousel, card photos for future use, product video for future use',
+    league: 'NBA',
+    exclusive: true,
     notes: ['Exclusive - 90 min', 'Agent: Jenny Sacks (Excel)', 'Rep: Caleb', 'Guests: Jenny Sacks, Kristina Jankauskaite (mother)'],
     embargoed: false,
     translatorNeeded: false,
@@ -645,7 +714,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'What Chicago city imagery do you want in a Bulls insert card?',
           'Which play defines you: pull-up 3, coast-to-coast, or weakside block?',
@@ -673,6 +742,11 @@ export const players: Player[] = [
     day: 2,
     scheduledTime: null,
     playerNumber: 15,
+    tier: 3,
+    tierReason: 'Solid rookie "signing only"',
+    contentNotes: 'Signing photos/footage, card photos - no immediate deliverables',
+    league: 'NBA',
+    signingOnly: true,
     notes: ['Signing Only', 'Agent: Alex Tarshis (LIFE)', 'Rep: Caleb'],
     embargoed: false,
     translatorNeeded: false,
@@ -690,7 +764,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'What stat are you most proud of?',
           'What insert theme fits a "connector wing"?',
@@ -715,7 +789,11 @@ export const players: Player[] = [
     day: 2,
     scheduledTime: null,
     playerNumber: 16,
-    notes: ['60 min appearance', 'Agent: Alex Tarshis (LIFE)', 'Rep: Caleb'],
+    tier: 1.5,
+    tierReason: 'Good Rookie, non-exclusive but has appearance',
+    contentNotes: 'Panini posted carousel, card photos for future use, product video for future use',
+    league: 'NBA',
+    notes: ['60 min appearance $5000', 'Agent: Alex Tarshis (LIFE)', 'Rep: Caleb', 'Dual w/VJ'],
     embargoed: false,
     translatorNeeded: false,
     bio: [
@@ -732,7 +810,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'Your "perfect from 3" game — does that deserve its own insert?',
           'What do you want collectors to remember from your first season?',
@@ -756,6 +834,11 @@ export const players: Player[] = [
     day: 2,
     scheduledTime: null,
     playerNumber: 17,
+    tier: 3.5,
+    tierReason: '2nd year solid role player for OKC, "signing only"',
+    contentNotes: 'Signing photos/footage - no immediate deliverables',
+    league: 'NBA',
+    signingOnly: true,
     notes: ['Signing Only', 'Agent: Alex Tarshis (LIFE)', 'Rep: Caleb'],
     embargoed: false,
     translatorNeeded: false,
@@ -773,7 +856,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'How do you tell the Belgium-to-NBA journey on a card back?',
           'What flag or country cues would you want in card parallels?',
@@ -798,6 +881,11 @@ export const players: Player[] = [
     day: 2,
     scheduledTime: null,
     playerNumber: 18,
+    tier: 4,
+    tierReason: '2nd round rookie, "signing only"',
+    contentNotes: 'Signing photos/footage - no immediate deliverables',
+    league: 'NBA',
+    signingOnly: true,
     notes: ['Signing Only', 'Agent: Alex Tarshis (LIFE)', 'Rep: Caleb'],
     embargoed: false,
     translatorNeeded: false,
@@ -815,7 +903,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'What\'s your favorite "tournament run" memory to capture as a card moment?',
           'Which teammate would you want on a dual auto?',
@@ -839,7 +927,12 @@ export const players: Player[] = [
     day: 2,
     scheduledTime: null,
     playerNumber: 19,
-    notes: ['Signing Only', 'Agent: Percy Miller', 'Rep: Karishma'],
+    tier: 2.5,
+    tierReason: 'Celeb - "signing only" but usually down to clown',
+    contentNotes: 'Panini posted carousel if we get enough, card photos for future use',
+    league: 'NBA',
+    signingOnly: true,
+    notes: ['(Master P) Signing Only', 'Agent: Percy Miller', 'Rep: Karishma'],
     embargoed: false,
     translatorNeeded: false,
     bio: [
@@ -856,7 +949,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'What would a "culture-builder" card set look like?',
           'How would you blend music and entrepreneurship into collectible storytelling?',
@@ -882,7 +975,11 @@ export const players: Player[] = [
     day: 2,
     scheduledTime: null,
     playerNumber: 20,
-    notes: ['Signing Only', 'Agent: Jordan Sarason (Excel)', 'Rep: Caleb'],
+    tier: 3.5,
+    tierReason: 'OK rookie "signing only"',
+    contentNotes: 'Signing photos/footage - no immediate deliverables',
+    signingOnly: true,
+    notes: ['Signing Only', 'Rep: Caleb'],
     embargoed: false,
     translatorNeeded: false,
     bio: [
@@ -899,7 +996,7 @@ export const players: Player[] = [
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
       {
-        station: 'product',
+        station: 'qa',
         questions: [
           'How do you tell the Switzerland-to-NBA story on card backs?',
           'What do international collectors ask you for?',
@@ -979,7 +1076,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1014,7 +1111,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1050,7 +1147,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1085,7 +1182,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1120,7 +1217,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1155,7 +1252,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1191,7 +1288,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1226,7 +1323,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1261,7 +1358,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1296,7 +1393,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   // --- PREVIOUS DAY 1 ROOKIES ---
@@ -1333,7 +1430,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1368,7 +1465,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1403,7 +1500,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1438,7 +1535,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1474,7 +1571,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1509,7 +1606,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   // --- PREVIOUS DAY 2 PLAYERS ---
@@ -1545,7 +1642,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1581,7 +1678,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1616,7 +1713,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1652,7 +1749,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1688,7 +1785,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1724,7 +1821,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1760,7 +1857,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1795,7 +1892,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1831,7 +1928,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1866,7 +1963,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1901,7 +1998,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1937,7 +2034,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -1972,7 +2069,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -2007,7 +2104,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -2043,7 +2140,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
   {
@@ -2078,7 +2175,7 @@ export const archivedPlayers: Player[] = [
     ],
     questions: [
       { station: 'tunnel', questions: tunnelQuestions },
-      { station: 'product', questions: [] },
+      { station: 'qa', questions: [] },
     ],
   },
 ];

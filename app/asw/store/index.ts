@@ -10,10 +10,8 @@ import type {
   EventDay,
   ASWStationId,
   PlayerStationCompletion,
-  ClipMarker,
-  ClipCategory,
-  ClipDefaults,
 } from '../types';
+import type { ASWClipMarker, ASWClipCategory, ASWClipDefaults } from '../types/clips';
 import { defaultDeliverables } from '../data/deliverables';
 import {
   syncNoteInsert,
@@ -28,14 +26,9 @@ import {
   syncCompletionDelete,
   syncResetCompletions,
 } from '../lib/db-sync';
-import {
-  syncClipInsert,
-  syncClipUpdate,
-  syncClipDelete,
-} from '../lib/clip-sync';
 
-// ASW has 2 checklist stations
-const checklistStations: ASWStationId[] = ['tunnel', 'product'];
+// ASW has 3 checklist stations
+const checklistStations: ASWStationId[] = ['tunnel', 'qa', 'signing'];
 
 function deliverableToRecord(d: Deliverable) {
   return {
@@ -58,18 +51,10 @@ interface ASWState {
   // UI state
   viewMode: ViewMode;
   setViewMode: (mode: ViewMode) => void;
-  selectedStation: ASWStationId | null;
-  setSelectedStation: (station: ASWStationId | null) => void;
   largeText: boolean;
   toggleLargeText: () => void;
   searchOpen: boolean;
   setSearchOpen: (open: boolean) => void;
-
-  // Notifications
-  notificationsEnabled: boolean;
-  setNotificationsEnabled: (enabled: boolean) => void;
-  notificationSound: boolean;
-  setNotificationSound: (enabled: boolean) => void;
 
   // Filters
   activeDay: number | null;
@@ -107,19 +92,20 @@ interface ASWState {
   resetPlayerStationChecklist: () => void;
   getStationCompletionCount: (stationId: ASWStationId) => number;
 
-  // Clips
-  clips: ClipMarker[];
-  clipModalOpen: boolean;
-  quickMarkCategory: ClipCategory;
-  clipDefaults: ClipDefaults;
-  addClip: (clip: Partial<ClipMarker>) => ClipMarker;
+  // Clip Markers
+  clips: ASWClipMarker[];
+  setClips: (clips: ASWClipMarker[]) => void;
+  addClip: (clip: ASWClipMarker) => void;
+  updateClip: (id: string, updates: Partial<ASWClipMarker>) => void;
   deleteClip: (id: string) => void;
+  clipModalOpen: boolean;
   setClipModalOpen: (open: boolean) => void;
-  setQuickMarkCategory: (category: ClipCategory) => void;
-  setClipDefaults: (defaults: Partial<ClipDefaults>) => void;
   editingClipId: string | null;
   setEditingClipId: (id: string | null) => void;
-  toggleClipFlag: (id: string) => void;
+  quickMarkCategory: ASWClipCategory;
+  setQuickMarkCategory: (category: ASWClipCategory) => void;
+  clipDefaults: ASWClipDefaults;
+  setClipDefaults: (defaults: Partial<ASWClipDefaults>) => void;
   getTodayClipCount: () => number;
   getFlaggedCount: () => number;
 }
@@ -130,18 +116,10 @@ export const useASWStore = create<ASWState>()(
       // UI state
       viewMode: 'now',
       setViewMode: (mode) => set({ viewMode: mode }),
-      selectedStation: null,
-      setSelectedStation: (station) => set({ selectedStation: station }),
       largeText: false,
       toggleLargeText: () => set((state) => ({ largeText: !state.largeText })),
       searchOpen: false,
       setSearchOpen: (open) => set({ searchOpen: open }),
-
-      // Notifications
-      notificationsEnabled: true,
-      setNotificationsEnabled: (enabled) => set({ notificationsEnabled: enabled }),
-      notificationSound: true,
-      setNotificationSound: (enabled) => set({ notificationSound: enabled }),
 
       // Filters
       activeDay: null,
@@ -319,6 +297,7 @@ export const useASWStore = create<ASWState>()(
             const existing = state.playerStationCompletions[existingIndex];
 
             if (existing.completed) {
+              // Toggle off: remove completion
               shouldDelete = true;
               return {
                 playerStationCompletions: state.playerStationCompletions.filter(
@@ -326,6 +305,7 @@ export const useASWStore = create<ASWState>()(
                 ),
               };
             } else {
+              // Toggle on: mark existing as completed
               const now = new Date().toISOString();
               upsertPayload = {
                 player_id: playerId,
@@ -343,6 +323,7 @@ export const useASWStore = create<ASWState>()(
               };
             }
           } else {
+            // No existing record: create a new completed entry
             const now = new Date().toISOString();
             const newCompletion: PlayerStationCompletion = {
               playerId,
@@ -367,6 +348,7 @@ export const useASWStore = create<ASWState>()(
           }
         });
 
+        // Perform database sync after state update
         if (shouldDelete) {
           syncCompletionDelete(playerId, stationId);
         } else if (upsertPayload) {
@@ -407,91 +389,41 @@ export const useASWStore = create<ASWState>()(
         ).length;
       },
 
-      // Clips
+      // Clip Markers
       clips: [],
-      clipModalOpen: false,
-      quickMarkCategory: 'highlight',
-      clipDefaults: { crewMember: '', camera: '', mediaType: 'video' },
-      addClip: (clipData) => {
-        const now = new Date().toISOString();
-        const defaults = get().clipDefaults;
-        const newClip: ClipMarker = {
-          id: crypto.randomUUID(),
-          name: clipData.name || null,
-          timestamp: now,
-          timecode: clipData.timecode || null,
-          timecodeIn: clipData.timecodeIn || null,
-          timecodeOut: clipData.timecodeOut || null,
-          playerId: clipData.playerId || null,
-          stationId: clipData.stationId || null,
-          category: clipData.category || 'general',
-          tags: clipData.tags || [],
-          notes: clipData.notes || null,
-          rating: clipData.rating || null,
-          mediaType: clipData.mediaType || defaults.mediaType || 'video',
-          camera: clipData.camera || defaults.camera || null,
-          crewMember: clipData.crewMember || defaults.crewMember || null,
-          status: 'marked',
-          priority: clipData.priority || 'normal',
-          flagged: clipData.flagged || false,
-          createdAt: now,
-          updatedAt: now,
-        };
-        set((state) => {
-          const updated = [newClip, ...state.clips];
-          return { clips: updated.length > 500 ? updated.slice(0, 500) : updated };
-        });
-        syncClipInsert(newClip);
-        return newClip;
-      },
-      deleteClip: (id) => {
-        set((state) => ({
-          clips: state.clips.filter((clip) => clip.id !== id),
-        }));
-        syncClipDelete(id);
-      },
-      editingClipId: null,
-      setEditingClipId: (id) => set({ editingClipId: id }),
-      setClipModalOpen: (open) => {
-        if (!open) set({ clipModalOpen: false, editingClipId: null });
-        else set({ clipModalOpen: true });
-      },
-      setQuickMarkCategory: (category) => set({ quickMarkCategory: category }),
-      setClipDefaults: (defaults) => {
-        set((state) => ({
-          clipDefaults: { ...state.clipDefaults, ...defaults },
-        }));
-      },
-      toggleClipFlag: (id) => {
-        const clip = get().clips.find((c) => c.id === id);
-        const newFlagged = clip ? !clip.flagged : true;
+      setClips: (clips) => set({ clips }),
+      addClip: (clip) => set((state) => ({ clips: [clip, ...state.clips] })),
+      updateClip: (id, updates) =>
         set((state) => ({
           clips: state.clips.map((c) =>
-            c.id === id
-              ? { ...c, flagged: newFlagged, updatedAt: new Date().toISOString() }
-              : c
+            c.id === id ? { ...c, ...updates, updated_at: new Date().toISOString() } : c
           ),
-        }));
-        syncClipUpdate(id, { flagged: newFlagged });
-      },
+        })),
+      deleteClip: (id) =>
+        set((state) => ({ clips: state.clips.filter((c) => c.id !== id) })),
+      clipModalOpen: false,
+      setClipModalOpen: (open) => set({ clipModalOpen: open }),
+      editingClipId: null,
+      setEditingClipId: (id) => set({ editingClipId: id }),
+      quickMarkCategory: 'highlight',
+      setQuickMarkCategory: (category) => set({ quickMarkCategory: category }),
+      clipDefaults: { crew_member: '', camera: '', media_type: 'video' },
+      setClipDefaults: (defaults) =>
+        set((state) => ({ clipDefaults: { ...state.clipDefaults, ...defaults } })),
       getTodayClipCount: () => {
-        const today = new Date().toDateString();
-        return get().clips.filter(
-          (c) => new Date(c.timestamp).toDateString() === today
-        ).length;
+        const today = new Date().toISOString().split('T')[0];
+        return get().clips.filter((c) => c.created_at.startsWith(today)).length;
       },
-      getFlaggedCount: () => {
-        return get().clips.filter((c) => c.flagged).length;
-      },
+      getFlaggedCount: () => get().clips.filter((c) => c.flagged).length,
     }),
     {
       name: 'asw-storage',
       storage: createJSONStorage(() => localStorage),
+      // Only persist UI-related preferences; Supabase remains the source of truth
+      // for notes, deliverables, and playerStationCompletions to avoid stale-data flashes.
       partialize: (state) => ({
         viewMode: state.viewMode,
         largeText: state.largeText,
-        notificationsEnabled: state.notificationsEnabled,
-        notificationSound: state.notificationSound,
         clips: state.clips,
         quickMarkCategory: state.quickMarkCategory,
         clipDefaults: state.clipDefaults,

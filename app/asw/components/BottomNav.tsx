@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Zap, Calendar, Radio, User, MoreHorizontal, MessageSquare, ClipboardCheck, FileBox, Timer, Clapperboard, X, ArrowLeft } from 'lucide-react';
+import { Zap, Calendar, Radio, User, MoreHorizontal, MessageSquare, ClipboardCheck, FileBox, X, ArrowLeft, Settings, Film } from 'lucide-react';
 import { useASWStore } from '../store';
 import { useMounted } from '../hooks/useMounted';
 import type { ViewMode } from '../types';
@@ -16,11 +16,11 @@ const navItems: { mode: ViewMode; label: string; icon: typeof Zap }[] = [
 ];
 
 const moreItems = [
-  { href: '/asw/timer', label: 'Timer', icon: Timer, color: 'text-pink-400' },
-  { href: '/asw/clips', label: 'Clip Markers', icon: Clapperboard, color: 'text-yellow-400' },
   { href: '/asw/notes', label: 'Notes & Issues', icon: MessageSquare, color: 'text-blue-400' },
   { href: '/asw/checklist', label: 'Station Checklist', icon: ClipboardCheck, color: 'text-green-400' },
   { href: '/asw/deliverables', label: 'Deliverables', icon: FileBox, color: 'text-amber-400' },
+  { href: '/asw/clips', label: 'Clip Markers', icon: Film, color: 'text-purple-400' },
+  { href: '/asw/admin', label: 'Admin', icon: Settings, color: 'text-[#FFD100]' },
 ];
 
 export default function BottomNav() {
