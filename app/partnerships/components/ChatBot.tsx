@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback, type FormEvent } from 'react';
 import { MessageCircle, X, Send, Loader2 } from 'lucide-react';
+import { getSupabase } from '../lib/supabase';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -15,6 +16,7 @@ export default function ChatBot() {
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = useCallback(() => {
     if (scrollRef.current) {
@@ -32,6 +34,20 @@ export default function ChatBot() {
     }
   }, [open]);
 
+  // Close on Escape key
+  useEffect(() => {
+    if (!open) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [open]);
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     const trimmed = input.trim();
@@ -43,9 +59,17 @@ export default function ChatBot() {
     setLoading(true);
 
     try {
+      // Get auth token for the API request
+      const supabase = getSupabase();
+      const session = supabase ? (await supabase.auth.getSession()).data.session : null;
+      const authHeaders: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (session?.access_token) {
+        authHeaders['Authorization'] = `Bearer ${session.access_token}`;
+      }
+
       const res = await fetch('/api/partnerships/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders,
         body: JSON.stringify({
           message: trimmed,
           history: messages,
@@ -88,7 +112,12 @@ export default function ChatBot() {
 
       {/* Chat panel */}
       {open && (
-        <div className="fixed bottom-4 right-4 z-50 flex h-[min(520px,calc(100vh-2rem))] w-[min(380px,calc(100vw-2rem))] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#121212] shadow-2xl shadow-black/50 animate-appear">
+        <div
+          ref={panelRef}
+          role="dialog"
+          aria-label="Partnerships chat assistant"
+          className="fixed bottom-4 right-4 z-50 flex h-[min(520px,calc(100vh-2rem))] w-[min(380px,calc(100vw-2rem))] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#121212] shadow-2xl shadow-black/50 animate-appear"
+        >
           {/* Header */}
           <div className="flex items-center justify-between border-b border-white/10 bg-[#0D0D0D] px-4 py-3">
             <div className="flex items-center gap-2">
