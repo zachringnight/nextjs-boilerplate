@@ -1,4 +1,6 @@
-import { getSupabase } from './supabase';
+'use server';
+
+import { getServiceSupabaseClient } from '@/app/lib/supabase-server';
 import type {
   Athlete,
   AthleteContract,
@@ -12,9 +14,7 @@ import type {
 } from '../types';
 
 function requireClient() {
-  const client = getSupabase();
-  if (!client) throw new Error('Supabase not configured');
-  return client;
+  return getServiceSupabaseClient();
 }
 
 // === Athletes ===
