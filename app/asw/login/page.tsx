@@ -2,14 +2,12 @@
 
 import { FormEvent, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Eye, Mail, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Mail, ShieldCheck } from 'lucide-react';
 import { useAuthContext } from '../components/AuthProvider';
 
 export default function ASWLoginPage() {
-  const { mode, loading, session, hasAccess, sendMagicLink, defaultEventSlug, previewPasswordEnabled, activatePreviewAccess } = useAuthContext();
+  const { mode, loading, session, hasAccess, sendMagicLink, defaultEventSlug } = useAuthContext();
   const [email, setEmail] = useState('');
-  const [previewPw, setPreviewPw] = useState('');
-  const [previewError, setPreviewError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -68,46 +66,6 @@ export default function ASWLoginPage() {
           <div className="mt-4 rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">
             You are signed in, but this account is not assigned to the event yet. Ask an admin to add your membership.
           </div>
-        ) : null}
-
-        {previewPasswordEnabled && mode !== 'bypass' ? (
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              setPreviewError(null);
-              if (activatePreviewAccess(previewPw.trim())) {
-                return; // bypass activated — AuthProvider will re-render
-              }
-              setPreviewError('Incorrect preview password.');
-            }}
-            className="mt-4 space-y-3"
-          >
-            <label className="block text-xs font-medium uppercase tracking-wide text-[#9CA3AF]">
-              Preview Password
-            </label>
-            <div className="relative">
-              <Eye className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B7280]" />
-              <input
-                type="password"
-                required
-                value={previewPw}
-                onChange={(e) => setPreviewPw(e.target.value)}
-                placeholder="Enter preview password"
-                className="w-full min-h-[44px] rounded-xl border border-[#2A2A2A] bg-[#0F0F0F] pl-10 pr-3 text-sm text-white placeholder:text-[#6B7280]"
-              />
-            </div>
-            <button
-              type="submit"
-              className="inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl bg-[#3B82F6] px-4 text-sm font-semibold text-white hover:brightness-95"
-            >
-              <Eye className="h-4 w-4" />
-              Preview Access
-            </button>
-            {previewError ? <p className="text-sm text-red-300">{previewError}</p> : null}
-            <div className="border-t border-[#2A2A2A] pt-3 text-center text-xs text-[#6B7280]">
-              or sign in with your email below
-            </div>
-          </form>
         ) : null}
 
         <form onSubmit={handleSubmit} className="mt-4 space-y-3">
