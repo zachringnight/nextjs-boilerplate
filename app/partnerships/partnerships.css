@@ -1,0 +1,60 @@
+/* Glass morphism */
+.glass {
+  background: rgba(13, 13, 13, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Gold gradient accent */
+.gold-gradient {
+  background: linear-gradient(90deg, #FFD100, #FFA000, #FFD100);
+  background-size: 200% 100%;
+  animation: shimmer 3s ease infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes appear {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.animate-appear {
+  animation: appear 0.2s ease-out;
+}
+
+/* Touch target minimum size */
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* Safe area for bottom nav */
+.safe-area-pb {
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+}
+
+/* Focus ring */
+:where(a, button, input, select, textarea, [role='button']):focus-visible {
+  outline: 2px solid #FFD100;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.85), 0 0 0 4px rgba(255, 209, 0, 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .gold-gradient,
+  .animate-pulse {
+    animation: none !important;
+  }
+}
