@@ -20,6 +20,9 @@ function requireClient() {
   return getServiceSupabaseClient();
 }
 
+// Exclude contracts that expired before this date from all views
+const CONTRACT_CUTOFF_DATE = '2026-01-01';
+
 // === Athletes ===
 
 export async function fetchAthletes(filters?: {
@@ -64,6 +67,7 @@ export async function fetchContractsForAthlete(athleteId: number): Promise<Athle
     .from('athlete_contracts')
     .select('*')
     .eq('athlete_id', athleteId)
+    .or(`contract_end.gte.${CONTRACT_CUTOFF_DATE},contract_end.is.null`)
     .order('contract_start', { ascending: false });
   if (error) throw error;
   return (data ?? []) as AthleteContract[];
@@ -74,6 +78,7 @@ export async function fetchAllContracts(): Promise<(AthleteContract & { athlete:
   const { data, error } = await client
     .from('athlete_contracts')
     .select('*, athlete:athletes(*)')
+    .or(`contract_end.gte.${CONTRACT_CUTOFF_DATE},contract_end.is.null`)
     .order('contract_end', { ascending: true, nullsFirst: false });
   if (error) throw error;
   return (data ?? []) as (AthleteContract & { athlete: Athlete })[];
@@ -98,6 +103,7 @@ export async function fetchExpiredContracts(): Promise<(AthleteContract & { athl
     .from('athlete_contracts')
     .select('*, athlete:athletes(*)')
     .lt('contract_end', today)
+    .gte('contract_end', CONTRACT_CUTOFF_DATE)
     .order('contract_end', { ascending: false });
   if (error) throw error;
   return (data ?? []) as (AthleteContract & { athlete: Athlete })[];
@@ -120,7 +126,8 @@ export async function fetchAllObligations(): Promise<(MarketingObligation & { co
   const client = requireClient();
   const { data, error } = await client
     .from('marketing_obligations')
-    .select('*, contract:athlete_contracts(*, athlete:athletes(*))')
+    .select('*, contract:athlete_contracts!inner(*, athlete:athletes(*))')
+    .or(`contract_end.gte.${CONTRACT_CUTOFF_DATE},contract_end.is.null`, { referencedTable: 'athlete_contracts' })
     .order('obligation_type');
   if (error) throw error;
   return (data ?? []) as (MarketingObligation & { contract: AthleteContract & { athlete: Athlete } })[];
@@ -322,6 +329,7 @@ export async function fetchContractsWithObligationCounts(): Promise<
   const { data: contractsRaw, error: cErr } = await client
     .from('athlete_contracts')
     .select('*, athlete:athletes(*)')
+    .or(`contract_end.gte.${CONTRACT_CUTOFF_DATE},contract_end.is.null`)
     .order('contract_end', { ascending: true, nullsFirst: false });
   if (cErr) throw cErr;
 
