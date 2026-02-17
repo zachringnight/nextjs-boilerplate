@@ -34,9 +34,11 @@ interface AuthContextValue {
   role: AppRole | null;
   defaultEventSlug: string;
   error: string | null;
+  previewPasswordEnabled: boolean;
   sendMagicLink: (email: string) => Promise<{ ok: boolean; message?: string }>;
   signOut: () => Promise<void>;
   refreshAccess: () => Promise<void>;
+  activatePreviewAccess: (password: string) => boolean;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -51,6 +53,8 @@ function getRoleFromMembership(value: unknown): AppRole | null {
   return null;
 }
 
+const PREVIEW_STORAGE_KEY = 'asw-preview-access';
+
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
   const [mode, setMode] = useState<AuthMode>('auth');
   const [ready, setReady] = useState(false);
@@ -60,14 +64,16 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
   const [error, setError] = useState<string | null>(null);
 
   const defaultEventSlug = useMemo(() => getDefaultEventSlug(), []);
+  const previewPassword = process.env.NEXT_PUBLIC_PREVIEW_PASSWORD ?? '';
+  const previewPasswordEnabled = previewPassword.length > 0;
 
-  const applyBypassMode = useCallback(() => {
+  const applyBypassMode = useCallback((label = 'Local Development Mode') => {
     setMode('bypass');
     setSession(null);
     setAccess({
       eventId: defaultEventSlug,
       eventSlug: defaultEventSlug,
-      eventName: 'Local Development Mode',
+      eventName: label,
       role: 'admin',
     });
     setError(null);
@@ -77,13 +83,25 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     setRuntimeAccessContext({
       ready: true,
       bypass: true,
-      userId: 'local-dev-user',
+      userId: 'preview-user',
       eventId: defaultEventSlug,
       eventSlug: defaultEventSlug,
       role: 'admin',
       hasAccess: true,
     });
   }, [defaultEventSlug]);
+
+  const activatePreviewAccess = useCallback(
+    (password: string): boolean => {
+      if (!previewPasswordEnabled || password !== previewPassword) return false;
+      try {
+        localStorage.setItem(PREVIEW_STORAGE_KEY, 'true');
+      } catch { /* storage unavailable */ }
+      applyBypassMode('Preview Mode');
+      return true;
+    },
+    [applyBypassMode, previewPassword, previewPasswordEnabled],
+  );
 
   const resolveAccess = useCallback(
     async (nextSession: Session | null) => {
@@ -202,6 +220,17 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 
   const refreshAccess = useCallback(async () => {
     setLoading(true);
+
+    // Restore preview-password session from localStorage
+    if (previewPasswordEnabled) {
+      try {
+        if (localStorage.getItem(PREVIEW_STORAGE_KEY) === 'true') {
+          applyBypassMode('Preview Mode');
+          return;
+        }
+      } catch { /* storage unavailable */ }
+    }
+
     const supabase = getSupabase();
 
     if (!supabase || !isSupabaseConfigured()) {
@@ -219,7 +248,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     await resolveAccess(nextSession);
     setLoading(false);
     setReady(true);
-  }, [applyBypassMode, resolveAccess]);
+  }, [applyBypassMode, previewPasswordEnabled, resolveAccess]);
 
   useEffect(() => {
     void refreshAccess();
@@ -279,6 +308,8 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
   );
 
   const signOut = useCallback(async () => {
+    try { localStorage.removeItem(PREVIEW_STORAGE_KEY); } catch { /* ok */ }
+
     const supabase = getSupabase();
     if (!supabase || mode === 'bypass') return;
 
@@ -315,11 +346,13 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       role,
       defaultEventSlug,
       error,
+      previewPasswordEnabled,
       sendMagicLink,
       signOut,
       refreshAccess,
+      activatePreviewAccess,
     };
-  }, [access, defaultEventSlug, error, loading, mode, ready, refreshAccess, role, sendMagicLink, session, signOut]);
+  }, [access, activatePreviewAccess, defaultEventSlug, error, loading, mode, previewPasswordEnabled, ready, refreshAccess, role, sendMagicLink, session, signOut]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
