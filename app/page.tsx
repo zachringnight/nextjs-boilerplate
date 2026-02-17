@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Handshake, Zap, Trophy, ChevronRight, type LucideIcon } from 'lucide-react';
+import { Handshake, ChevronRight, type LucideIcon } from 'lucide-react';
 
 const apps: { name: string; href: string; description: string; icon: LucideIcon; color: string }[] = [
   {
@@ -8,20 +8,6 @@ const apps: { name: string; href: string; description: string; icon: LucideIcon;
     description: 'Athlete contracts, obligations, and partnership tracking',
     icon: Handshake,
     color: '#FFD100',
-  },
-  {
-    name: 'ASW 2026',
-    href: '/asw',
-    description: 'NBA All-Star Weekend production hub — Los Angeles',
-    icon: Zap,
-    color: '#FF6B35',
-  },
-  {
-    name: 'Prizm Lounge',
-    href: '/prizm',
-    description: 'Super Bowl LX production hub — San Francisco',
-    icon: Trophy,
-    color: '#00C2FF',
   },
 ];
 
