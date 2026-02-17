@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef, useCallback } from 'react';
 import { X, Volume2, AlertTriangle, Languages } from 'lucide-react';
 import type { Player } from '../types';
 import PlayerAvatar from './PlayerAvatar';
@@ -14,16 +15,66 @@ interface PlayerModalProps {
 
 export default function PlayerModal({ player, onClose, largeText = false }: PlayerModalProps) {
   const dayStyle = DAY_STYLES[player.day];
+  const modalRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+        return;
+      }
+
+      // Focus trapping
+      if (e.key !== 'Tab') return;
+      const modal = modalRef.current;
+      if (!modal) return;
+
+      const focusableElements = modal.querySelectorAll<HTMLElement>(
+        'button, a, [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusableElements.length === 0) return;
+
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+
+      if (e.shiftKey) {
+        if (document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement.focus();
+        }
+      } else {
+        if (document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement.focus();
+        }
+      }
+    },
+    [onClose]
+  );
+
+  useEffect(() => {
+    closeButtonRef.current?.focus();
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [handleKeyDown]);
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
-      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm animate-[backdropFade_0.2s_ease-out]" onClick={onClose} />
+    <div
+      className="fixed inset-0 z-50 overflow-y-auto"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Player details for ${player.firstName} ${player.lastName}`}
+    >
+      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm animate-[backdropFade_0.2s_ease-out]" onClick={onClose} aria-hidden="true" />
       <div className="relative min-h-screen flex items-start justify-center p-4 pt-8">
-        <div className="relative bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl w-full max-w-2xl overflow-hidden animate-[slideUp_0.3s_ease-out]">
+        <div ref={modalRef} className="relative bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl w-full max-w-2xl overflow-hidden animate-[slideUp_0.3s_ease-out]">
           {/* Close */}
           <button
+            ref={closeButtonRef}
             onClick={onClose}
             className="absolute top-4 right-4 z-10 p-2 rounded-lg bg-[#1a1a1a] hover:bg-[#2a2a2a] transition-colors"
+            aria-label="Close player details"
           >
             <X className="w-5 h-5" />
           </button>

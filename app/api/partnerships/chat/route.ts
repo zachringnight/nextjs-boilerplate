@@ -1,8 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
-import { getServiceSupabaseClient } from '@/app/lib/supabase-server';
+import { getServiceSupabaseClient, parseBearerToken, getUserFromBearerToken } from '@/app/lib/supabase-server';
 
 const anthropic = new Anthropic();
+
+// ---------------------------------------------------------------------------
+// Rate limiting (in-memory, per-user, resets on server restart)
+// ---------------------------------------------------------------------------
+
+const MAX_REQUESTS_PER_MINUTE = 10;
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+
+function checkRateLimit(userId: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(userId);
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(userId, { count: 1, resetAt: now + 60_000 });
+    return true;
+  }
+  if (entry.count >= MAX_REQUESTS_PER_MINUTE) return false;
+  entry.count++;
+  return true;
+}
+
+// ---------------------------------------------------------------------------
+// Input constraints
+// ---------------------------------------------------------------------------
+
+const MAX_MESSAGE_LENGTH = 2000;
+const MAX_HISTORY_MESSAGES = 20;
 
 // ---------------------------------------------------------------------------
 // Database helpers
@@ -519,6 +545,25 @@ const MAX_TOOL_ROUNDS = 5;
 
 export async function POST(request: NextRequest) {
   try {
+    // --- Authentication ---
+    const token = parseBearerToken(request.headers.get('authorization'));
+    if (!token) {
+      return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
+    }
+
+    const user = await getUserFromBearerToken(token);
+    if (!user) {
+      return NextResponse.json({ error: 'Invalid or expired token.' }, { status: 401 });
+    }
+
+    // --- Rate limiting ---
+    if (!checkRateLimit(user.id)) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please wait a minute before trying again.' },
+        { status: 429 },
+      );
+    }
+
     const { message, history } = (await request.json()) as {
       message: string;
       history?: { role: 'user' | 'assistant'; content: string }[];
@@ -526,6 +571,13 @@ export async function POST(request: NextRequest) {
 
     if (!message || typeof message !== 'string') {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
+    }
+
+    if (message.length > MAX_MESSAGE_LENGTH) {
+      return NextResponse.json(
+        { error: `Message must be ${MAX_MESSAGE_LENGTH} characters or fewer.` },
+        { status: 400 },
+      );
     }
 
     if (!process.env.ANTHROPIC_API_KEY) {
@@ -538,8 +590,11 @@ export async function POST(request: NextRequest) {
     const context = await fetchDatabaseContext();
     const systemPrompt = buildSystemPrompt(context);
 
+    // Truncate history to prevent unbounded token growth
+    const trimmedHistory = (history ?? []).slice(-MAX_HISTORY_MESSAGES);
+
     const messages: Anthropic.MessageParam[] = [
-      ...(history ?? []).map((msg) => ({
+      ...trimmedHistory.map((msg) => ({
         role: msg.role as 'user' | 'assistant',
         content: msg.content,
       })),

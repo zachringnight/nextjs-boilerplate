@@ -434,7 +434,11 @@ export const useAppStore = create<AppState>()(
         };
         set((state) => {
           const updated = [newClip, ...state.clips];
-          return { clips: updated.length > 500 ? updated.slice(0, 500) : updated };
+          if (updated.length > 500) {
+            console.warn(`Clip list exceeded 500 items (${updated.length}). Oldest clips were removed.`);
+            return { clips: updated.slice(0, 500) };
+          }
+          return { clips: updated };
         });
         syncClipInsert(newClip);
         return newClip;
@@ -481,7 +485,11 @@ export const useAppStore = create<AppState>()(
         };
         set((state) => {
           const updated = [newClip, ...state.clips];
-          return { clips: updated.length > 500 ? updated.slice(0, 500) : updated };
+          if (updated.length > 500) {
+            console.warn(`Clip list exceeded 500 items (${updated.length}). Oldest clips were removed.`);
+            return { clips: updated.slice(0, 500) };
+          }
+          return { clips: updated };
         });
         syncClipInsert(newClip);
         return newClip;
