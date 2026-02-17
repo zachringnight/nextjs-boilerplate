@@ -7,6 +7,7 @@ import {
   summarizeDiff,
   toNullable,
 } from '../_lib/csv';
+import { assertImportSchema } from '../_lib/schema';
 
 const deliverableStatusSchema = z.enum(['pending', 'in-progress', 'completed', 'delivered']);
 const deliverableTypeSchema = z.enum(['photo', 'video']);
@@ -37,6 +38,11 @@ export async function POST(request: NextRequest) {
   const auth = await requireAdminContext(request);
   if (!auth.ok) {
     return NextResponse.json({ error: auth.message }, { status: auth.status });
+  }
+
+  const schemaCheck = await assertImportSchema(auth.supabase, 'deliverables');
+  if (!schemaCheck.ok) {
+    return NextResponse.json({ error: schemaCheck.message }, { status: 409 });
   }
 
   let body: unknown;

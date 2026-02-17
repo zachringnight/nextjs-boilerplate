@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import FormModal from './FormModal';
 import { SPORTS } from '../lib/constants';
 import { createAthlete, updateAthlete } from '../lib/mutations';
@@ -21,6 +21,15 @@ export default function AthleteForm({ open, onClose, onSaved, athlete }: Athlete
   const [team, setTeam] = useState(athlete?.team ?? '');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    setName(athlete?.name ?? '');
+    setSport(athlete?.sport ?? '');
+    setLeague(athlete?.league ?? '');
+    setTeam(athlete?.team ?? '');
+    setError(null);
+  }, [open, athlete]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

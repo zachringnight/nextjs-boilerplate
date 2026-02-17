@@ -7,6 +7,7 @@ import {
   summarizeDiff,
   toNullable,
 } from '../_lib/csv';
+import { assertImportSchema } from '../_lib/schema';
 
 const timePattern = /^\d{2}:\d{2}$/;
 const datePattern = /^\d{4}-\d{2}-\d{2}$/;
@@ -40,6 +41,11 @@ export async function POST(request: NextRequest) {
   const auth = await requireAdminContext(request);
   if (!auth.ok) {
     return NextResponse.json({ error: auth.message }, { status: auth.status });
+  }
+
+  const schemaCheck = await assertImportSchema(auth.supabase, 'schedule');
+  if (!schemaCheck.ok) {
+    return NextResponse.json({ error: schemaCheck.message }, { status: 409 });
   }
 
   let body: unknown;

@@ -9,6 +9,7 @@ import {
   summarizeDiff,
   toNullable,
 } from '../_lib/csv';
+import { assertImportSchema } from '../_lib/schema';
 
 const playerRowSchema = z.object({
   id: z.string().min(1),
@@ -36,6 +37,11 @@ export async function POST(request: NextRequest) {
   const auth = await requireAdminContext(request);
   if (!auth.ok) {
     return NextResponse.json({ error: auth.message }, { status: auth.status });
+  }
+
+  const schemaCheck = await assertImportSchema(auth.supabase, 'players');
+  if (!schemaCheck.ok) {
+    return NextResponse.json({ error: schemaCheck.message }, { status: 409 });
   }
 
   let body: unknown;

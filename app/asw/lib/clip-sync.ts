@@ -1,11 +1,17 @@
 /**
  * Supabase sync helpers for clip markers in the ASW build.
  * Includes a pending sync queue that retries failed operations when online.
+ * Supports both event-scoped and legacy schemas.
  */
 
 import { getSupabase } from './supabase';
 import type { ClipMarker } from '../types';
 import { canWriteRole, getRuntimeAccessContext } from './runtime-context';
+import {
+  detectASWSchemaMode,
+  toLegacyClipStation,
+  toLegacyTimestamp,
+} from './schema-compat';
 
 interface WriteContext {
   eventId: string;
@@ -171,12 +177,45 @@ function toDbUpdates(updates: Partial<ClipMarker>): Record<string, unknown> {
   return dbUpdates;
 }
 
+function toLegacyClipInsert(
+  clipData: Partial<ClipMarker>,
+  ctx: WriteContext
+): Record<string, unknown> {
+  return {
+    id: clipData.id,
+    station: toLegacyClipStation(clipData.stationId),
+    player_id: clipData.playerId || null,
+    player_name: clipData.name || null,
+    timestamp: toLegacyTimestamp(clipData.timestamp || new Date().toISOString()),
+    note: clipData.notes || null,
+    marked_by: clipData.crewMember || ctx.userId || null,
+  };
+}
+
+function toLegacyClipUpdates(updates: Partial<ClipMarker>): Record<string, unknown> {
+  const dbUpdates: Record<string, unknown> = { updated_at: new Date().toISOString() };
+
+  if (updates.stationId !== undefined) dbUpdates.station = toLegacyClipStation(updates.stationId);
+  if (updates.playerId !== undefined) dbUpdates.player_id = updates.playerId;
+  if (updates.name !== undefined) dbUpdates.player_name = updates.name;
+  if (updates.notes !== undefined) dbUpdates.note = updates.notes;
+  if (updates.timestamp !== undefined) dbUpdates.timestamp = toLegacyTimestamp(updates.timestamp);
+  if (updates.crewMember !== undefined) dbUpdates.marked_by = updates.crewMember;
+
+  return dbUpdates;
+}
+
 async function doInsert(clipData: Partial<ClipMarker>, ctx: WriteContext): Promise<boolean> {
   const supabase = getSupabase();
   if (!supabase) return false;
 
   try {
-    const { error } = await supabase.from('clip_markers').insert(toDbClip(clipData, ctx));
+    const schemaMode = await detectASWSchemaMode();
+    const payload = schemaMode === 'event-scoped'
+      ? toDbClip(clipData, ctx)
+      : toLegacyClipInsert(clipData, ctx);
+
+    const { error } = await supabase.from('clip_markers').insert(payload);
     if (error) throw error;
     return true;
   } catch (err) {
@@ -190,11 +229,29 @@ async function doUpdate(id: string, updates: Partial<ClipMarker>, ctx: WriteCont
   if (!supabase) return false;
 
   try {
+    const schemaMode = await detectASWSchemaMode();
+
+    if (schemaMode === 'event-scoped') {
+      const { error } = await supabase
+        .from('clip_markers')
+        .update(toDbUpdates(updates))
+        .eq('event_id', ctx.eventId)
+        .eq('id', id);
+      if (error) throw error;
+      return true;
+    }
+
+    const legacyUpdates = toLegacyClipUpdates(updates);
+    if (Object.keys(legacyUpdates).length === 1) {
+      // only updated_at was set, so there is no legacy field to persist.
+      return true;
+    }
+
     const { error } = await supabase
       .from('clip_markers')
-      .update(toDbUpdates(updates))
-      .eq('event_id', ctx.eventId)
+      .update(legacyUpdates)
       .eq('id', id);
+
     if (error) throw error;
     return true;
   } catch (err) {
@@ -208,11 +265,23 @@ async function doDelete(id: string, ctx: WriteContext): Promise<boolean> {
   if (!supabase) return false;
 
   try {
+    const schemaMode = await detectASWSchemaMode();
+
+    if (schemaMode === 'event-scoped') {
+      const { error } = await supabase
+        .from('clip_markers')
+        .delete()
+        .eq('event_id', ctx.eventId)
+        .eq('id', id);
+      if (error) throw error;
+      return true;
+    }
+
     const { error } = await supabase
       .from('clip_markers')
       .delete()
-      .eq('event_id', ctx.eventId)
       .eq('id', id);
+
     if (error) throw error;
     return true;
   } catch (err) {
@@ -226,11 +295,28 @@ async function doBulkUpdate(ids: string[], updates: Partial<ClipMarker>, ctx: Wr
   if (!supabase) return false;
 
   try {
+    const schemaMode = await detectASWSchemaMode();
+
+    if (schemaMode === 'event-scoped') {
+      const { error } = await supabase
+        .from('clip_markers')
+        .update(toDbUpdates(updates))
+        .eq('event_id', ctx.eventId)
+        .in('id', ids);
+      if (error) throw error;
+      return true;
+    }
+
+    const legacyUpdates = toLegacyClipUpdates(updates);
+    if (Object.keys(legacyUpdates).length === 1) {
+      return true;
+    }
+
     const { error } = await supabase
       .from('clip_markers')
-      .update(toDbUpdates(updates))
-      .eq('event_id', ctx.eventId)
+      .update(legacyUpdates)
       .in('id', ids);
+
     if (error) throw error;
     return true;
   } catch (err) {
@@ -244,11 +330,23 @@ async function doBulkDelete(ids: string[], ctx: WriteContext): Promise<boolean> 
   if (!supabase) return false;
 
   try {
+    const schemaMode = await detectASWSchemaMode();
+
+    if (schemaMode === 'event-scoped') {
+      const { error } = await supabase
+        .from('clip_markers')
+        .delete()
+        .eq('event_id', ctx.eventId)
+        .in('id', ids);
+      if (error) throw error;
+      return true;
+    }
+
     const { error } = await supabase
       .from('clip_markers')
       .delete()
-      .eq('event_id', ctx.eventId)
       .in('id', ids);
+
     if (error) throw error;
     return true;
   } catch (err) {

@@ -33,6 +33,7 @@ import {
   syncClipUpdate,
   syncClipDelete,
 } from '../lib/clip-sync';
+import { createClientUuid, ensureUuid } from '../lib/id-utils';
 import { canWriteRole, getRuntimeAccessContext } from '../lib/runtime-context';
 
 // ASW has 2 checklist stations
@@ -53,6 +54,13 @@ function deliverableToRecord(d: Deliverable) {
     assignee: d.assignee || null,
     priority: d.priority || null,
   };
+}
+
+function normalizeDeliverableIds(deliverables: Deliverable[]): Deliverable[] {
+  return deliverables.map((deliverable) => ({
+    ...deliverable,
+    id: ensureUuid(deliverable.id, 'deliverable'),
+  }));
 }
 
 function canMutateData(): boolean {
@@ -187,7 +195,7 @@ export const useASWStore = create<ASWState>()(
         const now = new Date().toISOString();
         const note: Note = {
           ...noteData,
-          id: `note-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
+          id: createClientUuid(),
           createdAt: now,
           updatedAt: now,
         };
@@ -260,7 +268,7 @@ export const useASWStore = create<ASWState>()(
       },
 
       // Deliverables
-      deliverables: defaultDeliverables,
+      deliverables: normalizeDeliverableIds(defaultDeliverables),
       updateDeliverableStatus: (id, status) => {
         if (!canMutateData()) return;
         const now = new Date().toISOString();
@@ -295,7 +303,7 @@ export const useASWStore = create<ASWState>()(
       },
       addDeliverable: (deliverableData) => {
         if (!canMutateData()) return '';
-        const id = `deliverable-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+        const id = createClientUuid();
         const deliverable: Deliverable = {
           ...deliverableData,
           id,
@@ -315,8 +323,9 @@ export const useASWStore = create<ASWState>()(
       },
       resetDeliverables: () => {
         if (!canMutateData()) return;
-        set({ deliverables: defaultDeliverables });
-        syncBulkDeliverableUpsert(defaultDeliverables.map(deliverableToRecord));
+        const normalizedDefaults = normalizeDeliverableIds(defaultDeliverables);
+        set({ deliverables: normalizedDefaults });
+        syncBulkDeliverableUpsert(normalizedDefaults.map(deliverableToRecord));
       },
       getDeliverablesByDay: (day) => {
         return get().deliverables.filter((d) => d.dueDay === day);
@@ -460,7 +469,7 @@ export const useASWStore = create<ASWState>()(
         const now = new Date().toISOString();
         const defaults = get().clipDefaults;
         const newClip: ClipMarker = {
-          id: crypto.randomUUID(),
+          id: createClientUuid(),
           name: clipData.name || null,
           timestamp: now,
           timecode: clipData.timecode || null,

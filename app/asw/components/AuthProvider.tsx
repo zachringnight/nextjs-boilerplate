@@ -12,6 +12,7 @@ import type { Session, User } from '@supabase/supabase-js';
 import { getDefaultEventSlug } from '../lib/event-config';
 import { getSupabase, isSupabaseConfigured } from '../lib/supabase';
 import type { AppRole, EventAccess } from '../lib/auth-types';
+import { isUuid } from '../lib/id-utils';
 import {
   canAdminRole,
   canWriteRole,
@@ -112,7 +113,9 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       }
 
       try {
-        const { data: eventData, error: eventError } = await supabase
+        let eventData: { id: string; slug: string; name: string } | null = null;
+
+        const { data: eventBySlug, error: eventError } = await supabase
           .from('events')
           .select('id, slug, name')
           .eq('slug', defaultEventSlug)
@@ -120,6 +123,37 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 
         if (eventError) {
           throw new Error(`Failed to load event context: ${eventError.message}`);
+        }
+
+        eventData = eventBySlug;
+
+        if (!eventData && isUuid(defaultEventSlug)) {
+          const { data: eventById, error: eventByIdError } = await supabase
+            .from('events')
+            .select('id, slug, name')
+            .eq('id', defaultEventSlug)
+            .maybeSingle();
+
+          if (eventByIdError) {
+            throw new Error(`Failed to load event context by id: ${eventByIdError.message}`);
+          }
+
+          eventData = eventById;
+        }
+
+        if (!eventData) {
+          const { data: fallbackEvents, error: fallbackError } = await supabase
+            .from('events')
+            .select('id, slug, name')
+            .limit(2);
+
+          if (fallbackError) {
+            throw new Error(`Failed to inspect fallback event context: ${fallbackError.message}`);
+          }
+
+          if ((fallbackEvents || []).length === 1) {
+            eventData = fallbackEvents?.[0] || null;
+          }
         }
 
         if (!eventData?.id) {
@@ -166,7 +200,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 
         const resolvedAccess: EventAccess = {
           eventId: eventData.id,
-          eventSlug: eventData.slug,
+          eventSlug: eventData.slug || defaultEventSlug,
           eventName: eventData.name,
           role,
         };

@@ -12,6 +12,7 @@ import {
   type CompletionRecord,
 } from '../lib/db-sync';
 import { flushSyncQueue } from '../lib/clip-sync';
+import { detectASWSchemaMode } from '../lib/schema-compat';
 import type {
   Note,
   NoteCategory,
@@ -150,8 +151,8 @@ export default function SupabaseProvider() {
       if (!supabase || !isSupabaseConfigured()) return;
       if (!(await ensureSupabaseAvailable())) return;
       if (!mounted) return;
-
-      currentChannel = supabase
+      const schemaMode = await detectASWSchemaMode();
+      const baseChannel = supabase
         .channel(`asw-tables-sync-${eventId}`)
         .on(
           'postgres_changes',
@@ -172,21 +173,34 @@ export default function SupabaseProvider() {
               }
             });
           }
-        )
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: 'player_station_completions', filter: `event_id=eq.${eventId}` },
-          () => {
-            fetchCompletions().then((data) => {
-              if (data && mounted) {
-                useASWStore.setState({
-                  playerStationCompletions: data.map(toAppCompletion),
-                });
-              }
+        );
+
+      const onCompletionsChange = () => {
+        fetchCompletions().then((data) => {
+          if (data && mounted) {
+            useASWStore.setState({
+              playerStationCompletions: data.map(toAppCompletion),
             });
           }
-        )
-        .subscribe();
+        });
+      };
+
+      currentChannel =
+        schemaMode === 'event-scoped'
+          ? baseChannel
+              .on(
+                'postgres_changes',
+                { event: '*', schema: 'public', table: 'player_station_completions', filter: `event_id=eq.${eventId}` },
+                onCompletionsChange
+              )
+              .subscribe()
+          : baseChannel
+              .on(
+                'postgres_changes',
+                { event: '*', schema: 'public', table: 'player_station_completions' },
+                onCompletionsChange
+              )
+              .subscribe();
     };
 
     void subscribe();

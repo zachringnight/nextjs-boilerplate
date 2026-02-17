@@ -1,5 +1,6 @@
 import type { NextRequest } from 'next/server';
 import { getDefaultEventSlug } from '@/app/asw/lib/event-config';
+import { isUuid } from '@/app/asw/lib/id-utils';
 import {
   getServiceSupabaseClient,
   getUserFromBearerToken,
@@ -32,7 +33,9 @@ export async function requireAdminContext(request: NextRequest): Promise<AdminCo
     const eventSlug = request.nextUrl.searchParams.get('eventSlug') || getDefaultEventSlug();
     const supabase = getServiceSupabaseClient();
 
-    const { data: eventData, error: eventError } = await supabase
+    let eventData: { id: string; slug: string | null; name: string } | null = null;
+
+    const { data: eventBySlug, error: eventError } = await supabase
       .from('events')
       .select('id, slug, name')
       .eq('slug', eventSlug)
@@ -42,8 +45,43 @@ export async function requireAdminContext(request: NextRequest): Promise<AdminCo
       return { ok: false, status: 500, message: `Failed to load event: ${eventError.message}` };
     }
 
+    eventData = eventBySlug;
+
+    if (!eventData && isUuid(eventSlug)) {
+      const { data: eventById, error: eventByIdError } = await supabase
+        .from('events')
+        .select('id, slug, name')
+        .eq('id', eventSlug)
+        .maybeSingle();
+
+      if (eventByIdError) {
+        return { ok: false, status: 500, message: `Failed to load event by id: ${eventByIdError.message}` };
+      }
+
+      eventData = eventById;
+    }
+
     if (!eventData) {
-      return { ok: false, status: 404, message: `No event found for slug "${eventSlug}".` };
+      const { data: fallbackEvents, error: fallbackError } = await supabase
+        .from('events')
+        .select('id, slug, name')
+        .limit(2);
+
+      if (fallbackError) {
+        return {
+          ok: false,
+          status: 500,
+          message: `Failed to inspect fallback event context: ${fallbackError.message}`,
+        };
+      }
+
+      if ((fallbackEvents || []).length === 1) {
+        eventData = fallbackEvents?.[0] || null;
+      }
+    }
+
+    if (!eventData) {
+      return { ok: false, status: 404, message: `No event found for identifier "${eventSlug}".` };
     }
 
     const { data: membershipData, error: membershipError } = await supabase
@@ -71,7 +109,7 @@ export async function requireAdminContext(request: NextRequest): Promise<AdminCo
       ctx: {
         userId: user.id,
         eventId: eventData.id,
-        eventSlug: eventData.slug,
+        eventSlug: eventData.slug || eventSlug,
         eventName: eventData.name,
       },
     };

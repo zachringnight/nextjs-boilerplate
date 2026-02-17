@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import FormModal from './FormModal';
 import {
   createTeamPartnership,
@@ -18,20 +18,49 @@ interface PartnershipFormProps {
   data?: TeamPartnership | PartnerPartnership | null;
 }
 
+function getInitialValues(
+  type: PartnershipFormProps['type'],
+  data: PartnershipFormProps['data']
+) {
+  const isTeam = type === 'team';
+  const teamData = isTeam ? (data as TeamPartnership | null | undefined) : undefined;
+  const partnerData = !isTeam ? (data as PartnerPartnership | null | undefined) : undefined;
+
+  return {
+    name: isTeam ? teamData?.team_name ?? '' : partnerData?.partner_name ?? '',
+    league: isTeam ? teamData?.league ?? '' : '',
+    assetType: data?.asset_type ?? '',
+    details: data?.details ?? '',
+    activationDate: data?.activation_date ?? '',
+    status: data?.status ?? '',
+  };
+}
+
 export default function PartnershipForm({ open, onClose, onSaved, type, data }: PartnershipFormProps) {
   const isEdit = Boolean(data);
   const isTeam = type === 'team';
+  const initialValues = getInitialValues(type, data);
 
-  const [name, setName] = useState(
-    isTeam ? (data as TeamPartnership)?.team_name ?? '' : (data as PartnerPartnership)?.partner_name ?? ''
-  );
-  const [league, setLeague] = useState(isTeam ? (data as TeamPartnership)?.league ?? '' : '');
-  const [assetType, setAssetType] = useState(data?.asset_type ?? '');
-  const [details, setDetails] = useState(data?.details ?? '');
-  const [activationDate, setActivationDate] = useState(data?.activation_date ?? '');
-  const [status, setStatus] = useState(data?.status ?? '');
+  const [name, setName] = useState(initialValues.name);
+  const [league, setLeague] = useState(initialValues.league);
+  const [assetType, setAssetType] = useState(initialValues.assetType);
+  const [details, setDetails] = useState(initialValues.details);
+  const [activationDate, setActivationDate] = useState(initialValues.activationDate);
+  const [status, setStatus] = useState(initialValues.status);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const nextValues = getInitialValues(type, data);
+    setName(nextValues.name);
+    setLeague(nextValues.league);
+    setAssetType(nextValues.assetType);
+    setDetails(nextValues.details);
+    setActivationDate(nextValues.activationDate);
+    setStatus(nextValues.status);
+    setError(null);
+  }, [open, type, data]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
