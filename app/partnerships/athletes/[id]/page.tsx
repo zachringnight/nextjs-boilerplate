@@ -37,6 +37,7 @@ import {
   isExpired,
   isExpiringSoon,
 } from '../../lib/utils';
+import { SPORT_ACCENT_COLORS } from '../../lib/constants';
 import type {
   Athlete,
   AthleteContract,
@@ -151,12 +152,13 @@ export default function AthleteDetailPage({ params }: { params: Promise<{ id: st
     <>
       <SideNav className="hidden md:flex" />
       <main className="flex-1 pb-20 md:pb-0">
-        <div className="p-4 md:p-6 max-w-4xl mx-auto space-y-6">
+        <div className="p-4 md:p-6 lg:p-8 max-w-4xl mx-auto space-y-6">
           <Link
             href="/partnerships/athletes"
-            className="inline-flex items-center text-[#9CA3AF] hover:text-white text-sm transition-colors"
+            className="inline-flex items-center gap-1.5 text-[#9CA3AF] hover:text-white text-sm transition-colors group"
           >
-            &larr; Back to Athletes
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:-translate-x-0.5 transition-transform"><polyline points="15 18 9 12 15 6" /></svg>
+            Athletes
           </Link>
 
           {loading && (
@@ -173,30 +175,102 @@ export default function AthleteDetailPage({ params }: { params: Promise<{ id: st
 
           {athlete && !loading && (
             <>
-              {/* Hero */}
-              <div className="flex items-start justify-between">
-                <div>
-                  <h1 className="text-2xl font-bold text-white">{athlete.name}</h1>
-                  <div className="flex items-center gap-2 mt-2">
-                    {athlete.sport && <SportBadge sport={athlete.sport} />}
-                    {athlete.league && <span className="text-[#6B7280] text-sm">{athlete.league}</span>}
+              {/* Hero Card */}
+              <div className="relative overflow-hidden bg-[#141414] border border-[#2A2A2A] rounded-xl p-5 md:p-6">
+                <div
+                  className="absolute top-0 left-0 w-full h-[3px]"
+                  style={{ background: athlete.sport ? SPORT_ACCENT_COLORS[athlete.sport] ?? '#6B7280' : '#FFD100' }}
+                />
+                <div className="flex items-start gap-4">
+                  <div
+                    className="w-14 h-14 rounded-full flex items-center justify-center shrink-0 text-lg font-bold"
+                    style={{
+                      background: `${athlete.sport ? SPORT_ACCENT_COLORS[athlete.sport] ?? '#6B7280' : '#FFD100'}20`,
+                      color: athlete.sport ? SPORT_ACCENT_COLORS[athlete.sport] ?? '#6B7280' : '#FFD100',
+                    }}
+                  >
+                    {athlete.name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()}
                   </div>
-                  {athlete.team && <p className="text-[#9CA3AF] text-sm mt-1">{athlete.team}</p>}
+                  <div className="flex-1 min-w-0">
+                    <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">{athlete.name}</h1>
+                    <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                      {athlete.sport && <SportBadge sport={athlete.sport} />}
+                      {athlete.league && <span className="text-[#9CA3AF] text-sm">{athlete.league}</span>}
+                      {athlete.team && (
+                        <>
+                          <span className="text-[#4B5563]">&middot;</span>
+                          <span className="text-[#9CA3AF] text-sm">{athlete.team}</span>
+                        </>
+                      )}
+                    </div>
+                    {(athlete.team_city || athlete.team_state || athlete.hometown_city || athlete.hometown_state) && (
+                      <div className="flex items-center gap-4 mt-2 text-xs text-[#6B7280]">
+                        {(athlete.team_city || athlete.team_state) && (
+                          <span>{[athlete.team_city, athlete.team_state].filter(Boolean).join(', ')}</span>
+                        )}
+                        {(athlete.hometown_city || athlete.hometown_state) && (
+                          <span>Hometown: {[athlete.hometown_city, athlete.hometown_state].filter(Boolean).join(', ')}</span>
+                        )}
+                      </div>
+                    )}
+                    {(athlete.instagram_handle || athlete.x_handle) && (
+                      <div className="flex items-center gap-4 mt-3">
+                        {athlete.instagram_handle && (
+                          <a
+                            href={`https://instagram.com/${athlete.instagram_handle}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 text-[#9CA3AF] text-sm hover:text-[#E1306C] transition-colors"
+                          >
+                            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                            @{athlete.instagram_handle}
+                          </a>
+                        )}
+                        {athlete.x_handle && (
+                          <a
+                            href={`https://x.com/${athlete.x_handle}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 text-[#9CA3AF] text-sm hover:text-white transition-colors"
+                          >
+                            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                            @{athlete.x_handle}
+                          </a>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex gap-2 shrink-0">
+                    <button
+                      onClick={() => setShowAthleteForm(true)}
+                      className="px-3 py-1.5 text-xs font-medium text-[#9CA3AF] hover:text-white bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg transition-colors"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => setDeleteTarget({ entity: 'athlete', id: athlete.id })}
+                      className="px-3 py-1.5 text-xs font-medium text-red-400 hover:text-red-300 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg transition-colors"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setShowAthleteForm(true)}
-                    className="px-3 py-1.5 text-xs font-medium text-[#9CA3AF] hover:text-white bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg transition-colors"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => setDeleteTarget({ entity: 'athlete', id: athlete.id })}
-                    className="px-3 py-1.5 text-xs font-medium text-red-400 hover:text-red-300 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg transition-colors"
-                  >
-                    Delete
-                  </button>
-                </div>
+                {contractsData.length > 0 && (
+                  <div className="flex items-center gap-6 mt-4 pt-4 border-t border-[#2A2A2A]/60 text-sm">
+                    <div>
+                      <span className="text-[#6B7280]">Contracts</span>
+                      <span className="text-white font-semibold ml-1.5">{contractsData.length}</span>
+                    </div>
+                    <div>
+                      <span className="text-[#6B7280]">Obligations</span>
+                      <span className="text-white font-semibold ml-1.5">{contractsData.reduce((sum, cd) => sum + cd.obligations.length, 0)}</span>
+                    </div>
+                    <div>
+                      <span className="text-[#6B7280]">Activities</span>
+                      <span className="text-white font-semibold ml-1.5">{contractsData.reduce((sum, cd) => sum + cd.activities.length, 0)}</span>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* NO ANNOUNCEMENT check */}

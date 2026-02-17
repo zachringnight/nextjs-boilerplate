@@ -20,6 +20,7 @@
     "clean": "rm -rf .next out node_modules/.cache"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.74.0",
     "@supabase/supabase-js": "^2.95.0",
     "lucide-react": "^0.563.0",
     "next": "^15.5.12",

@@ -1,4 +1,6 @@
-import { getSupabase } from './supabase';
+'use server';
+
+import { getServiceSupabaseClient } from '@/app/lib/supabase-server';
 import type {
   Athlete,
   AthleteContract,
@@ -10,12 +12,12 @@ import type {
   NascarActivity,
   EuroleagueActivity,
   DashboardStats,
+  DeliverableTrackerStats,
+  DeliverableRow,
 } from '../types';
 
 function requireClient() {
-  const client = getSupabase();
-  if (!client) throw new Error('Supabase not configured');
-  return client;
+  return getServiceSupabaseClient();
 }
 
 // === Athletes ===
@@ -237,4 +239,115 @@ export async function fetchDashboardStats(): Promise<DashboardStats> {
     recentActivities: (recentActivities.data ?? []) as CompletedActivity[],
     sportBreakdown,
   };
+}
+
+// === Deliverable Tracker ===
+
+export async function fetchDeliverableTracker(): Promise<DeliverableTrackerStats> {
+  const client = requireClient();
+  const today = new Date().toISOString().split('T')[0];
+
+  // Active contracts with athlete info
+  const { data: contractsRaw, error: cErr } = await client
+    .from('athlete_contracts')
+    .select('*, athlete:athletes(*)')
+    .or(`contract_end.gte.${today},contract_end.is.null`)
+    .order('contract_end', { ascending: true, nullsFirst: false });
+  if (cErr) throw cErr;
+
+  const contracts = (contractsRaw ?? []) as (AthleteContract & { athlete: Athlete })[];
+  const contractIds = contracts.map((c) => c.id);
+
+  // Fetch obligations and activity counts for these contracts
+  const [obligationsRes, activitiesRes] = await Promise.all([
+    contractIds.length > 0
+      ? client.from('marketing_obligations').select('*').in('contract_id', contractIds)
+      : Promise.resolve({ data: [], error: null }),
+    contractIds.length > 0
+      ? client.from('completed_activities').select('contract_id').in('contract_id', contractIds)
+      : Promise.resolve({ data: [], error: null }),
+  ]);
+
+  const obligations = (obligationsRes.data ?? []) as MarketingObligation[];
+  const activities = (activitiesRes.data ?? []) as { contract_id: number }[];
+
+  // Group by contract
+  const oblMap = new Map<number, MarketingObligation[]>();
+  for (const o of obligations) {
+    const arr = oblMap.get(o.contract_id) ?? [];
+    arr.push(o);
+    oblMap.set(o.contract_id, arr);
+  }
+
+  const actMap = new Map<number, number>();
+  for (const a of activities) {
+    actMap.set(a.contract_id, (actMap.get(a.contract_id) ?? 0) + 1);
+  }
+
+  const rows: DeliverableRow[] = contracts.map((contract) => ({
+    contract,
+    obligations: oblMap.get(contract.id) ?? [],
+    completedCount: actMap.get(contract.id) ?? 0,
+  }));
+
+  // Counts
+  const now = new Date();
+  const in30 = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+  const in90 = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000);
+  let criticalCount = 0;
+  let warningCount = 0;
+  for (const c of contracts) {
+    if (!c.contract_end) continue;
+    const end = new Date(c.contract_end + 'T00:00:00');
+    if (end <= in30) criticalCount++;
+    else if (end <= in90) warningCount++;
+  }
+
+  return {
+    rows,
+    totalActiveDeals: contracts.length,
+    criticalCount,
+    warningCount,
+    totalObligations: obligations.length,
+  };
+}
+
+// === Contracts with obligation counts (for contracts page) ===
+
+export async function fetchContractsWithObligationCounts(): Promise<
+  (AthleteContract & { athlete: Athlete; obligation_count: number; completed_count: number })[]
+> {
+  const client = requireClient();
+
+  const { data: contractsRaw, error: cErr } = await client
+    .from('athlete_contracts')
+    .select('*, athlete:athletes(*)')
+    .order('contract_end', { ascending: true, nullsFirst: false });
+  if (cErr) throw cErr;
+
+  const contracts = (contractsRaw ?? []) as (AthleteContract & { athlete: Athlete })[];
+  const contractIds = contracts.map((c) => c.id);
+
+  if (contractIds.length === 0) return [];
+
+  const [oblRes, actRes] = await Promise.all([
+    client.from('marketing_obligations').select('contract_id').in('contract_id', contractIds),
+    client.from('completed_activities').select('contract_id').in('contract_id', contractIds),
+  ]);
+
+  const oblCounts = new Map<number, number>();
+  for (const o of oblRes.data ?? []) {
+    oblCounts.set(o.contract_id, (oblCounts.get(o.contract_id) ?? 0) + 1);
+  }
+
+  const actCounts = new Map<number, number>();
+  for (const a of actRes.data ?? []) {
+    actCounts.set(a.contract_id, (actCounts.get(a.contract_id) ?? 0) + 1);
+  }
+
+  return contracts.map((c) => ({
+    ...c,
+    obligation_count: oblCounts.get(c.id) ?? 0,
+    completed_count: actCounts.get(c.id) ?? 0,
+  }));
 }
