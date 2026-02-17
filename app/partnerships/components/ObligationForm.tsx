@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import FormModal from './FormModal';
 import { OBLIGATION_TYPES } from '../lib/constants';
 import { createObligation, updateObligation } from '../lib/mutations';
@@ -23,6 +23,16 @@ export default function ObligationForm({ open, onClose, onSaved, contractId, obl
   const [notes, setNotes] = useState(obligation?.notes ?? '');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    setObligationType(obligation?.obligation_type ?? '');
+    setQuantityPerYear(obligation?.quantity_per_year?.toString() ?? '');
+    setQuantityTotal(obligation?.quantity_total?.toString() ?? '');
+    setPlatform(obligation?.platform ?? '');
+    setNotes(obligation?.notes ?? '');
+    setError(null);
+  }, [open, obligation]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

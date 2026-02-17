@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import FormModal from './FormModal';
 import {
   createNascarActivity,
@@ -18,22 +18,43 @@ interface EventFormProps {
   data?: NascarActivity | EuroleagueActivity | null;
 }
 
+function getInitialValues(
+  type: EventFormProps['type'],
+  data: EventFormProps['data']
+) {
+  const isNascar = type === 'nascar';
+  const nascarData = isNascar ? (data as NascarActivity | null | undefined) : undefined;
+  const euroData = !isNascar ? (data as EuroleagueActivity | null | undefined) : undefined;
+
+  return {
+    name: isNascar ? nascarData?.item ?? '' : euroData?.event_name ?? '',
+    eventDate: data?.event_date ?? '',
+    details: isNascar ? nascarData?.details ?? '' : euroData?.details ?? '',
+    activationType: isNascar ? '' : euroData?.activation_type ?? '',
+  };
+}
+
 export default function EventForm({ open, onClose, onSaved, type, data }: EventFormProps) {
   const isEdit = Boolean(data);
   const isNascar = type === 'nascar';
+  const initialValues = getInitialValues(type, data);
 
-  const [name, setName] = useState(
-    isNascar ? (data as NascarActivity)?.item ?? '' : (data as EuroleagueActivity)?.event_name ?? ''
-  );
-  const [eventDate, setEventDate] = useState(data?.event_date ?? '');
-  const [details, setDetails] = useState(
-    isNascar ? (data as NascarActivity)?.details ?? '' : (data as EuroleagueActivity)?.details ?? ''
-  );
-  const [activationType, setActivationType] = useState(
-    !isNascar ? (data as EuroleagueActivity)?.activation_type ?? '' : ''
-  );
+  const [name, setName] = useState(initialValues.name);
+  const [eventDate, setEventDate] = useState(initialValues.eventDate);
+  const [details, setDetails] = useState(initialValues.details);
+  const [activationType, setActivationType] = useState(initialValues.activationType);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const nextValues = getInitialValues(type, data);
+    setName(nextValues.name);
+    setEventDate(nextValues.eventDate);
+    setDetails(nextValues.details);
+    setActivationType(nextValues.activationType);
+    setError(null);
+  }, [open, type, data]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

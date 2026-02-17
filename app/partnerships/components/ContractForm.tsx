@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import FormModal from './FormModal';
 import { createContract, updateContract } from '../lib/mutations';
 import type { AthleteContract } from '../types';
@@ -25,6 +25,19 @@ export default function ContractForm({ open, onClose, onSaved, athleteId, contra
   const [specialNotes, setSpecialNotes] = useState(contract?.special_notes ?? '');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    setDealType(contract?.deal_type ?? 'exclusive');
+    setExclusivityScope(contract?.exclusivity_scope ?? '');
+    setContractStart(contract?.contract_start ?? '');
+    setContractEnd(contract?.contract_end ?? '');
+    setContractEndNote(contract?.contract_end_note ?? '');
+    setRawMarketingSpecs(contract?.raw_marketing_specs ?? '');
+    setRawCompletedMarketing(contract?.raw_completed_marketing ?? '');
+    setSpecialNotes(contract?.special_notes ?? '');
+    setError(null);
+  }, [open, contract]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

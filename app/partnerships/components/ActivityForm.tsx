@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import FormModal from './FormModal';
 import { createActivity, updateActivity } from '../lib/mutations';
 import type { CompletedActivity } from '../types';
@@ -20,6 +20,14 @@ export default function ActivityForm({ open, onClose, onSaved, contractId, activ
   const [activityYear, setActivityYear] = useState(activity?.activity_year?.toString() ?? '');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    setDescription(activity?.activity_description ?? '');
+    setActivityDate(activity?.activity_date ?? '');
+    setActivityYear(activity?.activity_year?.toString() ?? '');
+    setError(null);
+  }, [open, activity]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
