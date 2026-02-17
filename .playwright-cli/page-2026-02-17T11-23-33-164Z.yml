@@ -1,0 +1,44 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - heading "PANINI NBA ASW" [level=1] [ref=e7]
+          - generic [ref=e8]:
+            - generic [ref=e9]: Tue, Feb 17
+            - generic [ref=e10]: ·
+            - generic [ref=e11]: 3:23 AM
+            - generic [ref=e12]: ·
+            - generic [ref=e13]: Event Preview
+        - generic [ref=e14]:
+          - button "Search (Cmd+K)" [ref=e15]:
+            - img [ref=e16]
+          - button "Toggle large text" [ref=e19]:
+            - img [ref=e20]
+    - generic [ref=e22]:
+      - generic [ref=e23]:
+        - img [ref=e24]
+        - text: Sign in is required for this pilot.
+      - link "Login" [ref=e26] [cursor=pointer]:
+        - /url: /asw/login
+        - img [ref=e27]
+        - text: Login
+    - main [ref=e30]:
+      - generic [ref=e31]:
+        - link "Back" [ref=e32] [cursor=pointer]:
+          - /url: /asw
+          - img [ref=e33]
+          - text: Back
+        - generic [ref=e35]:
+          - heading "Pilot Sign In" [level=1] [ref=e36]
+          - paragraph [ref=e37]: Use your approved email to access event asw-2026.
+          - generic [ref=e38]:
+            - generic [ref=e39]: Work Email
+            - generic [ref=e40]:
+              - img
+              - textbox "you@company.com" [ref=e41]: zach@ringnight.com
+            - button "Send Magic Link" [ref=e42]:
+              - img [ref=e43]
+              - text: Send Magic Link
+          - paragraph [ref=e47]: Magic link sent. Check your email and return to this page after signing in.
+  - alert [ref=e46]
