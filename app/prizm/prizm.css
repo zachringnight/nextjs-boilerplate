@@ -1,0 +1,433 @@
+/* Prizm Lounge Production Hub - Custom Styles */
+
+/* Safe area padding for mobile */
+.safe-area-pb {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+/* Large text mode */
+.prizm-app.large-text {
+  font-size: 1.25rem;
+}
+
+.prizm-app.large-text h1 {
+  font-size: 2rem;
+}
+
+.prizm-app.large-text h2 {
+  font-size: 1.75rem;
+}
+
+.prizm-app.large-text h3 {
+  font-size: 1.5rem;
+}
+
+.prizm-app.large-text p,
+.prizm-app.large-text span,
+.prizm-app.large-text button {
+  font-size: 1.125rem;
+}
+
+/* Station grid */
+.station-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .station-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Player grid */
+.player-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .player-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .player-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Countdown flash animation */
+@keyframes countdown-flash {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.countdown-flash {
+  animation: countdown-flash 1s ease-in-out infinite;
+}
+
+/* Tab transitions */
+.tab-content {
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Jump to Now button */
+.jump-to-now {
+  position: fixed;
+  bottom: 5rem;
+  right: 1rem;
+  z-index: 30;
+}
+
+/* Station tab colors */
+.station-tab-signing { border-color: #22c55e; }
+.station-tab-packRip { border-color: #f59e0b; }
+.station-tab-photoOp { border-color: #3b82f6; }
+.station-tab-interview { border-color: #8b5cf6; }
+
+/* Scrollbar styling */
+.prizm-app::-webkit-scrollbar {
+  width: 6px;
+}
+
+.prizm-app::-webkit-scrollbar-track {
+  background: #1A1A1A;
+}
+
+.prizm-app::-webkit-scrollbar-thumb {
+  background: #3A3A3A;
+  border-radius: 3px;
+}
+
+.prizm-app::-webkit-scrollbar-thumb:hover {
+  background: #4A4A4A;
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Focus styles */
+.prizm-app button:focus-visible,
+.prizm-app a:focus-visible {
+  outline: 2px solid #FFD100;
+  outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+  /* Hide navigation and interactive elements */
+  .prizm-app nav,
+  .prizm-app .jump-to-now,
+  .prizm-app header button,
+  .prizm-app .no-print {
+    display: none !important;
+  }
+
+  .prizm-app main {
+    padding-bottom: 0 !important;
+  }
+
+  /* Reset colors for printing */
+  .prizm-app {
+    background: white !important;
+    color: black !important;
+  }
+
+  .prizm-app header {
+    background: white !important;
+    border-bottom: 2px solid #000 !important;
+    position: relative !important;
+  }
+
+  .prizm-app header h1 {
+    color: black !important;
+  }
+
+  .prizm-app header div {
+    color: #666 !important;
+  }
+
+  /* Print-specific layout */
+  .print-schedule {
+    page-break-inside: avoid;
+  }
+
+  .print-schedule-header {
+    text-align: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #000;
+  }
+
+  .print-schedule-row {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #ddd;
+    page-break-inside: avoid;
+  }
+
+  .print-schedule-time {
+    width: 80px;
+    font-weight: bold;
+  }
+
+  .print-schedule-player {
+    flex: 1;
+    font-weight: 500;
+  }
+
+  .print-schedule-station {
+    width: 100px;
+    text-align: right;
+    font-size: 0.875rem;
+    color: #666;
+  }
+
+  /* Station badges for print */
+  .print-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border: 1px solid #000;
+  }
+
+  .print-badge-ledWall { background: #fce7f3; }
+  .print-badge-signing { background: #dcfce7; }
+  .print-badge-packRip { background: #fef3c7; }
+  .print-badge-prCall { background: #ede9fe; }
+  .print-badge-free { background: #f3f4f6; }
+
+  /* Force backgrounds to print */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Page settings */
+  @page {
+    margin: 0.5in;
+    size: letter portrait;
+  }
+
+  /* PR Call details for print */
+  .print-pr-info {
+    font-size: 0.75rem;
+    color: #666;
+    margin-top: 0.25rem;
+  }
+}
+
+/* Print preview container */
+.print-preview {
+  background: white;
+  color: black;
+  padding: 2rem;
+  min-height: 100vh;
+}
+
+.print-preview h1 {
+  color: black;
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.print-preview h2 {
+  color: #666;
+  font-size: 1rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid black;
+}
+
+.print-preview table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.print-preview th {
+  text-align: left;
+  padding: 0.5rem;
+  border-bottom: 2px solid black;
+  font-weight: 600;
+}
+
+.print-preview td {
+  padding: 0.5rem;
+  border-bottom: 1px solid #ddd;
+}
+
+.print-preview tr:nth-child(even) {
+  background: #f9f9f9;
+}
+
+/* ===================== */
+/* Quick Clip Button     */
+/* ===================== */
+
+/* Pulse ring around FAB when stations are live */
+@keyframes quick-clip-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  70% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+.quick-clip-pulse-ring {
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 2px solid #FFD100;
+  animation: quick-clip-pulse 2s ease-out infinite;
+  pointer-events: none;
+}
+
+/* Live dot blink */
+@keyframes quick-clip-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.quick-clip-live-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #22C55E;
+  animation: quick-clip-blink 1.5s ease-in-out infinite;
+}
+
+/* Toast enter/exit */
+@keyframes quick-clip-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes quick-clip-toast-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.95);
+  }
+}
+
+.quick-clip-toast-enter {
+  animation: quick-clip-toast-in 0.25s ease-out forwards;
+}
+
+.quick-clip-toast-exit {
+  animation: quick-clip-toast-out 0.4s ease-in forwards;
+}
+
+/* Panel slide-up */
+@keyframes quick-clip-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.quick-clip-panel {
+  animation: quick-clip-panel-in 0.2s ease-out;
+  transform-origin: bottom right;
+}
+
+/* FAB glow when live */
+.quick-clip-fab-live {
+  box-shadow: 0 0 0 0 rgba(255, 209, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Analytics panel enter */
+@keyframes clip-analytics-enter {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    max-height: 500px;
+    transform: translateY(0);
+  }
+}
+
+.clip-analytics-enter {
+  animation: clip-analytics-enter 0.3s ease-out;
+}
+
+/* Bulk action bar enter */
+@keyframes clip-bulk-bar-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.clip-bulk-bar-enter {
+  animation: clip-bulk-bar-enter 0.2s ease-out;
+}
+
+/* Urgent clip pulse border */
+@keyframes urgent-pulse {
+  0%, 100% {
+    border-color: rgba(239, 68, 68, 0.5);
+  }
+  50% {
+    border-color: rgba(239, 68, 68, 0.15);
+  }
+}
+
+.clip-urgent-pulse {
+  animation: urgent-pulse 2s ease-in-out infinite;
+}
