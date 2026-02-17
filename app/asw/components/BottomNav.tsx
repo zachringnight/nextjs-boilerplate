@@ -3,10 +3,11 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Zap, Calendar, Radio, User, MoreHorizontal, MessageSquare, ClipboardCheck, FileBox, Timer, Clapperboard, X, ArrowLeft, SlidersHorizontal } from 'lucide-react';
+import { Zap, Calendar, Radio, User, MoreHorizontal, MessageSquare, ClipboardCheck, FileBox, Timer, Clapperboard, X, ArrowLeft, SlidersHorizontal, Upload } from 'lucide-react';
 import { useASWStore } from '../store';
 import { useMounted } from '../hooks/useMounted';
 import type { ViewMode } from '../types';
+import { useAuthContext } from './AuthProvider';
 
 const navItems: { mode: ViewMode; label: string; icon: typeof Zap }[] = [
   { mode: 'now', label: 'Live', icon: Zap },
@@ -26,6 +27,7 @@ const moreItems = [
 
 export default function BottomNav() {
   const { viewMode, setViewMode } = useASWStore();
+  const { canAdmin } = useAuthContext();
   const mounted = useMounted();
   const pathname = usePathname();
   const [moreOpen, setMoreOpen] = useState(false);
@@ -33,6 +35,10 @@ export default function BottomNav() {
   const moreButtonMainRef = useRef<HTMLButtonElement>(null);
   const moreButtonSubRef = useRef<HTMLButtonElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
+
+  const visibleMoreItems = canAdmin
+    ? [...moreItems, { href: '/asw/admin/import', label: 'CSV Import', icon: Upload, color: 'text-indigo-300' }]
+    : moreItems;
 
   // Check if we're on a sub-page (not the main /asw page)
   const isSubPage = pathname !== '/asw';
@@ -91,6 +97,7 @@ export default function BottomNav() {
     };
   }, [moreOpen, isSubPage]);
 
+  if (pathname === '/asw/login') return null;
   if (!mounted) return null;
 
   const handleCloseMenu = () => {
@@ -124,7 +131,7 @@ export default function BottomNav() {
                 </button>
               </div>
               <div className="p-2">
-                {moreItems.map((item) => {
+                {visibleMoreItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = pathname === item.href;
                   return (

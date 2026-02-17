@@ -33,6 +33,7 @@ import {
   syncClipUpdate,
   syncClipDelete,
 } from '../lib/clip-sync';
+import { canWriteRole, getRuntimeAccessContext } from '../lib/runtime-context';
 
 // ASW has 2 checklist stations
 const checklistStations: ASWStationId[] = ['tunnel', 'product'];
@@ -52,6 +53,12 @@ function deliverableToRecord(d: Deliverable) {
     assignee: d.assignee || null,
     priority: d.priority || null,
   };
+}
+
+function canMutateData(): boolean {
+  const ctx = getRuntimeAccessContext();
+  if (ctx.bypass) return true;
+  return canWriteRole(ctx.role);
 }
 
 interface ASWState {
@@ -153,22 +160,30 @@ export const useASWStore = create<ASWState>()(
       showEmbargoedOnly: false,
       setShowEmbargoedOnly: (show) => set({ showEmbargoedOnly: show }),
       scheduleOverrides: {},
-      setScheduleOverride: (playerId, override) => set((state) => ({
-        scheduleOverrides: {
-          ...state.scheduleOverrides,
-          [playerId]: override,
-        },
-      })),
+      setScheduleOverride: (playerId, override) => {
+        if (!canMutateData()) return;
+        set((state) => ({
+          scheduleOverrides: {
+            ...state.scheduleOverrides,
+            [playerId]: override,
+          },
+        }));
+      },
       clearScheduleOverride: (playerId) => set((state) => {
+        if (!canMutateData()) return state;
         const next = { ...state.scheduleOverrides };
         delete next[playerId];
         return { scheduleOverrides: next };
       }),
-      resetScheduleOverrides: () => set({ scheduleOverrides: {} }),
+      resetScheduleOverrides: () => {
+        if (!canMutateData()) return;
+        set({ scheduleOverrides: {} });
+      },
 
       // Notes / Issue Logger
       notes: [],
       addNote: (noteData) => {
+        if (!canMutateData()) return;
         const now = new Date().toISOString();
         const note: Note = {
           ...noteData,
@@ -194,6 +209,7 @@ export const useASWStore = create<ASWState>()(
         });
       },
       updateNote: (id, updates) => {
+        if (!canMutateData()) return;
         const now = new Date().toISOString();
         set((state) => ({
           notes: state.notes.map((note) =>
@@ -214,12 +230,14 @@ export const useASWStore = create<ASWState>()(
         syncNoteUpdate(id, dbUpdates);
       },
       deleteNote: (id) => {
+        if (!canMutateData()) return;
         set((state) => ({
           notes: state.notes.filter((note) => note.id !== id),
         }));
         syncNoteDelete(id);
       },
       resolveNote: (id) => {
+        if (!canMutateData()) return;
         const now = new Date().toISOString();
         set((state) => ({
           notes: state.notes.map((note) =>
@@ -231,6 +249,7 @@ export const useASWStore = create<ASWState>()(
         syncNoteUpdate(id, { status: 'resolved', resolved_at: now, updated_at: now });
       },
       clearResolvedNotes: () => {
+        if (!canMutateData()) return;
         const resolvedIds = get().notes
           .filter((note) => note.status === 'resolved')
           .map((note) => note.id);
@@ -243,6 +262,7 @@ export const useASWStore = create<ASWState>()(
       // Deliverables
       deliverables: defaultDeliverables,
       updateDeliverableStatus: (id, status) => {
+        if (!canMutateData()) return;
         const now = new Date().toISOString();
         set((state) => ({
           deliverables: state.deliverables.map((d) =>
@@ -264,6 +284,7 @@ export const useASWStore = create<ASWState>()(
         });
       },
       updateDeliverable: (id, updates) => {
+        if (!canMutateData()) return;
         set((state) => ({
           deliverables: state.deliverables.map((d) =>
             d.id === id ? { ...d, ...updates } : d
@@ -273,6 +294,7 @@ export const useASWStore = create<ASWState>()(
         if (updated) syncDeliverableUpsert(deliverableToRecord(updated));
       },
       addDeliverable: (deliverableData) => {
+        if (!canMutateData()) return '';
         const id = `deliverable-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
         const deliverable: Deliverable = {
           ...deliverableData,
@@ -285,12 +307,14 @@ export const useASWStore = create<ASWState>()(
         return id;
       },
       removeDeliverable: (id) => {
+        if (!canMutateData()) return;
         set((state) => ({
           deliverables: state.deliverables.filter((d) => d.id !== id),
         }));
         syncDeliverableDelete(id);
       },
       resetDeliverables: () => {
+        if (!canMutateData()) return;
         set({ deliverables: defaultDeliverables });
         syncBulkDeliverableUpsert(defaultDeliverables.map(deliverableToRecord));
       },
@@ -316,6 +340,7 @@ export const useASWStore = create<ASWState>()(
       // Player Station Checklist
       playerStationCompletions: [],
       togglePlayerStation: (playerId, stationId, completedBy) => {
+        if (!canMutateData()) return;
         let shouldDelete = false;
         let upsertPayload:
           | {
@@ -415,6 +440,7 @@ export const useASWStore = create<ASWState>()(
         return checklistStations.filter((s) => !completed.includes(s));
       },
       resetPlayerStationChecklist: () => {
+        if (!canMutateData()) return;
         set({ playerStationCompletions: [] });
         syncResetCompletions();
       },
@@ -430,6 +456,7 @@ export const useASWStore = create<ASWState>()(
       quickMarkCategory: 'highlight',
       clipDefaults: { crewMember: '', camera: '', mediaType: 'video' },
       addClip: (clipData) => {
+        const canMutate = canMutateData();
         const now = new Date().toISOString();
         const defaults = get().clipDefaults;
         const newClip: ClipMarker = {
@@ -454,6 +481,9 @@ export const useASWStore = create<ASWState>()(
           createdAt: now,
           updatedAt: now,
         };
+        if (!canMutate) {
+          return newClip;
+        }
         set((state) => {
           const updated = [newClip, ...state.clips];
           return { clips: updated.length > 500 ? updated.slice(0, 500) : updated };
@@ -462,6 +492,7 @@ export const useASWStore = create<ASWState>()(
         return newClip;
       },
       deleteClip: (id) => {
+        if (!canMutateData()) return;
         set((state) => ({
           clips: state.clips.filter((clip) => clip.id !== id),
         }));
@@ -475,11 +506,13 @@ export const useASWStore = create<ASWState>()(
       },
       setQuickMarkCategory: (category) => set({ quickMarkCategory: category }),
       setClipDefaults: (defaults) => {
+        if (!canMutateData()) return;
         set((state) => ({
           clipDefaults: { ...state.clipDefaults, ...defaults },
         }));
       },
       toggleClipFlag: (id) => {
+        if (!canMutateData()) return;
         const clip = get().clips.find((c) => c.id === id);
         const newFlagged = clip ? !clip.flagged : true;
         set((state) => ({

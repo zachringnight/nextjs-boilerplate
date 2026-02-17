@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import type { Player } from '../types';
 
 interface PlayerAvatarProps {
@@ -39,13 +38,15 @@ export default function PlayerAvatar({ player, size = 'md' }: PlayerAvatarProps)
   if (hasPhoto && !imageError) {
     return (
       <div className={`${sizeClasses[size]} rounded-xl overflow-hidden flex-shrink-0 shadow-lg bg-[#1a1a1a]`}>
-        <Image
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src={player.photo}
           alt={`${player.firstName} ${player.lastName}`}
+          className="w-full h-full object-cover"
           width={sizePixels[size]}
           height={sizePixels[size]}
-          sizes={`${sizePixels[size]}px`}
-          className="w-full h-full object-cover"
+          loading="lazy"
+          decoding="async"
           onError={() => setImageError(true)}
         />
       </div>

@@ -1,29 +1,73 @@
 /**
  * Supabase sync helpers for clip markers in the ASW build.
- * Includes a pending sync queue that retries failed operations
- * when the connection is restored.
+ * Includes a pending sync queue that retries failed operations when online.
  */
 
 import { getSupabase } from './supabase';
 import type { ClipMarker } from '../types';
+import { canWriteRole, getRuntimeAccessContext } from './runtime-context';
 
-// =============================================
-// Pending sync queue for offline resilience
-// =============================================
+interface WriteContext {
+  eventId: string;
+  userId: string | null;
+}
+
+interface SyncInsertOp {
+  type: 'insert';
+  clip: Partial<ClipMarker>;
+  ctx: WriteContext;
+}
+
+interface SyncUpdateOp {
+  type: 'update';
+  id: string;
+  updates: Partial<ClipMarker>;
+  ctx: WriteContext;
+}
+
+interface SyncDeleteOp {
+  type: 'delete';
+  id: string;
+  ctx: WriteContext;
+}
+
+interface SyncBulkUpdateOp {
+  type: 'bulk_update';
+  ids: string[];
+  updates: Partial<ClipMarker>;
+  ctx: WriteContext;
+}
+
+interface SyncBulkDeleteOp {
+  type: 'bulk_delete';
+  ids: string[];
+  ctx: WriteContext;
+}
 
 type SyncOp =
-  | { type: 'insert'; clip: Partial<ClipMarker> }
-  | { type: 'update'; id: string; updates: Partial<ClipMarker> }
-  | { type: 'delete'; id: string }
-  | { type: 'bulk_update'; ids: string[]; updates: Partial<ClipMarker> }
-  | { type: 'bulk_delete'; ids: string[] };
+  | SyncInsertOp
+  | SyncUpdateOp
+  | SyncDeleteOp
+  | SyncBulkUpdateOp
+  | SyncBulkDeleteOp;
 
 const QUEUE_KEY = 'asw-clip-sync-queue';
+
+function getWriteContext(): WriteContext | null {
+  const ctx = getRuntimeAccessContext();
+  if (!ctx.ready || !ctx.hasAccess || !ctx.eventId) return null;
+  if (!canWriteRole(ctx.role)) return null;
+
+  return {
+    eventId: ctx.eventId,
+    userId: ctx.userId,
+  };
+}
 
 function loadQueue(): SyncOp[] {
   try {
     const raw = localStorage.getItem(QUEUE_KEY);
-    return raw ? JSON.parse(raw) : [];
+    return raw ? (JSON.parse(raw) as SyncOp[]) : [];
   } catch {
     return [];
   }
@@ -55,21 +99,22 @@ export async function flushSyncQueue(): Promise<number> {
     let success = false;
     switch (op.type) {
       case 'insert':
-        success = await doInsert(op.clip);
+        success = await doInsert(op.clip, op.ctx);
         break;
       case 'update':
-        success = await doUpdate(op.id, op.updates);
+        success = await doUpdate(op.id, op.updates, op.ctx);
         break;
       case 'delete':
-        success = await doDelete(op.id);
+        success = await doDelete(op.id, op.ctx);
         break;
       case 'bulk_update':
-        success = await doBulkUpdate(op.ids, op.updates);
+        success = await doBulkUpdate(op.ids, op.updates, op.ctx);
         break;
       case 'bulk_delete':
-        success = await doBulkDelete(op.ids);
+        success = await doBulkDelete(op.ids, op.ctx);
         break;
     }
+
     if (!success) failed.push(op);
   }
 
@@ -77,14 +122,10 @@ export async function flushSyncQueue(): Promise<number> {
   return failed.length;
 }
 
-// =============================================
-// Raw Supabase operations
-// =============================================
-
-// Convert camelCase ClipMarker to snake_case for Supabase
-function toDbClip(clipData: Partial<ClipMarker>): Record<string, unknown> {
+function toDbClip(clipData: Partial<ClipMarker>, ctx: WriteContext): Record<string, unknown> {
   return {
     id: clipData.id,
+    event_id: ctx.eventId,
     name: clipData.name || null,
     timestamp: clipData.timestamp || new Date().toISOString(),
     category: clipData.category || 'general',
@@ -102,13 +143,13 @@ function toDbClip(clipData: Partial<ClipMarker>): Record<string, unknown> {
     camera: clipData.camera || null,
     crew_member: clipData.crewMember || null,
     rating: clipData.rating || null,
+    created_by_user_id: ctx.userId,
   };
 }
 
-// Convert updates object (camelCase) to snake_case for Supabase
 function toDbUpdates(updates: Partial<ClipMarker>): Record<string, unknown> {
   const dbUpdates: Record<string, unknown> = { updated_at: new Date().toISOString() };
-  
+
   if (updates.name !== undefined) dbUpdates.name = updates.name;
   if (updates.timestamp !== undefined) dbUpdates.timestamp = updates.timestamp;
   if (updates.category !== undefined) dbUpdates.category = updates.category;
@@ -126,16 +167,16 @@ function toDbUpdates(updates: Partial<ClipMarker>): Record<string, unknown> {
   if (updates.camera !== undefined) dbUpdates.camera = updates.camera;
   if (updates.crewMember !== undefined) dbUpdates.crew_member = updates.crewMember;
   if (updates.rating !== undefined) dbUpdates.rating = updates.rating;
-  
+
   return dbUpdates;
 }
 
-async function doInsert(clipData: Partial<ClipMarker>): Promise<boolean> {
+async function doInsert(clipData: Partial<ClipMarker>, ctx: WriteContext): Promise<boolean> {
   const supabase = getSupabase();
   if (!supabase) return false;
 
   try {
-    const { error } = await supabase.from('clip_markers').insert(toDbClip(clipData));
+    const { error } = await supabase.from('clip_markers').insert(toDbClip(clipData, ctx));
     if (error) throw error;
     return true;
   } catch (err) {
@@ -144,7 +185,7 @@ async function doInsert(clipData: Partial<ClipMarker>): Promise<boolean> {
   }
 }
 
-async function doUpdate(id: string, updates: Partial<ClipMarker>): Promise<boolean> {
+async function doUpdate(id: string, updates: Partial<ClipMarker>, ctx: WriteContext): Promise<boolean> {
   const supabase = getSupabase();
   if (!supabase) return false;
 
@@ -152,6 +193,7 @@ async function doUpdate(id: string, updates: Partial<ClipMarker>): Promise<boole
     const { error } = await supabase
       .from('clip_markers')
       .update(toDbUpdates(updates))
+      .eq('event_id', ctx.eventId)
       .eq('id', id);
     if (error) throw error;
     return true;
@@ -161,7 +203,7 @@ async function doUpdate(id: string, updates: Partial<ClipMarker>): Promise<boole
   }
 }
 
-async function doDelete(id: string): Promise<boolean> {
+async function doDelete(id: string, ctx: WriteContext): Promise<boolean> {
   const supabase = getSupabase();
   if (!supabase) return false;
 
@@ -169,6 +211,7 @@ async function doDelete(id: string): Promise<boolean> {
     const { error } = await supabase
       .from('clip_markers')
       .delete()
+      .eq('event_id', ctx.eventId)
       .eq('id', id);
     if (error) throw error;
     return true;
@@ -178,7 +221,7 @@ async function doDelete(id: string): Promise<boolean> {
   }
 }
 
-async function doBulkUpdate(ids: string[], updates: Partial<ClipMarker>): Promise<boolean> {
+async function doBulkUpdate(ids: string[], updates: Partial<ClipMarker>, ctx: WriteContext): Promise<boolean> {
   const supabase = getSupabase();
   if (!supabase) return false;
 
@@ -186,6 +229,7 @@ async function doBulkUpdate(ids: string[], updates: Partial<ClipMarker>): Promis
     const { error } = await supabase
       .from('clip_markers')
       .update(toDbUpdates(updates))
+      .eq('event_id', ctx.eventId)
       .in('id', ids);
     if (error) throw error;
     return true;
@@ -195,7 +239,7 @@ async function doBulkUpdate(ids: string[], updates: Partial<ClipMarker>): Promis
   }
 }
 
-async function doBulkDelete(ids: string[]): Promise<boolean> {
+async function doBulkDelete(ids: string[], ctx: WriteContext): Promise<boolean> {
   const supabase = getSupabase();
   if (!supabase) return false;
 
@@ -203,6 +247,7 @@ async function doBulkDelete(ids: string[]): Promise<boolean> {
     const { error } = await supabase
       .from('clip_markers')
       .delete()
+      .eq('event_id', ctx.eventId)
       .in('id', ids);
     if (error) throw error;
     return true;
@@ -212,22 +257,20 @@ async function doBulkDelete(ids: string[]): Promise<boolean> {
   }
 }
 
-// =============================================
-// Public sync API (with online check + queue fallback)
-// =============================================
-
 export async function syncClipInsert(
   clipData: Partial<ClipMarker>
 ): Promise<boolean> {
   const supabase = getSupabase();
-  if (!supabase) return false;
+  const ctx = getWriteContext();
+  if (!supabase || !ctx) return false;
+
   if (!navigator.onLine) {
-    enqueue({ type: 'insert', clip: clipData });
+    enqueue({ type: 'insert', clip: clipData, ctx });
     return false;
   }
 
-  const ok = await doInsert(clipData);
-  if (!ok) enqueue({ type: 'insert', clip: clipData });
+  const ok = await doInsert(clipData, ctx);
+  if (!ok) enqueue({ type: 'insert', clip: clipData, ctx });
   return ok;
 }
 
@@ -236,27 +279,31 @@ export async function syncClipUpdate(
   updates: Partial<ClipMarker>
 ): Promise<boolean> {
   const supabase = getSupabase();
-  if (!supabase) return false;
+  const ctx = getWriteContext();
+  if (!supabase || !ctx) return false;
+
   if (!navigator.onLine) {
-    enqueue({ type: 'update', id, updates });
+    enqueue({ type: 'update', id, updates, ctx });
     return false;
   }
 
-  const ok = await doUpdate(id, updates);
-  if (!ok) enqueue({ type: 'update', id, updates });
+  const ok = await doUpdate(id, updates, ctx);
+  if (!ok) enqueue({ type: 'update', id, updates, ctx });
   return ok;
 }
 
 export async function syncClipDelete(id: string): Promise<boolean> {
   const supabase = getSupabase();
-  if (!supabase) return false;
+  const ctx = getWriteContext();
+  if (!supabase || !ctx) return false;
+
   if (!navigator.onLine) {
-    enqueue({ type: 'delete', id });
+    enqueue({ type: 'delete', id, ctx });
     return false;
   }
 
-  const ok = await doDelete(id);
-  if (!ok) enqueue({ type: 'delete', id });
+  const ok = await doDelete(id, ctx);
+  if (!ok) enqueue({ type: 'delete', id, ctx });
   return ok;
 }
 
@@ -265,26 +312,30 @@ export async function syncBulkClipUpdate(
   updates: Partial<ClipMarker>
 ): Promise<boolean> {
   const supabase = getSupabase();
-  if (!supabase) return false;
+  const ctx = getWriteContext();
+  if (!supabase || !ctx) return false;
+
   if (!navigator.onLine) {
-    enqueue({ type: 'bulk_update', ids, updates });
+    enqueue({ type: 'bulk_update', ids, updates, ctx });
     return false;
   }
 
-  const ok = await doBulkUpdate(ids, updates);
-  if (!ok) enqueue({ type: 'bulk_update', ids, updates });
+  const ok = await doBulkUpdate(ids, updates, ctx);
+  if (!ok) enqueue({ type: 'bulk_update', ids, updates, ctx });
   return ok;
 }
 
 export async function syncBulkClipDelete(ids: string[]): Promise<boolean> {
   const supabase = getSupabase();
-  if (!supabase) return false;
+  const ctx = getWriteContext();
+  if (!supabase || !ctx) return false;
+
   if (!navigator.onLine) {
-    enqueue({ type: 'bulk_delete', ids });
+    enqueue({ type: 'bulk_delete', ids, ctx });
     return false;
   }
 
-  const ok = await doBulkDelete(ids);
-  if (!ok) enqueue({ type: 'bulk_delete', ids });
+  const ok = await doBulkDelete(ids, ctx);
+  if (!ok) enqueue({ type: 'bulk_delete', ids, ctx });
   return ok;
 }

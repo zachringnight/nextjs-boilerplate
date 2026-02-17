@@ -23,6 +23,7 @@ import {
 import { cn, hapticFeedback } from '../lib/utils';
 import { CATEGORY_CONFIG, PRIORITY_CONFIG } from '../lib/clip-constants';
 import { ACTIVE_PLAYER_UPDATE_INTERVAL } from '../lib/constants';
+import { useAuthContext } from './AuthProvider';
 
 // Map station IDs to likely clip categories
 const STATION_CATEGORY_MAP: Partial<Record<ASWStationId, ClipCategory>> = {
@@ -32,6 +33,7 @@ const STATION_CATEGORY_MAP: Partial<Record<ASWStationId, ClipCategory>> = {
 
 export default function QuickClipButton() {
   const { players } = useSchedulePlayers();
+  const { canEdit } = useAuthContext();
   const pathname = usePathname();
   const [expanded, setExpanded] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -55,6 +57,7 @@ export default function QuickClipButton() {
   } = useASWStore();
 
   const isClipsPage = pathname === '/asw/clips';
+  const isLoginPage = pathname === '/asw/login';
 
   const [defaultCrew, setDefaultCrew] = useState(clipDefaults.crewMember);
   const [defaultCamera, setDefaultCamera] = useState(clipDefaults.camera);
@@ -205,7 +208,7 @@ export default function QuickClipButton() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [expanded]);
 
-  if (!mounted || isClipsPage) return null;
+  if (!mounted || isClipsPage || isLoginPage || !canEdit) return null;
 
   const todayCount = getTodayClipCount();
   const flaggedCount = getFlaggedCount();

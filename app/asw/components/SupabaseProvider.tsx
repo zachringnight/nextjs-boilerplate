@@ -23,6 +23,7 @@ import type {
   ASWStationId,
   PlayerStationCompletion,
 } from '../types';
+import { useAuthContext } from './AuthProvider';
 
 function toAppNote(row: NoteRecord): Note {
   return {
@@ -69,27 +70,31 @@ function toAppCompletion(row: CompletionRecord): PlayerStationCompletion {
 }
 
 export default function SupabaseProvider() {
-  const isInitialLoad = useRef(true);
   const onlineRef = useRef(true);
   const supabaseAvailableRef = useRef<boolean | null>(null);
+  const { mode, ready, hasAccess, access } = useAuthContext();
+
+  const eventId = access?.eventId ?? null;
 
   const ensureSupabaseAvailable = useCallback(async () => {
+    if (mode === 'bypass') return false;
+    if (!ready || !hasAccess || !eventId) return false;
     if (!onlineRef.current || !isSupabaseConfigured()) return false;
     if (supabaseAvailableRef.current === true) return true;
+
     const isAvailable = await checkSupabaseConnection();
     supabaseAvailableRef.current = isAvailable;
     return isAvailable;
-  }, []);
+  }, [eventId, hasAccess, mode, ready]);
 
   const loadAllData = useCallback(async () => {
     if (!(await ensureSupabaseAvailable())) return;
 
-    const [notesData, deliverablesData, completionsData] =
-      await Promise.all([
-        fetchNotes(),
-        fetchDeliverables(),
-        fetchCompletions(),
-      ]);
+    const [notesData, deliverablesData, completionsData] = await Promise.all([
+      fetchNotes(),
+      fetchDeliverables(),
+      fetchCompletions(),
+    ]);
 
     if (notesData) {
       useASWStore.setState({ notes: notesData.map(toAppNote) });
@@ -104,15 +109,17 @@ export default function SupabaseProvider() {
     }
   }, [ensureSupabaseAvailable]);
 
-  // Initial load and online/offline handling
   useEffect(() => {
+    if (mode === 'bypass') return;
+    if (!ready || !hasAccess || !eventId) return;
+
     const handleOnline = async () => {
       onlineRef.current = true;
       supabaseAvailableRef.current = null;
-      // Flush any pending clip sync operations when coming back online
       await flushSyncQueue();
-      loadAllData();
+      await loadAllData();
     };
+
     const handleOffline = () => {
       onlineRef.current = false;
     };
@@ -122,21 +129,19 @@ export default function SupabaseProvider() {
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
-    if (isInitialLoad.current) {
-      isInitialLoad.current = false;
-      loadAllData();
-      // Also flush any pending operations on initial load
-      flushSyncQueue();
-    }
+    void loadAllData();
+    void flushSyncQueue();
 
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, [loadAllData]);
+  }, [eventId, hasAccess, loadAllData, mode, ready]);
 
-  // Subscribe to realtime changes
   useEffect(() => {
+    if (mode === 'bypass') return;
+    if (!ready || !hasAccess || !eventId) return;
+
     let mounted = true;
     let currentChannel: ReturnType<NonNullable<ReturnType<typeof getSupabase>>['channel']> | null = null;
 
@@ -147,10 +152,10 @@ export default function SupabaseProvider() {
       if (!mounted) return;
 
       currentChannel = supabase
-        .channel('asw-tables-sync')
+        .channel(`asw-tables-sync-${eventId}`)
         .on(
           'postgres_changes',
-          { event: '*', schema: 'public', table: 'notes' },
+          { event: '*', schema: 'public', table: 'notes', filter: `event_id=eq.${eventId}` },
           () => {
             fetchNotes().then((data) => {
               if (data && mounted) useASWStore.setState({ notes: data.map(toAppNote) });
@@ -159,30 +164,32 @@ export default function SupabaseProvider() {
         )
         .on(
           'postgres_changes',
-          { event: '*', schema: 'public', table: 'deliverables' },
+          { event: '*', schema: 'public', table: 'deliverables', filter: `event_id=eq.${eventId}` },
           () => {
             fetchDeliverables().then((data) => {
-              if (data && data.length > 0 && mounted)
+              if (data && data.length > 0 && mounted) {
                 useASWStore.setState({ deliverables: data.map(toAppDeliverable) });
+              }
             });
           }
         )
         .on(
           'postgres_changes',
-          { event: '*', schema: 'public', table: 'player_station_completions' },
+          { event: '*', schema: 'public', table: 'player_station_completions', filter: `event_id=eq.${eventId}` },
           () => {
             fetchCompletions().then((data) => {
-              if (data && mounted)
+              if (data && mounted) {
                 useASWStore.setState({
                   playerStationCompletions: data.map(toAppCompletion),
                 });
+              }
             });
           }
         )
         .subscribe();
     };
 
-    subscribe();
+    void subscribe();
 
     return () => {
       mounted = false;
@@ -191,7 +198,7 @@ export default function SupabaseProvider() {
         if (supabase) supabase.removeChannel(currentChannel);
       }
     };
-  }, [ensureSupabaseAvailable]);
+  }, [ensureSupabaseAvailable, eventId, hasAccess, mode, ready]);
 
   return null;
 }

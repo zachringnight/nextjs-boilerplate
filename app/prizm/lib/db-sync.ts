@@ -9,6 +9,14 @@ function isOnline(): boolean {
   return typeof navigator !== 'undefined' && navigator.onLine;
 }
 
+function getScopedEventId(): string {
+  return (
+    process.env.NEXT_PUBLIC_DEFAULT_EVENT_SLUG ||
+    process.env.DEFAULT_EVENT_SLUG ||
+    'asw-2026'
+  );
+}
+
 // =============================================
 // NOTES SYNC
 // =============================================
@@ -30,10 +38,12 @@ export interface NoteRecord {
 export async function fetchNotes(): Promise<NoteRecord[] | null> {
   const supabase = getSupabase();
   if (!supabase || !isOnline()) return null;
+  const eventId = getScopedEventId();
   try {
     const { data, error } = await supabase
       .from('notes')
       .select('*')
+      .eq('event_id', eventId)
       .order('created_at', { ascending: false });
     if (error) throw error;
     return data as NoteRecord[];
@@ -46,9 +56,11 @@ export async function fetchNotes(): Promise<NoteRecord[] | null> {
 export async function syncNoteInsert(note: NoteRecord): Promise<boolean> {
   const supabase = getSupabase();
   if (!supabase || !isOnline()) return false;
+  const eventId = getScopedEventId();
   try {
     const { error } = await supabase.from('notes').insert({
       id: note.id,
+      event_id: eventId,
       content: note.content,
       category: note.category,
       priority: note.priority,
@@ -74,10 +86,12 @@ export async function syncNoteUpdate(
 ): Promise<boolean> {
   const supabase = getSupabase();
   if (!supabase || !isOnline()) return false;
+  const eventId = getScopedEventId();
   try {
     const { error } = await supabase
       .from('notes')
       .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('event_id', eventId)
       .eq('id', id);
     if (error) throw error;
     return true;
@@ -90,8 +104,13 @@ export async function syncNoteUpdate(
 export async function syncNoteDelete(id: string): Promise<boolean> {
   const supabase = getSupabase();
   if (!supabase || !isOnline()) return false;
+  const eventId = getScopedEventId();
   try {
-    const { error } = await supabase.from('notes').delete().eq('id', id);
+    const { error } = await supabase
+      .from('notes')
+      .delete()
+      .eq('event_id', eventId)
+      .eq('id', id);
     if (error) throw error;
     return true;
   } catch (err) {
@@ -103,8 +122,13 @@ export async function syncNoteDelete(id: string): Promise<boolean> {
 export async function syncBulkNoteDelete(ids: string[]): Promise<boolean> {
   const supabase = getSupabase();
   if (!supabase || !isOnline()) return false;
+  const eventId = getScopedEventId();
   try {
-    const { error } = await supabase.from('notes').delete().in('id', ids);
+    const { error } = await supabase
+      .from('notes')
+      .delete()
+      .eq('event_id', eventId)
+      .in('id', ids);
     if (error) throw error;
     return true;
   } catch (err) {
@@ -135,8 +159,12 @@ export interface DeliverableRecord {
 export async function fetchDeliverables(): Promise<DeliverableRecord[] | null> {
   const supabase = getSupabase();
   if (!supabase || !isOnline()) return null;
+  const eventId = getScopedEventId();
   try {
-    const { data, error } = await supabase.from('deliverables').select('*');
+    const { data, error } = await supabase
+      .from('deliverables')
+      .select('*')
+      .eq('event_id', eventId);
     if (error) throw error;
     return data as DeliverableRecord[];
   } catch (err) {
@@ -150,9 +178,11 @@ export async function syncDeliverableUpsert(
 ): Promise<boolean> {
   const supabase = getSupabase();
   if (!supabase || !isOnline()) return false;
+  const eventId = getScopedEventId();
   try {
     const { error } = await supabase.from('deliverables').upsert({
       id: deliverable.id,
+      event_id: eventId,
       title: deliverable.title,
       description: deliverable.description || null,
       type: deliverable.type,
@@ -179,10 +209,12 @@ export async function syncDeliverableUpdate(
 ): Promise<boolean> {
   const supabase = getSupabase();
   if (!supabase || !isOnline()) return false;
+  const eventId = getScopedEventId();
   try {
     const { error } = await supabase
       .from('deliverables')
       .update(updates)
+      .eq('event_id', eventId)
       .eq('id', id);
     if (error) throw error;
     return true;
@@ -195,8 +227,13 @@ export async function syncDeliverableUpdate(
 export async function syncDeliverableDelete(id: string): Promise<boolean> {
   const supabase = getSupabase();
   if (!supabase || !isOnline()) return false;
+  const eventId = getScopedEventId();
   try {
-    const { error } = await supabase.from('deliverables').delete().eq('id', id);
+    const { error } = await supabase
+      .from('deliverables')
+      .delete()
+      .eq('event_id', eventId)
+      .eq('id', id);
     if (error) throw error;
     return true;
   } catch (err) {
@@ -210,9 +247,11 @@ export async function syncBulkDeliverableUpsert(
 ): Promise<boolean> {
   const supabase = getSupabase();
   if (!supabase || !isOnline()) return false;
+  const eventId = getScopedEventId();
   try {
     const rows = deliverables.map((d) => ({
       id: d.id,
+      event_id: eventId,
       title: d.title,
       description: d.description || null,
       type: d.type,
@@ -253,10 +292,12 @@ export interface ScheduleSlotRecord {
 export async function fetchScheduleSlots(): Promise<ScheduleSlotRecord[] | null> {
   const supabase = getSupabase();
   if (!supabase || !isOnline()) return null;
+  const eventId = getScopedEventId();
   try {
     const { data, error } = await supabase
       .from('schedule_slots')
       .select('*')
+      .eq('event_id', eventId)
       .order('date', { ascending: true })
       .order('start_time', { ascending: true });
     if (error) throw error;
@@ -272,9 +313,11 @@ export async function syncScheduleSlotUpsert(
 ): Promise<boolean> {
   const supabase = getSupabase();
   if (!supabase || !isOnline()) return false;
+  const eventId = getScopedEventId();
   try {
     const { error } = await supabase.from('schedule_slots').upsert({
       id: slot.id,
+      event_id: eventId,
       player_id: slot.player_id,
       date: slot.date,
       start_time: slot.start_time,
@@ -295,10 +338,12 @@ export async function syncScheduleSlotUpsert(
 export async function syncScheduleSlotDelete(id: string): Promise<boolean> {
   const supabase = getSupabase();
   if (!supabase || !isOnline()) return false;
+  const eventId = getScopedEventId();
   try {
     const { error } = await supabase
       .from('schedule_slots')
       .delete()
+      .eq('event_id', eventId)
       .eq('id', id);
     if (error) throw error;
     return true;
@@ -313,9 +358,11 @@ export async function syncBulkScheduleSlotUpsert(
 ): Promise<boolean> {
   const supabase = getSupabase();
   if (!supabase || !isOnline()) return false;
+  const eventId = getScopedEventId();
   try {
     const rows = slots.map((s) => ({
       id: s.id,
+      event_id: eventId,
       player_id: s.player_id,
       date: s.date,
       start_time: s.start_time,
@@ -350,10 +397,12 @@ export interface CompletionRecord {
 export async function fetchCompletions(): Promise<CompletionRecord[] | null> {
   const supabase = getSupabase();
   if (!supabase || !isOnline()) return null;
+  const eventId = getScopedEventId();
   try {
     const { data, error } = await supabase
       .from('player_station_completions')
-      .select('*');
+      .select('*')
+      .eq('event_id', eventId);
     if (error) throw error;
     return data as CompletionRecord[];
   } catch (err) {
@@ -367,11 +416,13 @@ export async function syncCompletionUpsert(
 ): Promise<boolean> {
   const supabase = getSupabase();
   if (!supabase || !isOnline()) return false;
+  const eventId = getScopedEventId();
   try {
     const { error } = await supabase
       .from('player_station_completions')
       .upsert(
         {
+          event_id: eventId,
           player_id: completion.player_id,
           station_id: completion.station_id,
           completed: completion.completed,
@@ -379,7 +430,7 @@ export async function syncCompletionUpsert(
           completed_by: completion.completed_by || null,
           notes: completion.notes || null,
         },
-        { onConflict: 'player_id,station_id' }
+        { onConflict: 'event_id,player_id,station_id' }
       );
     if (error) throw error;
     return true;
@@ -395,10 +446,12 @@ export async function syncCompletionDelete(
 ): Promise<boolean> {
   const supabase = getSupabase();
   if (!supabase || !isOnline()) return false;
+  const eventId = getScopedEventId();
   try {
     const { error } = await supabase
       .from('player_station_completions')
       .delete()
+      .eq('event_id', eventId)
       .eq('player_id', playerId)
       .eq('station_id', stationId);
     if (error) throw error;
@@ -412,10 +465,12 @@ export async function syncCompletionDelete(
 export async function syncResetCompletions(): Promise<boolean> {
   const supabase = getSupabase();
   if (!supabase || !isOnline()) return false;
+  const eventId = getScopedEventId();
   try {
     const { error } = await supabase
       .from('player_station_completions')
       .delete()
+      .eq('event_id', eventId)
       .neq('player_id', '');
     if (error) throw error;
     return true;

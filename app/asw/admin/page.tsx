@@ -14,6 +14,7 @@ import { useASWStore } from '../store';
 import { useSchedulePlayers, type PlayerScheduleOverride } from '../data/schedule';
 import type { Player } from '../types';
 import { parseTime } from '../lib/schedule-utils';
+import { useAuthContext } from '../components/AuthProvider';
 
 type DayFilter = 'all' | 1 | 2;
 
@@ -149,6 +150,7 @@ function ScheduleRow({
 }
 
 export default function AdminSchedulePage() {
+  const { mode, loading, session, canEdit, canAdmin } = useAuthContext();
   const { players, basePlayerById, overrideCount } = useSchedulePlayers();
   const setScheduleOverride = useASWStore((state) => state.setScheduleOverride);
   const clearScheduleOverride = useASWStore((state) => state.clearScheduleOverride);
@@ -183,6 +185,37 @@ export default function AdminSchedulePage() {
       });
   }, [dayFilter, players, searchQuery]);
 
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-10 text-sm text-[#9CA3AF]">
+        Checking permissions...
+      </div>
+    );
+  }
+
+  if (mode !== 'bypass' && !session) {
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-10">
+        <div className="rounded-xl border border-[#2A2A2A] bg-[#141414] p-5">
+          <p className="text-sm text-[#9CA3AF]">Sign in is required to access Schedule Admin.</p>
+          <Link href="/asw/login" className="mt-3 inline-block text-sm font-semibold text-[#FFD100] hover:underline">
+            Go to login
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (!canEdit) {
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-10">
+        <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-5 text-sm text-red-300">
+          Your role has read-only access. Ask an admin for editor access to use Schedule Admin.
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-6">
       <div className="flex items-center gap-3">
@@ -194,6 +227,14 @@ export default function AdminSchedulePage() {
           Back
         </Link>
         <h1 className="text-2xl font-bold text-white">Schedule Admin</h1>
+        {canAdmin ? (
+          <Link
+            href="/asw/admin/import"
+            className="ml-auto inline-flex min-h-[44px] items-center gap-2 rounded-lg border border-[#2A2A2A] bg-[#141414] px-3 text-sm text-[#D1D5DB] hover:text-white"
+          >
+            CSV Import
+          </Link>
+        ) : null}
       </div>
 
       <p className="mt-2 text-sm text-[#9CA3AF]">

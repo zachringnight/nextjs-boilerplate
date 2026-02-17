@@ -22,6 +22,14 @@ type SyncOp =
 
 const QUEUE_KEY = 'prizm-clip-sync-queue';
 
+function getScopedEventId(): string {
+  return (
+    process.env.NEXT_PUBLIC_DEFAULT_EVENT_SLUG ||
+    process.env.DEFAULT_EVENT_SLUG ||
+    'asw-2026'
+  );
+}
+
 function loadQueue(): SyncOp[] {
   try {
     const raw = localStorage.getItem(QUEUE_KEY);
@@ -92,10 +100,12 @@ export async function flushSyncQueue(): Promise<number> {
 async function doInsert(clipData: Partial<ClipMarker>): Promise<boolean> {
   const supabase = getSupabase();
   if (!supabase) return false;
+  const eventId = getScopedEventId();
 
   try {
     const { error } = await supabase.from('clip_markers').insert({
       id: clipData.id,
+      event_id: eventId,
       name: clipData.name || null,
       timestamp: clipData.timestamp || new Date().toISOString(),
       category: clipData.category || 'general',
@@ -125,11 +135,13 @@ async function doInsert(clipData: Partial<ClipMarker>): Promise<boolean> {
 async function doUpdate(id: string, updates: Partial<ClipMarker>): Promise<boolean> {
   const supabase = getSupabase();
   if (!supabase) return false;
+  const eventId = getScopedEventId();
 
   try {
     const { error } = await supabase
       .from('clip_markers')
       .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('event_id', eventId)
       .eq('id', id);
     if (error) throw error;
     return true;
@@ -142,11 +154,13 @@ async function doUpdate(id: string, updates: Partial<ClipMarker>): Promise<boole
 async function doDelete(id: string): Promise<boolean> {
   const supabase = getSupabase();
   if (!supabase) return false;
+  const eventId = getScopedEventId();
 
   try {
     const { error } = await supabase
       .from('clip_markers')
       .delete()
+      .eq('event_id', eventId)
       .eq('id', id);
     if (error) throw error;
     return true;
@@ -159,11 +173,13 @@ async function doDelete(id: string): Promise<boolean> {
 async function doBulkUpdate(ids: string[], updates: Partial<ClipMarker>): Promise<boolean> {
   const supabase = getSupabase();
   if (!supabase) return false;
+  const eventId = getScopedEventId();
 
   try {
     const { error } = await supabase
       .from('clip_markers')
       .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('event_id', eventId)
       .in('id', ids);
     if (error) throw error;
     return true;
@@ -176,11 +192,13 @@ async function doBulkUpdate(ids: string[], updates: Partial<ClipMarker>): Promis
 async function doBulkDelete(ids: string[]): Promise<boolean> {
   const supabase = getSupabase();
   if (!supabase) return false;
+  const eventId = getScopedEventId();
 
   try {
     const { error } = await supabase
       .from('clip_markers')
       .delete()
+      .eq('event_id', eventId)
       .in('id', ids);
     if (error) throw error;
     return true;
