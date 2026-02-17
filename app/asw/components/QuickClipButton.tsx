@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useASWStore } from '../store';
 import type { ClipCategory, ClipPriority, ASWStationId } from '../types';
 import { ASW_STATIONS } from '../types';
-import { players } from '../data/players';
+import { useSchedulePlayers } from '../data/schedule';
 import { isCurrentPlayer, getEventDay } from '../lib/schedule-utils';
 import {
   Clapperboard,
@@ -31,6 +31,7 @@ const STATION_CATEGORY_MAP: Partial<Record<ASWStationId, ClipCategory>> = {
 };
 
 export default function QuickClipButton() {
+  const { players } = useSchedulePlayers();
   const pathname = usePathname();
   const [expanded, setExpanded] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -80,7 +81,7 @@ export default function QuickClipButton() {
     const eventDay = getEventDay(now);
     if (!eventDay) return null;
     return players.find(p => isCurrentPlayer(p, now, eventDay)) || null;
-  }, [currentTime]);
+  }, [currentTime, players]);
 
   // Recent clips (last 3)
   const recentClips = useMemo(() => {
@@ -99,7 +100,7 @@ export default function QuickClipButton() {
         time: time.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
       };
     });
-  }, [clips]);
+  }, [clips, players]);
 
   const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const toastClearRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);

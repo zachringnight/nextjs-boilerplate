@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Search, X } from 'lucide-react';
-import { players } from '../data/players';
+import { useSchedulePlayers } from '../data/schedule';
 import { useASWStore } from '../store';
 import type { Player } from '../types';
 
@@ -11,6 +11,7 @@ interface GlobalSearchProps {
 }
 
 export default function GlobalSearch({ onPlayerSelect }: GlobalSearchProps) {
+  const { players } = useSchedulePlayers();
   const { searchOpen, setSearchOpen } = useASWStore();
   const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -25,7 +26,7 @@ export default function GlobalSearch({ onPlayerSelect }: GlobalSearchProps) {
       p.position.toLowerCase().includes(q) ||
       p.teamAbbr.toLowerCase().includes(q)
     );
-  }, [query]);
+  }, [players, query]);
 
   const close = useCallback(() => {
     setSearchOpen(false);
@@ -80,7 +81,7 @@ export default function GlobalSearch({ onPlayerSelect }: GlobalSearchProps) {
               onChange={(e) => setQuery(e.target.value)}
               className="flex-1 bg-transparent px-4 py-4 text-white placeholder-gray-500 focus:outline-none"
             />
-            <button onClick={close} className="p-1 hover:bg-[#2a2a2a] rounded">
+            <button onClick={close} className="p-1 hover:bg-[#2a2a2a] rounded" aria-label="Close search">
               <X className="w-5 h-5 text-gray-500" />
             </button>
           </div>

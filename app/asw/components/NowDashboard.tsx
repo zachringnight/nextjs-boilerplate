@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { players, day1Players, day2Players, playerCounts } from '../data/players';
+import { useSchedulePlayers } from '../data/schedule';
 import type { Player } from '../types';
 import PlayerAvatar from './PlayerAvatar';
 import { ChevronRight, Volume2, Zap, ArrowRight, Calendar, Radio } from 'lucide-react';
@@ -204,6 +204,7 @@ interface NowDashboardProps {
 }
 
 export default function NowDashboard({ onPlayerClick }: NowDashboardProps) {
+  const { players, day1Players, day2Players, playerCounts } = useSchedulePlayers();
   const [currentTime, setCurrentTime] = useState(new Date());
   const setViewMode = useASWStore((s) => s.setViewMode);
   const mounted = useMounted();
@@ -221,16 +222,16 @@ export default function NowDashboard({ onPlayerClick }: NowDashboardProps) {
     if (eventDay === 1) return day1Players;
     if (eventDay === 2) return day2Players;
     return [];
-  }, [eventDay]);
+  }, [day1Players, day2Players, eventDay]);
 
   const currentPlayer = useMemo(
     () => players.find(p => isCurrentPlayer(p, currentTime, eventDay)),
-    [currentTime, eventDay]
+    [currentTime, eventDay, players]
   );
 
   const nextPlayer = useMemo(
     () => getNextPlayer(players, currentTime, eventDay),
-    [currentTime, eventDay]
+    [currentTime, eventDay, players]
   );
 
   const upcomingQueue = useMemo(() => {

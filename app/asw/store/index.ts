@@ -76,6 +76,10 @@ interface ASWState {
   setActiveDay: (day: number | null) => void;
   showEmbargoedOnly: boolean;
   setShowEmbargoedOnly: (show: boolean) => void;
+  scheduleOverrides: Record<string, { day: 1 | 2; scheduledTime: string | null }>;
+  setScheduleOverride: (playerId: string, override: { day: 1 | 2; scheduledTime: string | null }) => void;
+  clearScheduleOverride: (playerId: string) => void;
+  resetScheduleOverrides: () => void;
 
   // Notes / Issue Logger
   notes: Note[];
@@ -148,6 +152,19 @@ export const useASWStore = create<ASWState>()(
       setActiveDay: (day) => set({ activeDay: day }),
       showEmbargoedOnly: false,
       setShowEmbargoedOnly: (show) => set({ showEmbargoedOnly: show }),
+      scheduleOverrides: {},
+      setScheduleOverride: (playerId, override) => set((state) => ({
+        scheduleOverrides: {
+          ...state.scheduleOverrides,
+          [playerId]: override,
+        },
+      })),
+      clearScheduleOverride: (playerId) => set((state) => {
+        const next = { ...state.scheduleOverrides };
+        delete next[playerId];
+        return { scheduleOverrides: next };
+      }),
+      resetScheduleOverrides: () => set({ scheduleOverrides: {} }),
 
       // Notes / Issue Logger
       notes: [],

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Zap, Calendar, Radio, User, MoreHorizontal, MessageSquare, ClipboardCheck, FileBox, Timer, Clapperboard, X, ArrowLeft } from 'lucide-react';
+import { Zap, Calendar, Radio, User, MoreHorizontal, MessageSquare, ClipboardCheck, FileBox, Timer, Clapperboard, X, ArrowLeft, SlidersHorizontal } from 'lucide-react';
 import { useASWStore } from '../store';
 import { useMounted } from '../hooks/useMounted';
 import type { ViewMode } from '../types';
@@ -21,6 +21,7 @@ const moreItems = [
   { href: '/asw/notes', label: 'Notes & Issues', icon: MessageSquare, color: 'text-blue-400' },
   { href: '/asw/checklist', label: 'Station Checklist', icon: ClipboardCheck, color: 'text-green-400' },
   { href: '/asw/deliverables', label: 'Deliverables', icon: FileBox, color: 'text-amber-400' },
+  { href: '/asw/admin', label: 'Schedule Admin', icon: SlidersHorizontal, color: 'text-cyan-400' },
 ];
 
 export default function BottomNav() {
@@ -188,6 +189,7 @@ export default function BottomNav() {
                   moreOpen ? 'text-[#FFD100]' : 'text-[#6B7280] hover:text-white'
                 }`}
                 aria-expanded={moreOpen}
+                aria-haspopup="dialog"
                 aria-label="More tools menu"
               >
                 <MoreHorizontal size={22} strokeWidth={moreOpen ? 2.5 : 1.75} />
@@ -205,11 +207,14 @@ export default function BottomNav() {
                   <button
                     key={item.mode}
                     onClick={() => setViewMode(item.mode)}
+                    data-testid={`nav-${item.mode}`}
                     className={`relative flex flex-col items-center justify-center w-full h-full px-2 transition-all ${
                       active
                         ? 'text-[#FFD100]'
                         : 'text-[#6B7280] hover:text-white active:text-white'
                     }`}
+                    aria-label={`Switch to ${item.label} view`}
+                    aria-current={active ? 'page' : undefined}
                   >
                     <Icon
                       size={22}
@@ -229,10 +234,12 @@ export default function BottomNav() {
                 ref={moreButtonMainRef}
                 type="button"
                 onClick={() => setMoreOpen(!moreOpen)}
+                data-testid="nav-more"
                 className={`relative flex flex-col items-center justify-center w-full h-full px-2 transition-all ${
                   moreOpen ? 'text-[#FFD100]' : 'text-[#6B7280] hover:text-white active:text-white'
                 }`}
                 aria-expanded={moreOpen}
+                aria-haspopup="dialog"
                 aria-label="More tools menu"
               >
                 <MoreHorizontal

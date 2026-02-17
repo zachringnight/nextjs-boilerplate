@@ -176,6 +176,7 @@ export default function TimerPage() {
         <Link
           href="/asw"
           className="p-2 rounded-lg bg-[#1A1A1A] hover:bg-[#2A2A2A] transition-colors"
+          aria-label="Back to ASW home"
         >
           <ArrowLeft className="w-5 h-5 text-[#9CA3AF]" />
         </Link>

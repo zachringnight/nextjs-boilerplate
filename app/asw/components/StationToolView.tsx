@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { players, day1Players, day2Players } from '../data/players';
+import { useSchedulePlayers } from '../data/schedule';
 import type { Player } from '../types';
 import PlayerAvatar from './PlayerAvatar';
 import InterviewQuestions from './InterviewQuestions';
@@ -35,6 +35,7 @@ function PlayerSlotCard({
   const isCurrent = isCurrentPlayer(player, currentTime, eventDay);
   const isUpcoming = !isCurrent && isUpcomingPlayer(player, currentTime, eventDay);
   const styles = DAY_STYLES[player.day];
+  const detailsId = `player-details-${player.id}`;
 
   return (
     <div className={`bg-[#141414] border rounded-xl overflow-hidden transition-all ${
@@ -49,6 +50,8 @@ function PlayerSlotCard({
         className={`w-full p-4 flex items-center gap-4 transition-colors text-left ${
           isCurrent ? 'bg-amber-500/10' : 'hover:bg-[#1a1a1a]'
         }`}
+        aria-expanded={isExpanded}
+        aria-controls={detailsId}
       >
         <PlayerAvatar player={player} size="md" />
         <div className="flex-1 min-w-0">
@@ -93,7 +96,7 @@ function PlayerSlotCard({
       </button>
 
       {isExpanded && (
-        <div className="border-t border-[#2a2a2a]">
+        <div id={detailsId} className="border-t border-[#2a2a2a]">
           {player.pronunciation && (
             <div className="px-4 py-3 bg-[#0a0a0a] border-b border-[#2a2a2a]">
               <div className="flex items-center gap-2 text-gray-400">
@@ -138,6 +141,7 @@ function PlayerSlotCard({
 }
 
 export default function StationToolView({ largeText = false, selectedStation = null }: StationToolViewProps) {
+  const { players, day1Players, day2Players } = useSchedulePlayers();
   const [expandedPlayers, setExpandedPlayers] = useState<Set<string>>(new Set());
   const [currentTime, setCurrentTime] = useState(new Date());
   const [activeDay, setActiveDay] = useState<1 | 2 | 'all'>('all');
@@ -153,7 +157,7 @@ export default function StationToolView({ largeText = false, selectedStation = n
   const filteredPlayers = useMemo(() => {
     if (activeDay === 'all') return players;
     return activeDay === 1 ? day1Players : day2Players;
-  }, [activeDay]);
+  }, [activeDay, day1Players, day2Players, players]);
 
   const formattedTime = useMemo(() => formatTime(currentTime), [currentTime]);
   const eventDay = useMemo(() => getEventDay(currentTime), [currentTime]);
@@ -254,6 +258,7 @@ export default function StationToolView({ largeText = false, selectedStation = n
       <div className="flex gap-2 overflow-x-auto pb-2">
         <button
           onClick={() => setActiveDay('all')}
+          aria-pressed={activeDay === 'all'}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
             activeDay === 'all' ? 'bg-amber-500 text-black' : 'bg-[#141414] text-gray-300 hover:bg-[#1a1a1a]'
           }`}
@@ -264,6 +269,7 @@ export default function StationToolView({ largeText = false, selectedStation = n
           <button
             key={day}
             onClick={() => setActiveDay(day)}
+            aria-pressed={activeDay === day}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
               activeDay === day ? `${DAY_STYLES[day].bg} text-white` : 'bg-[#141414] text-gray-300 hover:bg-[#1a1a1a]'
             }`}

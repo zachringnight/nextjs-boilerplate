@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { players, day1Players, day2Players } from '../data/players';
+import { useSchedulePlayers } from '../data/schedule';
 import type { Player } from '../types';
 import {
   Clock,
@@ -60,6 +60,7 @@ function DaySchedule({
   onToggle: () => void;
 }) {
   const styles = DAY_STYLES[day];
+  const panelId = `day-${day}-schedule-panel`;
   const embargoedCount = useMemo(() => dayPlayers.filter((player) => player.embargoed).length, [dayPlayers]);
   const clearCount = useMemo(() => dayPlayers.filter((player) => !player.embargoed).length, [dayPlayers]);
   const hasCurrentPlayer = useMemo(
@@ -72,6 +73,8 @@ function DaySchedule({
       <button
         onClick={onToggle}
         className={`w-full min-h-[48px] ${styles.header} px-4 py-3 border-b border-[#2a2a2a] flex items-center justify-between`}
+        aria-expanded={isExpanded}
+        aria-controls={panelId}
       >
         <div className="flex items-center gap-3 flex-wrap">
           <h3 className={`font-bold ${styles.text}`}>DAY {day}</h3>
@@ -93,7 +96,7 @@ function DaySchedule({
       </button>
 
       {isExpanded && (
-        <div className="-mx-4 px-4 sm:mx-0 sm:px-0 overflow-x-auto">
+        <div id={panelId} className="-mx-4 px-4 sm:mx-0 sm:px-0 overflow-x-auto">
           <table className="w-full min-w-[720px] text-sm">
             <thead className="sticky top-0 z-10">
               <tr className="border-b border-[#2a2a2a] bg-[#0f0f0f]">
@@ -196,6 +199,7 @@ function DaySchedule({
 }
 
 export default function ScheduleView({ onPlayerClick }: ScheduleViewProps) {
+  const { players, day1Players, day2Players } = useSchedulePlayers();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [expandedDays, setExpandedDays] = useState<Set<number>>(new Set([1, 2]));
   const [searchQuery, setSearchQuery] = useState('');
@@ -224,7 +228,7 @@ export default function ScheduleView({ onPlayerClick }: ScheduleViewProps) {
 
   const currentPlayer = useMemo(
     () => findCurrentPlayer(players, currentTime, eventDay),
-    [currentTime, eventDay]
+    [currentTime, eventDay, players]
   );
 
   const jumpToNow = useCallback(() => {
@@ -286,8 +290,8 @@ export default function ScheduleView({ onPlayerClick }: ScheduleViewProps) {
     });
   }, [currentTime, eventDay, searchQuery, sortBy, statusFilter]);
 
-  const filteredDay1Players = useMemo(() => filterAndSortPlayers(day1Players), [filterAndSortPlayers]);
-  const filteredDay2Players = useMemo(() => filterAndSortPlayers(day2Players), [filterAndSortPlayers]);
+  const filteredDay1Players = useMemo(() => filterAndSortPlayers(day1Players), [day1Players, filterAndSortPlayers]);
+  const filteredDay2Players = useMemo(() => filterAndSortPlayers(day2Players), [day2Players, filterAndSortPlayers]);
 
   const visiblePlayers = useMemo(
     () => [...filteredDay1Players, ...filteredDay2Players],
@@ -353,6 +357,7 @@ export default function ScheduleView({ onPlayerClick }: ScheduleViewProps) {
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
               placeholder="Search players, team, or nationality..."
+              data-testid="schedule-search-input"
               className="w-full min-h-[44px] bg-[#141414] border border-[#2a2a2a] rounded-xl pl-10 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#FFD100]/50"
             />
           </div>
@@ -387,6 +392,7 @@ export default function ScheduleView({ onPlayerClick }: ScheduleViewProps) {
             <button
               key={option.value}
               onClick={() => setStatusFilter(option.value)}
+              aria-pressed={statusFilter === option.value}
               className={`min-h-[44px] flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
                 statusFilter === option.value
                   ? 'bg-[#FFD100] text-black'

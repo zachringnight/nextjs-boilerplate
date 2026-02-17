@@ -12,7 +12,7 @@ import {
   Filter,
 } from 'lucide-react';
 import { useASWStore } from '../store';
-import { players } from '../data/players';
+import { useSchedulePlayers } from '../data/schedule';
 import { STATION_CONFIG } from '../lib/constants';
 import type { NoteCategory, NotePriority, NoteStatus, ASWStationId } from '../types';
 
@@ -40,6 +40,7 @@ const statusConfig: Record<NoteStatus, { label: string; icon: typeof Clock; colo
 const stations = Object.values(STATION_CONFIG);
 
 export default function NotesPage() {
+  const { players } = useSchedulePlayers();
   const {
     notes,
     addNote,

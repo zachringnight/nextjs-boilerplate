@@ -21,7 +21,7 @@ import type {
   EventDay,
 } from '../types';
 import { DELIVERABLE_TYPES, DELIVERABLE_STATUSES, EVENT_DAYS } from '../types';
-import { players } from '../data/players';
+import { useSchedulePlayers } from '../data/schedule';
 
 const typeConfig: Record<DeliverableType, { icon: typeof Camera; color: string; label: string }> = {
   photo: { icon: Camera, color: 'bg-blue-500', label: 'Photo' },
@@ -41,6 +41,7 @@ const dayColors: Record<EventDay, string> = {
 };
 
 export default function DeliverablesPage() {
+  const { players } = useSchedulePlayers();
   const {
     deliverables,
     updateDeliverableStatus,

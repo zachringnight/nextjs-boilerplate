@@ -2,7 +2,7 @@
 
 import { useEffect, useCallback, useRef } from 'react';
 import { useASWStore } from '../store';
-import { players } from '../data/players';
+import { useSchedulePlayers } from '../data/schedule';
 import { isCurrentPlayer, getEventDay, getTimeRemaining } from '../lib/schedule-utils';
 import { isPushSupported, requestNotificationPermission, hapticFeedback } from '../lib/utils';
 
@@ -15,6 +15,7 @@ interface NotificationState {
 }
 
 export default function NotificationProvider() {
+  const { players } = useSchedulePlayers();
   const { notificationsEnabled, notificationSound } = useASWStore();
   const notificationState = useRef<NotificationState>({
     fiveMinNotified: new Set(),
@@ -86,7 +87,7 @@ export default function NotificationProvider() {
         notificationState.current.oneMinNotified.add(playerKey);
       }
     }
-  }, [notificationsEnabled, showNotification]);
+  }, [notificationsEnabled, players, showNotification]);
 
   // Set up interval
   useEffect(() => {

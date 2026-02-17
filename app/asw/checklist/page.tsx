@@ -3,10 +3,11 @@
 import { useState, useMemo } from 'react';
 import { ClipboardCheck, RotateCcw, Users, Search } from 'lucide-react';
 import { useASWStore } from '../store';
-import { players } from '../data/players';
+import { useSchedulePlayers } from '../data/schedule';
 import { ASW_STATIONS, CHECKLIST_STATIONS, type ASWStationId } from '../types';
 
 export default function ChecklistPage() {
+  const { players } = useSchedulePlayers();
   const {
     largeText,
     playerStationCompletions,
@@ -35,7 +36,7 @@ export default function ChecklistPage() {
       }
       return true;
     });
-  }, [activeDay, searchQuery]);
+  }, [activeDay, players, searchQuery]);
 
   // Stats
   const stats = useMemo(() => {
@@ -59,7 +60,7 @@ export default function ChecklistPage() {
       day2Completed,
       totalCompletions: playerStationCompletions.filter((c) => c.completed).length,
     };
-  }, [playerStationCompletions, getPlayerProgress]);
+  }, [playerStationCompletions, getPlayerProgress, players]);
 
   // Station summary
   const stationSummary = useMemo(() => {
@@ -79,7 +80,7 @@ export default function ChecklistPage() {
         percentage: totalPlayers > 0 ? Math.round((count / totalPlayers) * 100) : 0,
       };
     });
-  }, [activeDay, getStationCompletionCount]);
+  }, [activeDay, getStationCompletionCount, players]);
 
   const getStation = (stationId: ASWStationId) => {
     return ASW_STATIONS.find((s) => s.id === stationId);

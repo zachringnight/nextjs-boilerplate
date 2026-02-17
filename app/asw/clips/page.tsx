@@ -11,10 +11,11 @@ import {
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { CATEGORY_CONFIG, PRIORITY_CONFIG } from '../lib/clip-constants';
-import { players } from '../data/players';
+import { useSchedulePlayers } from '../data/schedule';
 import type { ClipCategory } from '../types';
 
 export default function ClipsPage() {
+  const { players } = useSchedulePlayers();
   const { clips, deleteClip, toggleClipFlag, largeText } = useASWStore();
   const [filterCategory, setFilterCategory] = useState<ClipCategory | 'all'>('all');
   const [showFlaggedOnly, setShowFlaggedOnly] = useState(false);
@@ -41,6 +42,7 @@ export default function ClipsPage() {
         <Link
           href="/asw"
           className="p-2 rounded-lg bg-[#1A1A1A] hover:bg-[#2A2A2A] transition-colors"
+          aria-label="Back to ASW home"
         >
           <ArrowLeft className="w-5 h-5 text-[#9CA3AF]" />
         </Link>

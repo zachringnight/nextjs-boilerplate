@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
-import { players, playerCounts, getPlayerById } from './data/players';
+import { useSchedulePlayers } from './data/schedule';
 import PlayerCard from './components/PlayerCard';
 import GlobalSearch from './components/GlobalSearch';
 import { useASWStore } from './store';
@@ -26,6 +26,7 @@ const getSortTimeValue = (time: string | null) => {
 };
 
 export default function ASWContent() {
+  const { players, playerCounts, getPlayerById } = useSchedulePlayers();
   const { viewMode, largeText, activeDay, setActiveDay, showEmbargoedOnly, setShowEmbargoedOnly, selectedStation } = useASWStore();
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -36,7 +37,7 @@ export default function ASWContent() {
   const handlePlayerClick = useCallback((playerId: string) => {
     const player = getPlayerById(playerId);
     if (player) setSelectedPlayer(player);
-  }, []);
+  }, [getPlayerById]);
 
   const handleSearchSelect = useCallback((player: Player) => {
     setSelectedPlayer(player);
@@ -83,7 +84,7 @@ export default function ASWContent() {
           return a.lastName.localeCompare(b.lastName) || a.firstName.localeCompare(b.firstName);
       }
     });
-  }, [searchQuery, activeDay, showEmbargoedOnly, showTranslatorOnly, sortBy]);
+  }, [players, searchQuery, activeDay, showEmbargoedOnly, showTranslatorOnly, sortBy]);
 
   const visibleCounts = useMemo(() => {
     return {
