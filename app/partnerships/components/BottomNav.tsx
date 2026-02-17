@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import NavIcon from './NavIcon';
 import { NAV_ITEMS } from '../lib/constants';
 import { cn } from '../lib/utils';
 import { useMounted } from '../hooks/useMounted';
@@ -68,6 +69,7 @@ export default function BottomNav({ className }: { className?: string }) {
                         active ? 'bg-[#FFD100]/10 text-[#FFD100]' : 'hover:bg-[#2A2A2A] text-white'
                       )}
                     >
+                      <NavIcon name={item.icon} className={cn('shrink-0', active ? 'text-[#FFD100]' : 'text-[#6B7280]')} />
                       <span className="font-medium">{item.label}</span>
                     </Link>
                   );
@@ -92,7 +94,8 @@ export default function BottomNav({ className }: { className?: string }) {
                   active ? 'text-[#FFD100]' : 'text-[#6B7280] hover:text-white'
                 )}
               >
-                <span className={cn('text-[10px] mt-1 font-semibold tracking-wide', active && 'text-[#FFD100]')}>
+                <NavIcon name={item.icon} className="mb-0.5" />
+                <span className={cn('text-[10px] font-semibold tracking-wide', active && 'text-[#FFD100]')}>
                   {item.label}
                 </span>
                 {active && <div className="absolute bottom-1 w-8 h-[3px] rounded-full gold-gradient" />}
@@ -111,7 +114,10 @@ export default function BottomNav({ className }: { className?: string }) {
             aria-haspopup="dialog"
             aria-label="More pages menu"
           >
-            <span className="text-[10px] mt-1 font-semibold tracking-wide">More</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mb-0.5">
+              <circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /><circle cx="5" cy="12" r="1" />
+            </svg>
+            <span className="text-[10px] font-semibold tracking-wide">More</span>
           </button>
         </div>
       </nav>

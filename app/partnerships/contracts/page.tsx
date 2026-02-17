@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import SideNav from '../components/SideNav';
 import BottomNav from '../components/BottomNav';
@@ -11,11 +11,24 @@ import { SkeletonBlock } from '../components/Skeleton';
 import { useMounted } from '../hooks/useMounted';
 import { usePartnershipsStore } from '../store';
 import { fetchAllContracts } from '../lib/queries';
-import { formatDate, formatDealType, hasNoAnnouncement, isExpired, isExpiringSoon, cn } from '../lib/utils';
-import { SPORTS } from '../lib/constants';
+import { formatDate, hasNoAnnouncement, isExpired, isExpiringSoon, cn } from '../lib/utils';
+import { SPORTS, SPORT_ACCENT_COLORS } from '../lib/constants';
 import type { Athlete, AthleteContract } from '../types';
 
 type ContractWithAthlete = AthleteContract & { athlete: Athlete };
+type SortKey = 'athlete' | 'end_date' | 'start_date' | 'status';
+
+function getStatus(c: AthleteContract): 'active' | 'expired' | 'expiring' {
+  if (isExpired(c.contract_end)) return 'expired';
+  if (isExpiringSoon(c.contract_end)) return 'expiring';
+  return 'active';
+}
+
+const STATUS_BORDER: Record<string, string> = {
+  active: 'border-l-green-500',
+  expired: 'border-l-red-500',
+  expiring: 'border-l-yellow-500',
+};
 
 export default function ContractsPage() {
   const mounted = useMounted();
@@ -23,6 +36,7 @@ export default function ContractsPage() {
   const [contracts, setContracts] = useState<ContractWithAthlete[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<SortKey>('end_date');
 
   const loadContracts = useCallback(async () => {
     try {
@@ -41,36 +55,55 @@ export default function ContractsPage() {
     loadContracts();
   }, [mounted, loadContracts]);
 
-  // Client-side filtering
-  const filtered = contracts.filter((c) => {
-    // Status filter
-    if (contractFilters.status === 'active') {
-      if (isExpired(c.contract_end)) return false;
-    } else if (contractFilters.status === 'expired') {
-      if (!isExpired(c.contract_end)) return false;
+  const filtered = useMemo(() => {
+    let result = contracts.filter((c) => {
+      if (contractFilters.status === 'active') {
+        if (isExpired(c.contract_end)) return false;
+      } else if (contractFilters.status === 'expired') {
+        if (!isExpired(c.contract_end)) return false;
+      }
+      if (contractFilters.dealType !== 'all' && c.deal_type !== contractFilters.dealType) return false;
+      if (contractFilters.sport !== 'all' && c.athlete?.sport !== contractFilters.sport) return false;
+      if (contractFilters.search) {
+        const search = contractFilters.search.toLowerCase();
+        const name = c.athlete?.name?.toLowerCase() ?? '';
+        if (!name.includes(search)) return false;
+      }
+      return true;
+    });
+
+    switch (sortBy) {
+      case 'athlete':
+        result.sort((a, b) => (a.athlete?.name ?? '').localeCompare(b.athlete?.name ?? ''));
+        break;
+      case 'end_date':
+        result.sort((a, b) => {
+          const aDate = a.contract_end ? new Date(a.contract_end).getTime() : 0;
+          const bDate = b.contract_end ? new Date(b.contract_end).getTime() : 0;
+          return aDate - bDate;
+        });
+        break;
+      case 'start_date':
+        result.sort((a, b) => {
+          const aDate = a.contract_start ? new Date(a.contract_start).getTime() : 0;
+          const bDate = b.contract_start ? new Date(b.contract_start).getTime() : 0;
+          return bDate - aDate;
+        });
+        break;
+      case 'status':
+        result.sort((a, b) => {
+          const order = { expiring: 0, active: 1, expired: 2 };
+          return order[getStatus(a)] - order[getStatus(b)];
+        });
+        break;
     }
+    return result;
+  }, [contracts, contractFilters, sortBy]);
 
-    // Deal type filter
-    if (contractFilters.dealType !== 'all' && c.deal_type !== contractFilters.dealType) return false;
-
-    // Sport filter
-    if (contractFilters.sport !== 'all' && c.athlete?.sport !== contractFilters.sport) return false;
-
-    // Search
-    if (contractFilters.search) {
-      const search = contractFilters.search.toLowerCase();
-      const name = c.athlete?.name?.toLowerCase() ?? '';
-      if (!name.includes(search)) return false;
-    }
-
-    return true;
-  });
-
-  function getStatus(c: AthleteContract): 'active' | 'expired' | 'expiring' {
-    if (isExpired(c.contract_end)) return 'expired';
-    if (isExpiringSoon(c.contract_end)) return 'expiring';
-    return 'active';
-  }
+  // Summary counts
+  const activeCt = contracts.filter((c) => !isExpired(c.contract_end)).length;
+  const expiredCt = contracts.filter((c) => isExpired(c.contract_end)).length;
+  const expiringCt = contracts.filter((c) => isExpiringSoon(c.contract_end)).length;
 
   if (!mounted) return null;
 
@@ -78,31 +111,55 @@ export default function ContractsPage() {
     <>
       <SideNav className="hidden md:flex" />
       <main className="flex-1 pb-20 md:pb-0">
-        <div className="p-4 md:p-6 max-w-6xl mx-auto space-y-4">
-          <h1 className="text-2xl font-bold text-white">Contracts</h1>
+        <div className="p-4 md:p-6 lg:p-8 max-w-6xl mx-auto space-y-4">
+          {/* Header */}
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Contracts</h1>
+            {!loading && (
+              <div className="flex items-center gap-4 mt-2">
+                <button
+                  onClick={() => setContractFilters({ status: 'all' })}
+                  className={cn('text-sm transition-colors', contractFilters.status === 'all' ? 'text-white font-medium' : 'text-[#6B7280] hover:text-white')}
+                >
+                  All <span className="text-[#6B7280]">({contracts.length})</span>
+                </button>
+                <button
+                  onClick={() => setContractFilters({ status: 'active' })}
+                  className={cn('text-sm transition-colors', contractFilters.status === 'active' ? 'text-green-400 font-medium' : 'text-[#6B7280] hover:text-white')}
+                >
+                  Active <span className="text-[#6B7280]">({activeCt})</span>
+                </button>
+                <button
+                  onClick={() => setContractFilters({ status: 'expired' })}
+                  className={cn('text-sm transition-colors', contractFilters.status === 'expired' ? 'text-red-400 font-medium' : 'text-[#6B7280] hover:text-white')}
+                >
+                  Expired <span className="text-[#6B7280]">({expiredCt})</span>
+                </button>
+                {expiringCt > 0 && (
+                  <span className="text-yellow-400 text-xs font-medium px-2 py-0.5 bg-yellow-400/10 rounded-full">
+                    {expiringCt} expiring soon
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
 
           {/* Filters */}
           <div className="flex flex-col sm:flex-row gap-3">
-            <input
-              type="text"
-              value={contractFilters.search}
-              onChange={(e) => setContractFilters({ search: e.target.value })}
-              placeholder="Search by athlete name..."
-              className="flex-1 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-2 text-white text-sm focus:border-[#FFD100] focus:outline-none"
-            />
-            <select
-              value={contractFilters.status}
-              onChange={(e) => setContractFilters({ status: e.target.value as 'active' | 'expired' | 'all' })}
-              className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-2 text-white text-sm focus:border-[#FFD100] focus:outline-none"
-            >
-              <option value="all">All Status</option>
-              <option value="active">Active</option>
-              <option value="expired">Expired</option>
-            </select>
+            <div className="relative flex-1">
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6B7280]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+              <input
+                type="text"
+                value={contractFilters.search}
+                onChange={(e) => setContractFilters({ search: e.target.value })}
+                placeholder="Search by athlete name..."
+                className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg pl-9 pr-3 py-2.5 text-white text-sm focus:border-[#FFD100] focus:outline-none placeholder:text-[#4B5563]"
+              />
+            </div>
             <select
               value={contractFilters.dealType}
               onChange={(e) => setContractFilters({ dealType: e.target.value })}
-              className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-2 text-white text-sm focus:border-[#FFD100] focus:outline-none"
+              className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-2.5 text-white text-sm focus:border-[#FFD100] focus:outline-none"
             >
               <option value="all">All Deal Types</option>
               <option value="exclusive">Exclusive</option>
@@ -111,12 +168,22 @@ export default function ContractsPage() {
             <select
               value={contractFilters.sport}
               onChange={(e) => setContractFilters({ sport: e.target.value })}
-              className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-2 text-white text-sm focus:border-[#FFD100] focus:outline-none"
+              className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-2.5 text-white text-sm focus:border-[#FFD100] focus:outline-none"
             >
               <option value="all">All Sports</option>
               {SPORTS.map((s) => (
                 <option key={s} value={s}>{s}</option>
               ))}
+            </select>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as SortKey)}
+              className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-2.5 text-white text-sm focus:border-[#FFD100] focus:outline-none"
+            >
+              <option value="end_date">Sort: End Date</option>
+              <option value="start_date">Sort: Start Date</option>
+              <option value="athlete">Sort: Athlete</option>
+              <option value="status">Sort: Status</option>
             </select>
           </div>
 
@@ -125,45 +192,66 @@ export default function ContractsPage() {
           )}
 
           {loading ? (
-            <div className="space-y-3">
-              {Array.from({ length: 5 }).map((_, i) => (
+            <div className="space-y-2">
+              {Array.from({ length: 8 }).map((_, i) => (
                 <SkeletonBlock key={i} className="h-20" />
               ))}
             </div>
           ) : filtered.length === 0 ? (
             <EmptyState title="No contracts found" description="Try adjusting your filters." />
           ) : (
-            <div className="space-y-3">
-              {filtered.map((c) => (
-                <Link
-                  key={c.id}
-                  href={`/partnerships/athletes/${c.athlete_id}`}
-                  className="block bg-[#141414] border border-[#2A2A2A] rounded-xl p-4 hover:border-[#FFD100]/30 transition-colors"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-white font-semibold text-sm">{c.athlete?.name ?? 'Unknown'}</span>
-                        {c.athlete?.sport && <SportBadge sport={c.athlete.sport} />}
-                        <StatusBadge variant={getStatus(c)} />
-                        <StatusBadge variant={c.deal_type === 'exclusive' ? 'exclusive' : 'non_exclusive'} />
-                        {hasNoAnnouncement(c.special_notes) && (
-                          <span className="text-yellow-400 text-xs font-semibold">NO ANN.</span>
-                        )}
+            <>
+              <div className="space-y-2">
+                {filtered.map((c) => {
+                  const status = getStatus(c);
+                  const accentColor = c.athlete?.sport ? SPORT_ACCENT_COLORS[c.athlete.sport] ?? '#6B7280' : '#6B7280';
+                  return (
+                    <Link
+                      key={c.id}
+                      href={`/partnerships/athletes/${c.athlete_id}`}
+                      className={cn(
+                        'block bg-[#141414] border border-[#2A2A2A] rounded-xl p-4 hover:border-[#FFD100]/30 transition-all group border-l-[3px]',
+                        STATUS_BORDER[status]
+                      )}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-start gap-3 flex-1 min-w-0">
+                          {/* Avatar */}
+                          <div
+                            className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-[11px] font-bold"
+                            style={{ background: `${accentColor}20`, color: accentColor }}
+                          >
+                            {(c.athlete?.name ?? '?').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-white font-semibold text-sm group-hover:text-[#FFD100] transition-colors">
+                                {c.athlete?.name ?? 'Unknown'}
+                              </span>
+                              {c.athlete?.sport && <SportBadge sport={c.athlete.sport} />}
+                              <StatusBadge variant={status} />
+                              <StatusBadge variant={c.deal_type === 'exclusive' ? 'exclusive' : 'non_exclusive'} />
+                              {hasNoAnnouncement(c.special_notes) && (
+                                <span className="text-yellow-400 text-xs font-semibold px-1.5 py-0.5 bg-yellow-400/10 rounded">NO ANN.</span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-4 mt-1.5 text-xs text-[#6B7280]">
+                              <span>{formatDate(c.contract_start)} &mdash; {formatDate(c.contract_end)}</span>
+                              {c.contract_end_note && <span>({c.contract_end_note})</span>}
+                              {c.exclusivity_scope && <span className="capitalize">{c.exclusivity_scope.replace(/_/g, ' ')}</span>}
+                            </div>
+                          </div>
+                        </div>
+                        <span className="text-[#4B5563] group-hover:text-[#9CA3AF] transition-colors shrink-0 mt-1">&rarr;</span>
                       </div>
-                      <div className="flex gap-4 mt-1.5 text-xs text-[#6B7280]">
-                        <span>{formatDate(c.contract_start)} — {formatDate(c.contract_end)}</span>
-                        {c.contract_end_note && <span>({c.contract_end_note})</span>}
-                        {c.exclusivity_scope && <span>{c.exclusivity_scope.replace(/_/g, ' ')}</span>}
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              ))}
+                    </Link>
+                  );
+                })}
+              </div>
               <p className="text-[#6B7280] text-xs text-center pt-2">
-                {filtered.length} contract{filtered.length !== 1 ? 's' : ''} shown
+                Showing {filtered.length} of {contracts.length} contract{contracts.length !== 1 ? 's' : ''}
               </p>
-            </div>
+            </>
           )}
         </div>
       </main>
