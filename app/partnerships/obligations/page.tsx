@@ -10,7 +10,14 @@ import { SkeletonBlock } from '../components/Skeleton';
 import { useMounted } from '../hooks/useMounted';
 import { usePartnershipsStore } from '../store';
 import { fetchAllObligations } from '../lib/queries';
-import { formatObligationType, cn } from '../lib/utils';
+import {
+  formatObligationType,
+  formatDate,
+  daysUntilExpiry,
+  urgencyColor,
+  formatDaysRemaining,
+  cn,
+} from '../lib/utils';
 import { OBLIGATION_TYPES, SPORT_ACCENT_COLORS } from '../lib/constants';
 import type { Athlete, AthleteContract, MarketingObligation } from '../types';
 
@@ -18,7 +25,8 @@ type ObligationWithContext = MarketingObligation & {
   contract: AthleteContract & { athlete: Athlete };
 };
 
-type SortKey = 'athlete' | 'type' | 'quantity';
+type SortKey = 'deal_end_date' | 'athlete' | 'type' | 'quantity';
+type UrgencyFilter = 'all' | 'critical' | 'warning' | 'on_track';
 
 export default function ObligationsPage() {
   const mounted = useMounted();
@@ -26,7 +34,8 @@ export default function ObligationsPage() {
   const [obligations, setObligations] = useState<ObligationWithContext[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [sortBy, setSortBy] = useState<SortKey>('athlete');
+  const [sortBy, setSortBy] = useState<SortKey>('deal_end_date');
+  const [urgency, setUrgency] = useState<UrgencyFilter>('all');
 
   const loadObligations = useCallback(async () => {
     try {
@@ -53,10 +62,26 @@ export default function ObligationsPage() {
         const name = o.contract?.athlete?.name?.toLowerCase() ?? '';
         if (!name.includes(search)) return false;
       }
+
+      // Urgency filter
+      if (urgency !== 'all') {
+        const days = daysUntilExpiry(o.contract?.contract_end);
+        if (urgency === 'critical' && (days === null || days < 0 || days > 30)) return false;
+        if (urgency === 'warning' && (days === null || days <= 30 || days > 90)) return false;
+        if (urgency === 'on_track' && days !== null && days >= 0 && days <= 90) return false;
+      }
+
       return true;
     });
 
     switch (sortBy) {
+      case 'deal_end_date':
+        result.sort((a, b) => {
+          const aDate = a.contract?.contract_end ? new Date(a.contract.contract_end).getTime() : Infinity;
+          const bDate = b.contract?.contract_end ? new Date(b.contract.contract_end).getTime() : Infinity;
+          return aDate - bDate;
+        });
+        break;
       case 'athlete':
         result.sort((a, b) => (a.contract?.athlete?.name ?? '').localeCompare(b.contract?.athlete?.name ?? ''));
         break;
@@ -68,7 +93,7 @@ export default function ObligationsPage() {
         break;
     }
     return result;
-  }, [obligations, obligationFilters, sortBy]);
+  }, [obligations, obligationFilters, sortBy, urgency]);
 
   // Type breakdown for summary chips
   const typeBreakdown = useMemo(() => {
@@ -78,6 +103,10 @@ export default function ObligationsPage() {
     }
     return Array.from(map.entries()).sort((a, b) => b[1] - a[1]);
   }, [obligations]);
+
+  // Urgency counts
+  const criticalCt = obligations.filter((o) => { const d = daysUntilExpiry(o.contract?.contract_end); return d !== null && d >= 0 && d <= 30; }).length;
+  const warningCt = obligations.filter((o) => { const d = daysUntilExpiry(o.contract?.contract_end); return d !== null && d > 30 && d <= 90; }).length;
 
   // Group by athlete for summary
   const athleteMap = new Map<number, { name: string; sport: string | null; count: number }>();
@@ -104,9 +133,38 @@ export default function ObligationsPage() {
             {!loading && (
               <p className="text-[#6B7280] text-sm mt-1">
                 {filtered.length} obligation{filtered.length !== 1 ? 's' : ''} across {athleteMap.size} athlete{athleteMap.size !== 1 ? 's' : ''}
+                {criticalCt > 0 && <span className="text-red-400 ml-2">({criticalCt} critical)</span>}
               </p>
             )}
           </div>
+
+          {/* Urgency filter chips */}
+          {!loading && (
+            <div className="flex flex-wrap gap-2">
+              {([
+                { key: 'all' as const, label: `All (${obligations.length})` },
+                { key: 'critical' as const, label: `Critical < 30d (${criticalCt})` },
+                { key: 'warning' as const, label: `Warning < 90d (${warningCt})` },
+                { key: 'on_track' as const, label: 'On Track' },
+              ]).map((chip) => (
+                <button
+                  key={chip.key}
+                  onClick={() => setUrgency(urgency === chip.key ? 'all' : chip.key)}
+                  className={cn(
+                    'px-3 py-1.5 rounded-full text-xs font-medium transition-all border',
+                    urgency === chip.key
+                      ? chip.key === 'critical' ? 'bg-red-500/15 text-red-400 border-red-500/30'
+                        : chip.key === 'warning' ? 'bg-yellow-500/15 text-yellow-400 border-yellow-500/30'
+                        : chip.key === 'on_track' ? 'bg-green-500/15 text-green-400 border-green-500/30'
+                        : 'bg-[#FFD100]/15 text-[#FFD100] border-[#FFD100]/30'
+                      : 'bg-[#1A1A1A] text-[#9CA3AF] border-[#2A2A2A] hover:border-[#3A3A3A] hover:text-white'
+                  )}
+                >
+                  {chip.label}
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Type chips - quick filter */}
           {!loading && typeBreakdown.length > 0 && (
@@ -166,6 +224,7 @@ export default function ObligationsPage() {
               onChange={(e) => setSortBy(e.target.value as SortKey)}
               className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-2.5 text-white text-sm focus:border-[#FFD100] focus:outline-none"
             >
+              <option value="deal_end_date">Sort: Deal End Date</option>
               <option value="athlete">Sort: Athlete</option>
               <option value="type">Sort: Type</option>
               <option value="quantity">Sort: Quantity</option>
@@ -188,11 +247,17 @@ export default function ObligationsPage() {
             <div className="space-y-2">
               {filtered.map((o) => {
                 const accentColor = o.contract?.athlete?.sport ? SPORT_ACCENT_COLORS[o.contract.athlete.sport] ?? '#6B7280' : '#6B7280';
+                const days = daysUntilExpiry(o.contract?.contract_end);
+                const urg = urgencyColor(days);
+
                 return (
                   <Link
                     key={o.id}
                     href={`/partnerships/athletes/${o.contract?.athlete_id}`}
-                    className="flex items-center justify-between p-3.5 bg-[#141414] border border-[#2A2A2A] rounded-xl hover:border-[#FFD100]/30 transition-all group"
+                    className={cn(
+                      'flex items-center justify-between p-3.5 bg-[#141414] border rounded-xl hover:border-[#FFD100]/30 transition-all group',
+                      days !== null && days >= 0 && days <= 30 ? 'border-red-500/30' : days !== null && days > 30 && days <= 90 ? 'border-yellow-500/20' : 'border-[#2A2A2A]'
+                    )}
                   >
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       <div
@@ -216,6 +281,7 @@ export default function ObligationsPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-3 shrink-0 ml-3">
+                      {/* Quantity */}
                       <div className="text-right">
                         {o.quantity_per_year != null && (
                           <span className="text-white text-sm font-semibold">{o.quantity_per_year}<span className="text-[#6B7280] text-xs font-normal">/yr</span></span>
@@ -223,6 +289,13 @@ export default function ObligationsPage() {
                         {o.quantity_total != null && (
                           <span className="text-white text-sm font-semibold">{o.quantity_total} <span className="text-[#6B7280] text-xs font-normal">total</span></span>
                         )}
+                      </div>
+                      {/* Deal end date + urgency */}
+                      <div className="text-right hidden sm:block">
+                        <span className="text-[#6B7280] text-xs block">{formatDate(o.contract?.contract_end)}</span>
+                        <span className={cn('text-[10px] font-semibold', urg.text)}>
+                          {formatDaysRemaining(days)}
+                        </span>
                       </div>
                       <span className="text-[#4B5563] group-hover:text-[#9CA3AF] transition-colors">&rarr;</span>
                     </div>

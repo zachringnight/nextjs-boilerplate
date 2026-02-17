@@ -128,6 +128,20 @@ export interface DashboardStats {
   sportBreakdown: Record<string, number>;
 }
 
+export interface DeliverableRow {
+  contract: AthleteContract & { athlete: Athlete };
+  obligations: MarketingObligation[];
+  completedCount: number;
+}
+
+export interface DeliverableTrackerStats {
+  rows: DeliverableRow[];
+  totalActiveDeals: number;
+  criticalCount: number;
+  warningCount: number;
+  totalObligations: number;
+}
+
 // === Filters ===
 
 export interface AthleteFilters {

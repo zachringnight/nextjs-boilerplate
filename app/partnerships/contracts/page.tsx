@@ -10,13 +10,23 @@ import EmptyState from '../components/EmptyState';
 import { SkeletonBlock } from '../components/Skeleton';
 import { useMounted } from '../hooks/useMounted';
 import { usePartnershipsStore } from '../store';
-import { fetchAllContracts } from '../lib/queries';
-import { formatDate, hasNoAnnouncement, isExpired, isExpiringSoon, cn } from '../lib/utils';
+import { fetchContractsWithObligationCounts } from '../lib/queries';
+import {
+  formatDate,
+  hasNoAnnouncement,
+  isExpired,
+  isExpiringSoon,
+  daysUntilExpiry,
+  urgencyColor,
+  formatDaysRemaining,
+  cn,
+} from '../lib/utils';
 import { SPORTS, SPORT_ACCENT_COLORS } from '../lib/constants';
 import type { Athlete, AthleteContract } from '../types';
 
-type ContractWithAthlete = AthleteContract & { athlete: Athlete };
-type SortKey = 'athlete' | 'end_date' | 'start_date' | 'status';
+type ContractRow = AthleteContract & { athlete: Athlete; obligation_count: number; completed_count: number };
+type SortKey = 'athlete' | 'end_date' | 'start_date' | 'status' | 'obligations';
+type UrgencyFilter = 'all' | 'critical' | 'warning' | 'on_track';
 
 function getStatus(c: AthleteContract): 'active' | 'expired' | 'expiring' {
   if (isExpired(c.contract_end)) return 'expired';
@@ -33,16 +43,17 @@ const STATUS_BORDER: Record<string, string> = {
 export default function ContractsPage() {
   const mounted = useMounted();
   const { contractFilters, setContractFilters, refreshKey } = usePartnershipsStore();
-  const [contracts, setContracts] = useState<ContractWithAthlete[]>([]);
+  const [contracts, setContracts] = useState<ContractRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<SortKey>('end_date');
+  const [urgency, setUrgency] = useState<UrgencyFilter>('all');
 
   const loadContracts = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await fetchAllContracts();
-      setContracts(data);
+      const data = await fetchContractsWithObligationCounts();
+      setContracts(data as ContractRow[]);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to load contracts');
     } finally {
@@ -57,6 +68,7 @@ export default function ContractsPage() {
 
   const filtered = useMemo(() => {
     let result = contracts.filter((c) => {
+      // Status filter
       if (contractFilters.status === 'active') {
         if (isExpired(c.contract_end)) return false;
       } else if (contractFilters.status === 'expired') {
@@ -69,6 +81,15 @@ export default function ContractsPage() {
         const name = c.athlete?.name?.toLowerCase() ?? '';
         if (!name.includes(search)) return false;
       }
+
+      // Urgency filter
+      if (urgency !== 'all') {
+        const days = daysUntilExpiry(c.contract_end);
+        if (urgency === 'critical' && (days === null || days < 0 || days > 30)) return false;
+        if (urgency === 'warning' && (days === null || days <= 30 || days > 90)) return false;
+        if (urgency === 'on_track' && days !== null && days >= 0 && days <= 90) return false;
+      }
+
       return true;
     });
 
@@ -78,8 +99,8 @@ export default function ContractsPage() {
         break;
       case 'end_date':
         result.sort((a, b) => {
-          const aDate = a.contract_end ? new Date(a.contract_end).getTime() : 0;
-          const bDate = b.contract_end ? new Date(b.contract_end).getTime() : 0;
+          const aDate = a.contract_end ? new Date(a.contract_end).getTime() : Infinity;
+          const bDate = b.contract_end ? new Date(b.contract_end).getTime() : Infinity;
           return aDate - bDate;
         });
         break;
@@ -96,14 +117,18 @@ export default function ContractsPage() {
           return order[getStatus(a)] - order[getStatus(b)];
         });
         break;
+      case 'obligations':
+        result.sort((a, b) => b.obligation_count - a.obligation_count);
+        break;
     }
     return result;
-  }, [contracts, contractFilters, sortBy]);
+  }, [contracts, contractFilters, sortBy, urgency]);
 
   // Summary counts
   const activeCt = contracts.filter((c) => !isExpired(c.contract_end)).length;
   const expiredCt = contracts.filter((c) => isExpired(c.contract_end)).length;
   const expiringCt = contracts.filter((c) => isExpiringSoon(c.contract_end)).length;
+  const criticalCt = contracts.filter((c) => { const d = daysUntilExpiry(c.contract_end); return d !== null && d >= 0 && d <= 30; }).length;
 
   if (!mounted) return null;
 
@@ -143,6 +168,34 @@ export default function ContractsPage() {
               </div>
             )}
           </div>
+
+          {/* Urgency filter chips */}
+          {!loading && (
+            <div className="flex flex-wrap gap-2">
+              {([
+                { key: 'all' as const, label: 'All Urgencies' },
+                { key: 'critical' as const, label: `Critical < 30d (${criticalCt})` },
+                { key: 'warning' as const, label: `Warning < 90d (${expiringCt - criticalCt})` },
+                { key: 'on_track' as const, label: 'On Track' },
+              ]).map((chip) => (
+                <button
+                  key={chip.key}
+                  onClick={() => setUrgency(urgency === chip.key ? 'all' : chip.key)}
+                  className={cn(
+                    'px-3 py-1.5 rounded-full text-xs font-medium transition-all border',
+                    urgency === chip.key
+                      ? chip.key === 'critical' ? 'bg-red-500/15 text-red-400 border-red-500/30'
+                        : chip.key === 'warning' ? 'bg-yellow-500/15 text-yellow-400 border-yellow-500/30'
+                        : chip.key === 'on_track' ? 'bg-green-500/15 text-green-400 border-green-500/30'
+                        : 'bg-[#FFD100]/15 text-[#FFD100] border-[#FFD100]/30'
+                      : 'bg-[#1A1A1A] text-[#9CA3AF] border-[#2A2A2A] hover:border-[#3A3A3A] hover:text-white'
+                  )}
+                >
+                  {chip.label}
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Filters */}
           <div className="flex flex-col sm:flex-row gap-3">
@@ -184,6 +237,7 @@ export default function ContractsPage() {
               <option value="start_date">Sort: Start Date</option>
               <option value="athlete">Sort: Athlete</option>
               <option value="status">Sort: Status</option>
+              <option value="obligations">Sort: Obligations</option>
             </select>
           </div>
 
@@ -204,6 +258,8 @@ export default function ContractsPage() {
               <div className="space-y-2">
                 {filtered.map((c) => {
                   const status = getStatus(c);
+                  const days = daysUntilExpiry(c.contract_end);
+                  const urg = urgencyColor(days);
                   const accentColor = c.athlete?.sport ? SPORT_ACCENT_COLORS[c.athlete.sport] ?? '#6B7280' : '#6B7280';
                   return (
                     <Link
@@ -242,7 +298,23 @@ export default function ContractsPage() {
                             </div>
                           </div>
                         </div>
-                        <span className="text-[#4B5563] group-hover:text-[#9CA3AF] transition-colors shrink-0 mt-1">&rarr;</span>
+                        {/* Right side: urgency + obligations */}
+                        <div className="flex items-center gap-3 shrink-0 ml-3">
+                          {/* Obligation count */}
+                          {c.obligation_count > 0 && (
+                            <div className="text-right">
+                              <span className="text-white text-sm font-semibold">{c.completed_count}/{c.obligation_count}</span>
+                              <p className="text-[#6B7280] text-[10px]">deliverables</p>
+                            </div>
+                          )}
+                          {/* Days remaining */}
+                          {!isExpired(c.contract_end) && days !== null && (
+                            <span className={cn('text-xs font-semibold px-2 py-1 rounded-full', urg.bg, urg.text)}>
+                              {formatDaysRemaining(days)}
+                            </span>
+                          )}
+                          <span className="text-[#4B5563] group-hover:text-[#9CA3AF] transition-colors shrink-0 mt-1">&rarr;</span>
+                        </div>
                       </div>
                     </Link>
                   );
