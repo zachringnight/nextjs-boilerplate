@@ -1,8 +1,10 @@
 import type { Metadata, Viewport } from 'next';
+import dynamic from 'next/dynamic';
 import Header from './components/Header';
 import ErrorBoundary from './components/ErrorBoundary';
-import ChatBot from './components/ChatBot';
 import './partnerships.css';
+
+const ChatBot = dynamic(() => import('./components/ChatBot'));
 
 export const metadata: Metadata = {
   title: {
