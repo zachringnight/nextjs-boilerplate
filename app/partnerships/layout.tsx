@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import Header from './components/Header';
 import ErrorBoundary from './components/ErrorBoundary';
+import ChatBot from './components/ChatBot';
 import './partnerships.css';
 
 export const metadata: Metadata = {
@@ -42,6 +43,8 @@ export default function PartnershipsLayout({
           {children}
         </div>
       </ErrorBoundary>
+
+      <ChatBot />
     </div>
   );
 }
