@@ -182,6 +182,40 @@ export default function AthleteDetailPage({ params }: { params: Promise<{ id: st
                     {athlete.league && <span className="text-[#6B7280] text-sm">{athlete.league}</span>}
                   </div>
                   {athlete.team && <p className="text-[#9CA3AF] text-sm mt-1">{athlete.team}</p>}
+                  {(athlete.team_city || athlete.team_state) && (
+                    <p className="text-[#6B7280] text-xs mt-0.5">
+                      {[athlete.team_city, athlete.team_state].filter(Boolean).join(', ')}
+                    </p>
+                  )}
+                  {(athlete.hometown_city || athlete.hometown_state) && (
+                    <p className="text-[#6B7280] text-xs mt-0.5">
+                      Hometown: {[athlete.hometown_city, athlete.hometown_state].filter(Boolean).join(', ')}
+                    </p>
+                  )}
+                  {(athlete.instagram_handle || athlete.x_handle) && (
+                    <div className="flex items-center gap-3 mt-2">
+                      {athlete.instagram_handle && (
+                        <a
+                          href={`https://instagram.com/${athlete.instagram_handle}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#9CA3AF] text-sm hover:text-[#FFD100] transition-colors"
+                        >
+                          IG: @{athlete.instagram_handle}
+                        </a>
+                      )}
+                      {athlete.x_handle && (
+                        <a
+                          href={`https://x.com/${athlete.x_handle}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#9CA3AF] text-sm hover:text-[#FFD100] transition-colors"
+                        >
+                          X: @{athlete.x_handle}
+                        </a>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <div className="flex gap-2">
                   <button

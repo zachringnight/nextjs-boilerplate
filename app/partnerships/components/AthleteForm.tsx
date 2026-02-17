@@ -19,6 +19,12 @@ export default function AthleteForm({ open, onClose, onSaved, athlete }: Athlete
   const [sport, setSport] = useState(athlete?.sport ?? '');
   const [league, setLeague] = useState(athlete?.league ?? '');
   const [team, setTeam] = useState(athlete?.team ?? '');
+  const [instagramHandle, setInstagramHandle] = useState(athlete?.instagram_handle ?? '');
+  const [xHandle, setXHandle] = useState(athlete?.x_handle ?? '');
+  const [teamCity, setTeamCity] = useState(athlete?.team_city ?? '');
+  const [teamState, setTeamState] = useState(athlete?.team_state ?? '');
+  const [hometownCity, setHometownCity] = useState(athlete?.hometown_city ?? '');
+  const [hometownState, setHometownState] = useState(athlete?.hometown_state ?? '');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -28,6 +34,12 @@ export default function AthleteForm({ open, onClose, onSaved, athlete }: Athlete
     setSport(athlete?.sport ?? '');
     setLeague(athlete?.league ?? '');
     setTeam(athlete?.team ?? '');
+    setInstagramHandle(athlete?.instagram_handle ?? '');
+    setXHandle(athlete?.x_handle ?? '');
+    setTeamCity(athlete?.team_city ?? '');
+    setTeamState(athlete?.team_state ?? '');
+    setHometownCity(athlete?.hometown_city ?? '');
+    setHometownState(athlete?.hometown_state ?? '');
     setError(null);
   }, [open, athlete]);
 
@@ -41,21 +53,24 @@ export default function AthleteForm({ open, onClose, onSaved, athlete }: Athlete
     setSaving(true);
     setError(null);
 
+    const payload = {
+      name: name.trim(),
+      sport: sport || null,
+      league: league || null,
+      team: team || null,
+      instagram_handle: instagramHandle.trim() || null,
+      x_handle: xHandle.trim() || null,
+      team_city: teamCity.trim() || null,
+      team_state: teamState.trim() || null,
+      hometown_city: hometownCity.trim() || null,
+      hometown_state: hometownState.trim() || null,
+    };
+
     try {
       if (isEdit && athlete) {
-        await updateAthlete(athlete.id, {
-          name: name.trim(),
-          sport: sport || null,
-          league: league || null,
-          team: team || null,
-        });
+        await updateAthlete(athlete.id, payload);
       } else {
-        await createAthlete({
-          name: name.trim(),
-          sport: sport || null,
-          league: league || null,
-          team: team || null,
-        });
+        await createAthlete(payload);
       }
       onSaved();
       onClose();
@@ -66,6 +81,8 @@ export default function AthleteForm({ open, onClose, onSaved, athlete }: Athlete
     }
   }
 
+  const inputClass = "w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-2 text-white text-sm focus:border-[#FFD100] focus:outline-none";
+
   return (
     <FormModal open={open} onClose={onClose} title={isEdit ? 'Edit Athlete' : 'Add Athlete'}>
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -75,22 +92,12 @@ export default function AthleteForm({ open, onClose, onSaved, athlete }: Athlete
 
         <div>
           <label className="block text-sm font-medium text-[#9CA3AF] mb-1">Name *</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-2 text-white text-sm focus:border-[#FFD100] focus:outline-none"
-            placeholder="Full name"
-          />
+          <input type="text" value={name} onChange={(e) => setName(e.target.value)} className={inputClass} placeholder="Full name" />
         </div>
 
         <div>
           <label className="block text-sm font-medium text-[#9CA3AF] mb-1">Sport</label>
-          <select
-            value={sport}
-            onChange={(e) => setSport(e.target.value)}
-            className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-2 text-white text-sm focus:border-[#FFD100] focus:outline-none"
-          >
+          <select value={sport} onChange={(e) => setSport(e.target.value)} className={inputClass}>
             <option value="">Select sport</option>
             {SPORTS.map((s) => (
               <option key={s} value={s}>{s}</option>
@@ -100,24 +107,45 @@ export default function AthleteForm({ open, onClose, onSaved, athlete }: Athlete
 
         <div>
           <label className="block text-sm font-medium text-[#9CA3AF] mb-1">League</label>
-          <input
-            type="text"
-            value={league}
-            onChange={(e) => setLeague(e.target.value)}
-            className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-2 text-white text-sm focus:border-[#FFD100] focus:outline-none"
-            placeholder="NBA, NFL, NIL, etc."
-          />
+          <input type="text" value={league} onChange={(e) => setLeague(e.target.value)} className={inputClass} placeholder="NBA, NFL, NIL, etc." />
         </div>
 
         <div>
           <label className="block text-sm font-medium text-[#9CA3AF] mb-1">Team</label>
-          <input
-            type="text"
-            value={team}
-            onChange={(e) => setTeam(e.target.value)}
-            className="w-full bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg px-3 py-2 text-white text-sm focus:border-[#FFD100] focus:outline-none"
-            placeholder="Team or school"
-          />
+          <input type="text" value={team} onChange={(e) => setTeam(e.target.value)} className={inputClass} placeholder="Team or school" />
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-sm font-medium text-[#9CA3AF] mb-1">Team City</label>
+            <input type="text" value={teamCity} onChange={(e) => setTeamCity(e.target.value)} className={inputClass} placeholder="City" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-[#9CA3AF] mb-1">Team State</label>
+            <input type="text" value={teamState} onChange={(e) => setTeamState(e.target.value)} className={inputClass} placeholder="State" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-sm font-medium text-[#9CA3AF] mb-1">Hometown City</label>
+            <input type="text" value={hometownCity} onChange={(e) => setHometownCity(e.target.value)} className={inputClass} placeholder="City" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-[#9CA3AF] mb-1">Hometown State</label>
+            <input type="text" value={hometownState} onChange={(e) => setHometownState(e.target.value)} className={inputClass} placeholder="State" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-sm font-medium text-[#9CA3AF] mb-1">Instagram</label>
+            <input type="text" value={instagramHandle} onChange={(e) => setInstagramHandle(e.target.value)} className={inputClass} placeholder="handle (no @)" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-[#9CA3AF] mb-1">X / Twitter</label>
+            <input type="text" value={xHandle} onChange={(e) => setXHandle(e.target.value)} className={inputClass} placeholder="handle (no @)" />
+          </div>
         </div>
 
         <div className="flex gap-3 justify-end pt-2">

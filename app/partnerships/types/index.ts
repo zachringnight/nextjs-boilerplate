@@ -28,6 +28,12 @@ export interface Athlete {
   sport: string | null;
   league: string | null;
   team: string | null;
+  instagram_handle: string | null;
+  x_handle: string | null;
+  team_city: string | null;
+  team_state: string | null;
+  hometown_city: string | null;
+  hometown_state: string | null;
   created_at: string;
   updated_at: string;
 }

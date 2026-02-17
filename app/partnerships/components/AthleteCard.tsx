@@ -5,6 +5,8 @@ import SportBadge from './SportBadge';
 import type { Athlete } from '../types';
 
 export default function AthleteCard({ athlete }: { athlete: Athlete }) {
+  const location = [athlete.team_city, athlete.team_state].filter(Boolean).join(', ');
+
   return (
     <Link
       href={`/partnerships/athletes/${athlete.id}`}
@@ -17,8 +19,18 @@ export default function AthleteCard({ athlete }: { athlete: Athlete }) {
       {athlete.team && (
         <p className="text-[#6B7280] text-xs mt-2 truncate">{athlete.team}</p>
       )}
-      {athlete.league && (
-        <p className="text-[#6B7280] text-xs mt-0.5 truncate">{athlete.league}</p>
+      {location && (
+        <p className="text-[#6B7280] text-xs mt-0.5 truncate">{location}</p>
+      )}
+      {(athlete.instagram_handle || athlete.x_handle) && (
+        <div className="flex items-center gap-3 mt-2">
+          {athlete.instagram_handle && (
+            <span className="text-[#6B7280] text-xs truncate">IG: @{athlete.instagram_handle}</span>
+          )}
+          {athlete.x_handle && (
+            <span className="text-[#6B7280] text-xs truncate">X: @{athlete.x_handle}</span>
+          )}
+        </div>
       )}
     </Link>
   );
