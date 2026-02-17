@@ -6,6 +6,7 @@ import { getPlayerById } from '../data/players';
 import { getStationById } from '../data/stations';
 import { isCurrentSlot, isPastSlot } from '../lib/time';
 import { useAppStore } from '../store';
+import PlayerPhoto from './PlayerPhoto';
 
 interface ScheduleSlotRowProps {
   slot: ScheduleSlot;
@@ -58,22 +59,12 @@ export default function ScheduleSlotRow({ slot, showPRDetails = false }: Schedul
           </div>
 
           {/* Player Photo */}
-          <div className="w-10 h-10 rounded-full bg-[#2A2A2A] flex items-center justify-center text-lg font-bold text-white overflow-hidden flex-shrink-0">
-            {player.photo ? (
-              <img
-                src={player.photo}
-                alt={player.name}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = 'none';
-                  target.parentElement!.innerHTML = player.name.charAt(0);
-                }}
-              />
-            ) : (
-              player.name.charAt(0)
-            )}
-          </div>
+          <PlayerPhoto
+            src={player.photo}
+            name={player.name}
+            size="sm"
+            className="!text-lg"
+          />
 
           {/* Player Info */}
           <div className="flex-1 min-w-0">

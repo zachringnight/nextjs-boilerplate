@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { cn } from '../lib/utils';
 
 interface PlayerPhotoProps {
@@ -17,6 +18,13 @@ const sizeClasses = {
   xl: 'w-28 h-28 text-4xl',
 };
 
+const sizePixels = {
+  sm: 40,
+  md: 56,
+  lg: 64,
+  xl: 112,
+};
+
 export default function PlayerPhoto({ src, name, size = 'md', className }: PlayerPhotoProps) {
   const [failed, setFailed] = useState(false);
   const initial = name.charAt(0);
@@ -30,9 +38,12 @@ export default function PlayerPhoto({ src, name, size = 'md', className }: Playe
       )}
     >
       {src && !failed ? (
-        <img
+        <Image
           src={src}
           alt={name}
+          width={sizePixels[size]}
+          height={sizePixels[size]}
+          sizes={`${sizePixels[size]}px`}
           className="w-full h-full object-cover"
           onError={() => setFailed(true)}
         />

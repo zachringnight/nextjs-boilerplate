@@ -928,11 +928,6 @@ export const playerCounts = {
 
 // Player lookups
 export const playerById = new Map<string, Player>(players.map(p => [p.id, p]));
-export const playerByFirstName = new Map<string, Player>(players.map(p => [p.firstName.toLowerCase(), p]));
-
-export function getPlayerByFirstName(firstName: string): Player | undefined {
-  return playerByFirstName.get(firstName.toLowerCase());
-}
 
 export function getPlayerById(id: string): Player | undefined {
   return playerById.get(id);

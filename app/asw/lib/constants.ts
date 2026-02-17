@@ -17,8 +17,8 @@ export const EVENT_DATES = {
 export const EVENT_INFO = {
   name: 'NBA All-Star Weekend 2026',
   subtitle: 'Panini Shoot',
-  location: 'San Francisco',
-  dateDisplay: 'Feb 13 & 14, 2026',
+  location: 'Los Angeles',
+  dateDisplay: 'Feb 13-14, 2026',
   totalDays: 2,
 } as const;
 

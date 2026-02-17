@@ -76,7 +76,11 @@ export function isCurrentPlayer(player: Player, currentTime: Date, eventDay?: 1 
 /**
  * Check if a player is upcoming (within the next 30 minutes)
  */
-export function isUpcomingPlayer(player: Player, currentTime: Date): boolean {
+export function isUpcomingPlayer(player: Player, currentTime: Date, eventDay?: 1 | 2 | null): boolean {
+  if (eventDay !== undefined && eventDay !== null && player.day !== eventDay) {
+    return false;
+  }
+
   const parsed = parseTime(player.scheduledTime);
   if (!parsed) return false; // Skip players with TBD/null times
 

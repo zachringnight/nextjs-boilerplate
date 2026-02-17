@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type KeyboardEvent } from 'react';
 import Link from 'next/link';
 import { useAppStore } from '../store';
 import { players } from '../data/players';
 import { stations, checklistStations } from '../data/stations';
 import { StationId } from '../types';
+import PlayerPhoto from './PlayerPhoto';
 
 interface PlayerStationChecklistProps {
   filterSigningOnly?: boolean;
@@ -52,6 +53,13 @@ export default function PlayerStationChecklist({ filterSigningOnly = false }: Pl
       }
       return newSet;
     });
+  };
+
+  const handleExpandKeyDown = (event: KeyboardEvent<HTMLDivElement>, playerId: string) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      toggleExpand(playerId);
+    }
   };
 
   return (
@@ -119,33 +127,27 @@ export default function PlayerStationChecklist({ filterSigningOnly = false }: Pl
                 className="bg-[#1A1A1A] rounded-xl border border-[#2A2A2A] overflow-hidden"
               >
                 {/* Player Header */}
-                <button
+                <div
+                  role="button"
+                  tabIndex={0}
+                  aria-expanded={isExpanded}
                   onClick={() => toggleExpand(player.id)}
-                  className="w-full p-4 flex items-center gap-3 hover:bg-[#2A2A2A]/50 transition-colors"
+                  onKeyDown={(event) => handleExpandKeyDown(event, player.id)}
+                  className="w-full p-4 flex items-center gap-3 hover:bg-[#2A2A2A]/50 transition-colors cursor-pointer"
                 >
                   {/* Player Avatar */}
-                  <div className="w-12 h-12 rounded-full bg-[#2A2A2A] flex items-center justify-center text-lg font-bold text-white overflow-hidden flex-shrink-0">
-                    {player.photo ? (
-                      <img
-                        src={player.photo}
-                        alt={player.name}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = 'none';
-                          target.parentElement!.innerHTML = player.name.charAt(0);
-                        }}
-                      />
-                    ) : (
-                      player.name.charAt(0)
-                    )}
-                  </div>
+                  <PlayerPhoto
+                    src={player.photo}
+                    name={player.name}
+                    className="!w-12 !h-12 !text-lg"
+                  />
 
                   {/* Player Info */}
                   <div className="flex-1 min-w-0 text-left">
                     <Link
                       href={`/prizm/players/${player.id}`}
                       onClick={(e) => e.stopPropagation()}
+                      onKeyDown={(e) => e.stopPropagation()}
                       className={`font-semibold text-white hover:text-[#FFD100] transition-colors truncate block ${largeText ? 'text-lg' : 'text-base'}`}
                     >
                       {player.name}
@@ -207,7 +209,7 @@ export default function PlayerStationChecklist({ filterSigningOnly = false }: Pl
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </div>
-                </button>
+                </div>
 
                 {/* Station Checklist (Expanded) */}
                 {isExpanded && (

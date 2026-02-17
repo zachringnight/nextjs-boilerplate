@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Panini Production Hub | NBA All-Star Weekend 2026",
-  description: "Production coordination for Panini America NBA All-Star Weekend shoot — Los Angeles, Feb 12-13 2026",
+  description: "Production coordination for Panini America NBA All-Star Weekend shoot — Los Angeles, Feb 13-14 2026",
 };
 
 export default function RootLayout({

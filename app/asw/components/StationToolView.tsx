@@ -6,7 +6,7 @@ import type { Player } from '../types';
 import PlayerAvatar from './PlayerAvatar';
 import InterviewQuestions from './InterviewQuestions';
 import { ChevronDown, ChevronUp, Volume2, Clock, Zap, AlertTriangle, Languages } from 'lucide-react';
-import { isCurrentPlayer, isUpcomingPlayer, formatTime } from '../lib/schedule-utils';
+import { isCurrentPlayer, isUpcomingPlayer, formatTime, getEventDay } from '../lib/schedule-utils';
 import { UPDATE_INTERVALS, DAY_STYLES, STATION_CONFIG, STATUS_COLORS } from '../lib/constants';
 import { useMounted } from '../hooks/useMounted';
 import { Skeleton } from './Skeleton';
@@ -22,16 +22,18 @@ function PlayerSlotCard({
   isExpanded,
   onToggle,
   currentTime,
+  eventDay,
   largeText,
 }: {
   player: Player;
   isExpanded: boolean;
   onToggle: () => void;
   currentTime: Date;
+  eventDay: 1 | 2 | null;
   largeText: boolean;
 }) {
-  const isCurrent = isCurrentPlayer(player, currentTime);
-  const isUpcoming = !isCurrent && isUpcomingPlayer(player, currentTime);
+  const isCurrent = isCurrentPlayer(player, currentTime, eventDay);
+  const isUpcoming = !isCurrent && isUpcomingPlayer(player, currentTime, eventDay);
   const styles = DAY_STYLES[player.day];
 
   return (
@@ -154,6 +156,7 @@ export default function StationToolView({ largeText = false, selectedStation = n
   }, [activeDay]);
 
   const formattedTime = useMemo(() => formatTime(currentTime), [currentTime]);
+  const eventDay = useMemo(() => getEventDay(currentTime), [currentTime]);
 
   const togglePlayer = useCallback((playerId: string) => {
     setExpandedPlayers(prev => {
@@ -173,8 +176,8 @@ export default function StationToolView({ largeText = false, selectedStation = n
   }, []);
 
   const currentPlayerIndex = useMemo(
-    () => filteredPlayers.findIndex(p => isCurrentPlayer(p, currentTime)),
-    [filteredPlayers, currentTime]
+    () => filteredPlayers.findIndex(p => isCurrentPlayer(p, currentTime, eventDay)),
+    [filteredPlayers, currentTime, eventDay]
   );
 
   // Auto-expand current player
@@ -244,7 +247,7 @@ export default function StationToolView({ largeText = false, selectedStation = n
             <Clock className="w-4 h-4" />
             <span className="font-mono font-bold">{formattedTime}</span>
           </div>
-          <p className="text-xs text-gray-500">PT (San Francisco)</p>
+          <p className="text-xs text-gray-500">PT (Los Angeles)</p>
         </div>
       </div>
 
@@ -305,6 +308,7 @@ export default function StationToolView({ largeText = false, selectedStation = n
               isExpanded={expandedPlayers.has(player.id)}
               onToggle={() => togglePlayer(player.id)}
               currentTime={currentTime}
+              eventDay={eventDay}
               largeText={largeText}
             />
           </div>

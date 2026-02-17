@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import type { Player } from '../../data/players';
 
 interface PlayerAvatarProps {
@@ -13,6 +14,13 @@ const sizeClasses = {
   md: 'w-14 h-14 text-lg',
   lg: 'w-20 h-20 text-2xl',
   xl: 'w-32 h-32 text-4xl',
+};
+
+const sizePixels = {
+  sm: 40,
+  md: 56,
+  lg: 80,
+  xl: 128,
 };
 
 const positionColors: Record<string, { gradient: string; bg: string }> = {
@@ -34,9 +42,12 @@ export default function PlayerAvatar({ player, size = 'md' }: PlayerAvatarProps)
   if (hasLocalPhoto && !imageError) {
     return (
       <div className={`${sizeClasses[size]} rounded-xl overflow-hidden flex-shrink-0 shadow-lg bg-[#1a1a1a]`}>
-        <img
+        <Image
           src={player.photo}
           alt={`${player.firstName} ${player.lastName}`}
+          width={sizePixels[size]}
+          height={sizePixels[size]}
+          sizes={`${sizePixels[size]}px`}
           className="w-full h-full object-cover"
           onError={() => setImageError(true)}
         />
