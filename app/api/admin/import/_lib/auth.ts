@@ -42,7 +42,8 @@ export async function requireAdminContext(request: NextRequest): Promise<AdminCo
       .maybeSingle();
 
     if (eventError) {
-      return { ok: false, status: 500, message: `Failed to load event: ${eventError.message}` };
+      console.error('Failed to load event:', eventError.message);
+      return { ok: false, status: 500, message: 'Failed to load event.' };
     }
 
     eventData = eventBySlug;
@@ -55,7 +56,8 @@ export async function requireAdminContext(request: NextRequest): Promise<AdminCo
         .maybeSingle();
 
       if (eventByIdError) {
-        return { ok: false, status: 500, message: `Failed to load event by id: ${eventByIdError.message}` };
+        console.error('Failed to load event by id:', eventByIdError.message);
+        return { ok: false, status: 500, message: 'Failed to load event.' };
       }
 
       eventData = eventById;
@@ -68,11 +70,8 @@ export async function requireAdminContext(request: NextRequest): Promise<AdminCo
         .limit(2);
 
       if (fallbackError) {
-        return {
-          ok: false,
-          status: 500,
-          message: `Failed to inspect fallback event context: ${fallbackError.message}`,
-        };
+        console.error('Failed to inspect fallback event context:', fallbackError.message);
+        return { ok: false, status: 500, message: 'Failed to resolve event context.' };
       }
 
       if ((fallbackEvents || []).length === 1) {
@@ -92,7 +91,8 @@ export async function requireAdminContext(request: NextRequest): Promise<AdminCo
       .maybeSingle();
 
     if (membershipError) {
-      return { ok: false, status: 500, message: `Failed to verify membership: ${membershipError.message}` };
+      console.error('Failed to verify membership:', membershipError.message);
+      return { ok: false, status: 500, message: 'Failed to verify membership.' };
     }
 
     if (!membershipData?.role) {

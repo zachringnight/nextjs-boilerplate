@@ -602,8 +602,10 @@ export async function POST(request: NextRequest) {
     ];
 
     // Agentic tool-use loop
+    const model = process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-5-20250929';
+
     let response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-5-20250929',
+      model,
       max_tokens: 1024,
       system: systemPrompt,
       tools,
@@ -628,7 +630,7 @@ export async function POST(request: NextRequest) {
       messages.push({ role: 'user', content: toolResults });
 
       response = await anthropic.messages.create({
-        model: 'claude-sonnet-4-5-20250929',
+        model,
         max_tokens: 1024,
         system: systemPrompt,
         tools,
@@ -644,7 +646,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ reply: text });
   } catch (err: unknown) {
     console.error('Chat API error:', err);
-    const errMsg = err instanceof Error ? err.message : 'Internal server error';
-    return NextResponse.json({ error: errMsg }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

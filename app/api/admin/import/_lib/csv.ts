@@ -1,7 +1,9 @@
 import { z } from 'zod';
 
+const MAX_CSV_SIZE = 5 * 1024 * 1024; // 5 MB
+
 export const importPayloadSchema = z.object({
-  csv: z.string().min(1, 'CSV content is required.'),
+  csv: z.string().min(1, 'CSV content is required.').max(MAX_CSV_SIZE, `CSV content must be under ${MAX_CSV_SIZE / 1024 / 1024} MB.`),
   dryRun: z.boolean().optional().default(true),
 });
 
