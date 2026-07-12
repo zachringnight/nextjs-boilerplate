@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Handshake, ChevronRight, type LucideIcon } from 'lucide-react';
+import { Handshake, Tv, ChevronRight, type LucideIcon } from 'lucide-react';
 
 const apps: { name: string; href: string; description: string; icon: LucideIcon; color: string }[] = [
   {
@@ -8,6 +8,13 @@ const apps: { name: string; href: string; description: string; icon: LucideIcon;
     description: 'Athlete contracts, obligations, and partnership tracking',
     icon: Handshake,
     color: '#FFD100',
+  },
+  {
+    name: 'Senior Bowl Recap',
+    href: '/senior-bowl-recap',
+    description: 'Earned media recap with TV coverage clips from the 2026 Senior Bowl',
+    icon: Tv,
+    color: '#0055BF',
   },
 ];
 
