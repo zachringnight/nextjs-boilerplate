@@ -12,12 +12,11 @@ const CLIPS = [
   { id: "clip-6", label: "Clip 6", url: "https://iqmediacorp.com/ExternalIframeMedia?mediaID=cf37449b-1474-467c-b839-b9a3edff9681&isRM=false&rawMediaType=TV&end=true" },
   { id: "clip-7", label: "Clip 7", url: "https://iqmediacorp.com/ExternalIframeMedia?mediaID=44e7993e-8d91-4fe0-a411-bae915482e6b&isRM=false&rawMediaType=TV&end=true" },
   { id: "clip-8", label: "Clip 8", url: "https://iqmediacorp.com/ExternalIframeMedia?mediaID=b32641b2-bb06-4dc0-8a36-450c88b06ba6&isRM=false&rawMediaType=TV&end=true" },
-  { id: "clip-9", label: "Clip 9", url: "https://iqmediacorp.com/ExternalIframeMedia?mediaID=b32641b2-bb06-4dc0-8a36-450c88b06ba6&isRM=false&rawMediaType=TV&end=true" },
-  { id: "clip-10", label: "Clip 10", url: "https://iqmediacorp.com/ExternalIframeMedia?mediaID=287dfd0a-5f1b-4682-ace7-96b83b97809c&isRM=false&rawMediaType=TV&end=true" },
-  { id: "clip-11", label: "Clip 11", url: "https://iqmediacorp.com/ExternalIframeMedia?mediaID=53c442aa-bc3a-48fa-bd16-95c8b0446929&isRM=false&rawMediaType=TV&end=true" },
-  { id: "clip-12", label: "Clip 12", url: "https://iqmediacorp.com/ExternalIframeMedia?mediaID=1e226e83-7df7-4c1f-a7e0-03630400b50a&isRM=false&rawMediaType=TV&end=true" },
-  { id: "clip-13", label: "Clip 13", url: "https://iqmediacorp.com/ExternalIframeMedia?mediaID=0ca38296-6dfc-45ff-a28f-22dac9689389&isRM=false&rawMediaType=TV&end=true" },
-  { id: "clip-14", label: "Clip 14", url: "https://iqmediacorp.com/ExternalIframeMedia?mediaID=9f051c63-37e3-4160-987a-32fee7e04447&isRM=false&rawMediaType=TV&end=true" },
+  { id: "clip-9", label: "Clip 9", url: "https://iqmediacorp.com/ExternalIframeMedia?mediaID=287dfd0a-5f1b-4682-ace7-96b83b97809c&isRM=false&rawMediaType=TV&end=true" },
+  { id: "clip-10", label: "Clip 10", url: "https://iqmediacorp.com/ExternalIframeMedia?mediaID=53c442aa-bc3a-48fa-bd16-95c8b0446929&isRM=false&rawMediaType=TV&end=true" },
+  { id: "clip-11", label: "Clip 11", url: "https://iqmediacorp.com/ExternalIframeMedia?mediaID=1e226e83-7df7-4c1f-a7e0-03630400b50a&isRM=false&rawMediaType=TV&end=true" },
+  { id: "clip-12", label: "Clip 12", url: "https://iqmediacorp.com/ExternalIframeMedia?mediaID=0ca38296-6dfc-45ff-a28f-22dac9689389&isRM=false&rawMediaType=TV&end=true" },
+  { id: "clip-13", label: "Clip 13", url: "https://iqmediacorp.com/ExternalIframeMedia?mediaID=9f051c63-37e3-4160-987a-32fee7e04447&isRM=false&rawMediaType=TV&end=true" },
 ];
 
 type Clip = (typeof CLIPS)[number];
