@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
+import Link from "next/link";
 
 const CLIPS = [
   { id: "clip-1", label: "Clip 1", url: "https://iqmediacorp.com/ExternalIframeMedia?mediaID=0c851955-e04a-48cb-aabd-9bd803ba90de&isRM=false&rawMediaType=TV&end=true" },
@@ -66,7 +67,7 @@ export default function SeniorBowlRecap() {
               Earned Media Recap &middot; {CLIPS.length} Segments
             </p>
           </div>
-          <a
+          <Link
             href="/"
             className="text-sm text-white/40 hover:text-white/70 transition-colors flex items-center gap-1.5"
           >
@@ -74,7 +75,7 @@ export default function SeniorBowlRecap() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
             Back to site
-          </a>
+          </Link>
         </div>
       </header>
 
